@@ -9,13 +9,16 @@ const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 
 module.exports = {
   entry: {
-    index: "./src/index.js",
+    index: ['babel-polyfill',"./src/index.js"],
+    // app: ['babel-polyfill',"./src/index.js"],
+    // index: "./src/index.js",
   },
   watch: true,
   devtool: "source-map",
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist/static"),
+    publicPath:"/static/"
   },
   module: {
     rules: [
@@ -40,8 +43,9 @@ module.exports = {
   devServer: {
     port: 3000,
     contentBase: path.resolve(__dirname, "dist"),
-    publicPath: "/",
-    hot: true,
+    publicPath: "/static/",
+    //hot: true,
+    watchContentBase: true
   },
   plugins: [HTMLWebpackPluginConfig],
   mode: "development",
