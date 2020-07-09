@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -7,7 +8,15 @@ class CustomUser(AbstractUser):
     nickname = models.CharField(blank=True, max_length=120)
     intro = models.CharField(blank=True, max_length=800)
     avatar = models.ImageField(upload_to='avatar', default='default.jpg')
-
+    # map_like = ArrayField(models.IntegerField(blank=True))
+    # map_add = ArrayField(models.IntegerField(blank=True))
+    # map_comment = ArrayField(models.IntegerField(blank=True))
+    # activity_like = ArrayField(models.IntegerField(blank=True))
+    # activity_add = ArrayField(models.IntegerField(blank=True))
+    # group_joined = ArrayField(models.IntegerField(blank=True))
+    # article_like = ArrayField(models.IntegerField(blank=True))
+    # article_add = ArrayField(models.IntegerField(blank=True))
+    
 # class SocialAccount(models.Model):
 #     provider = models.CharField(max_length=200, default='google')
 #     user = models.ForeignKey(

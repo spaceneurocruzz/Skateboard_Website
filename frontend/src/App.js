@@ -5,7 +5,7 @@ import User from "./Pages/User";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
 import Home from "./Pages/Home";
-import Map from "./Pages/Map";
+import Guidemap from "./Pages/Guidemap";
 import Calendar from "./Pages/Calendar";
 import Friends from "./Pages/Friends";
 import Discussion from "./Pages/Discussion";
@@ -113,7 +113,7 @@ const App = () => {
         <div className="nav">
           <ul className="nav-link">
             <li className="nav-link-item">
-              <Link to="/map" className="link">
+              <Link to="/guidemap" className="link">
                 地圖
               </Link>
             </li>
@@ -170,6 +170,12 @@ const App = () => {
 
       <Switch>
         <Route exact path="/" render={() => <Home />} />
+        <Route
+          exact
+          path={"/guidemap"}
+          key={"route-guidemap"}
+          render={() => <Guidemap />}
+        />
         <Route
           exact
           path={"/user"}

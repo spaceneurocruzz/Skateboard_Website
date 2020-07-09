@@ -85,8 +85,8 @@ const Signup = () => {
       ...authData,
       [event.target.name]: event.target.value,
       isUsernameFilled:false,
-    isEmailFilled:false,
-    isPasswordValid:false
+      isEmailFilled:false,
+      isPasswordValid:false
     });
 
     if(event.target.name == 'username' && event.target.value.length == 0)
@@ -122,7 +122,6 @@ const Signup = () => {
         isEmailFilled: true,
       });
     }
-    
   };
 
   const handleSubmit = (e) => {
