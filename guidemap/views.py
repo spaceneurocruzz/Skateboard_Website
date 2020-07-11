@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status, permissions, generics, viewsets
 from rest_framework.response import Response
@@ -7,17 +8,25 @@ from rest_framework.generics import UpdateAPIView
 from .serializers import GuideMapSerializer, GuideMapCommentsSerializer
 from .models import GuideMap
 from .models import GuideMapComments
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 
 class GuideMapViewSet(viewsets.ModelViewSet):
     # permission_classes = (IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
     queryset = GuideMap.objects.all()
     serializer_class = GuideMapSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ['location_type', 'modified_user']
 
 class GuideMapCommentsViewSet(viewsets.ModelViewSet):
     # permission_classes = (IsAuthenticated,)
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
     queryset = GuideMapComments.objects.all()
     serializer_class = GuideMapCommentsSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ['map_id', 'username']
 
 # class GuideMapGet(APIView):
 #     permission_classes = (permissions.AllowAny,)

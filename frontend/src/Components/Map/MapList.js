@@ -1,17 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 import Grid from "@material-ui/core/Grid";
-import { Card, CardActions, CardContent, CardMedia } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
-import Chip from "@material-ui/core/Chip";
-import FaceIcon from "@material-ui/icons/Face";
-import DoneIcon from "@material-ui/icons/Done";
-import Avatar from "@material-ui/core/Avatar";
+import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import TagFacesIcon from "@material-ui/icons/TagFaces";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
-import TaiwanMapJson from "../../Data/TaiwanMap.json";
 import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
@@ -23,13 +16,13 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import PropTypes from "prop-types";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Tooltip from "@material-ui/core/Tooltip";
-
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import TablePagination from "@material-ui/core/TablePagination";
-import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+
+import TaiwanMapJson from "../../Data/TaiwanMap.json";
 
 const useRowStyles = makeStyles({
   root: {
@@ -88,9 +81,29 @@ const MapList = () => {
   const [city, setCity] = useState("臺北市");
   const [district, setDistrict] = useState("中正區");
   const [locationType, setLocationType] = useState({ key: 2, label: "全部" });
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [response, setResponse] = useState(null);
+  const initialState = [
+    {
+      location_name: "",
+      location_type: "",
+      latitude: null,
+      longitude: null,
+      address: "",
+      traffic: "",
+      openhours: null,
+      phone: "",
+      rating: null,
+      create_dt: null,
+      update_dt: null,
+      modified_user: "",
+    },
+  ];
+
+  const [dbData, setDbdata] = useState([]);
+  const [location_name, setlocation_name] = useState("");
+  const [rows, setRows] = useState([]);
   const [chipData, setChipData] = useState([
     { key: 0, label: "滑板場" },
     { key: 1, label: "店家" },
@@ -101,6 +114,19 @@ const MapList = () => {
     { key: 1, label: "店家" },
     { key: 2, label: "全部" },
   ];
+
+  useEffect(() => {
+    axios
+      .get(`api/map/guideMap/`)
+      .then((res) => {
+        console.log(res.data);
+        setDbdata(...dbData, res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
 
   const selectedArea = () => {
     const selectedCity = TaiwanMapJson.filter((c) => c.CityName === city);
@@ -136,39 +162,6 @@ const MapList = () => {
     setPage(0);
   };
 
-  const rows = [
-    createData("Frozen yoghurt", 159, 6.0, 24, 4.0, 3.99),
-    createData("Ice cream sandwich", 237, 9.0, 37, 4.3, 4.99),
-    createData("Eclair", 262, 16.0, 24, 6.0, 3.79),
-    createData("Cupcake", 305, 3.7, 67, 4.3, 2.5),
-    createData("Gingerbread", 356, 16.0, 49, 3.9, 1.5),
-    createData("Frozen yoghurt1", 159, 6.0, 24, 4.0, 3.99),
-    createData("Ice cream sandwich1", 237, 9.0, 37, 4.3, 4.99),
-    createData("Eclair1", 262, 16.0, 24, 6.0, 3.79),
-    createData("Cupcake1", 305, 3.7, 67, 4.3, 2.5),
-    createData("Gingerbread1", 356, 16.0, 49, 3.9, 1.5),
-    createData("Frozen yoghurt2", 159, 6.0, 24, 4.0, 3.99),
-    createData("Ice cream sandwich2", 237, 9.0, 37, 4.3, 4.99),
-    createData("Eclair2", 262, 16.0, 24, 6.0, 3.79),
-    createData("Cupcake2", 305, 3.7, 67, 4.3, 2.5),
-    createData("Gingerbread2", 356, 16.0, 49, 3.9, 1.5),
-  ];
-
-  function createData(name, calories, fat, carbs, protein, price) {
-    return {
-      name,
-      calories,
-      fat,
-      carbs,
-      protein,
-      price,
-      history: [
-        { date: "2020-01-05", customerId: "11091700", amount: 3 },
-        { date: "2020-01-02", customerId: "Anonymous", amount: 1 },
-      ],
-    };
-  }
-
   const DropdownFilter = (props) => {
     return (
       <>
@@ -198,7 +191,7 @@ const MapList = () => {
           )}
         />
         <Autocomplete
-          id="country-select-demo"
+          id="country-select-demo2"
           style={{ width: 300, marginBottom: 20 }}
           options={selectedArea()}
           classes={{
@@ -213,7 +206,7 @@ const MapList = () => {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="場地種類"
+              label="鄉鎮市區"
               variant="outlined"
               inputProps={{
                 ...params.inputProps,
@@ -223,7 +216,7 @@ const MapList = () => {
           )}
         />
         <Autocomplete
-          id="country-select-demo"
+          id="country-select-demo3"
           style={{ width: 200, marginBottom: 20 }}
           options={locationTypeList}
           classes={{
@@ -254,9 +247,11 @@ const MapList = () => {
   };
 
   const InnerRow = (props) => {
-    const { row } = props;
+    const { row, no } = props;
     const [open, setOpen] = useState(false);
     const classes = useRowStyles();
+
+    const openhoursJson = dbData[no].openhours;
 
     return (
       <React.Fragment>
@@ -271,17 +266,17 @@ const MapList = () => {
             </IconButton>
           </TableCell>
           <TableCell align="left" style={{ minWidth: 100 }}>
-            {row.name}
+            {row.location_name}
           </TableCell>
 
           <TableCell align="left" style={{ minWidth: 200 }}>
-            {row.calories}
+            {row.address}
           </TableCell>
           <TableCell align="left" style={{ minWidth: 100 }}>
-            {row.fat}
+            {row.rating}
           </TableCell>
           <TableCell align="left" style={{ minWidth: 100 }}>
-            {row.carbs}
+            {row.x}
           </TableCell>
         </TableRow>
         <TableRow className={classes.boxText}>
@@ -300,35 +295,11 @@ const MapList = () => {
                 </Box>
                 <Box p={1} bgcolor="grey.300">
                   <ListItemText
-                    primary="星期日 09:00-21:00"
+                    primary={`平日: ${openhoursJson["weekdayTimeStart"]}- ${openhoursJson["weekdayTimeEnd"]}`}
                     classes={{ primary: classes.listItemText }}
                   />
                   <ListItemText
-                    primary="星期一 09:00-21:00"
-                    classes={{ primary: classes.listItemText }}
-                  />
-                  <ListItemText
-                    primary="星期一 09:00-21:00"
-                    classes={{ primary: classes.listItemText }}
-                  />
-                  <ListItemText
-                    primary="星期二 09:00-21:00"
-                    classes={{ primary: classes.listItemText }}
-                  />
-                  <ListItemText
-                    primary="星期三 09:00-21:00"
-                    classes={{ primary: classes.listItemText }}
-                  />
-                  <ListItemText
-                    primary="星期四 09:00-21:00"
-                    classes={{ primary: classes.listItemText }}
-                  />
-                  <ListItemText
-                    primary="星期五 09:00-21:00"
-                    classes={{ primary: classes.listItemText }}
-                  />
-                  <ListItemText
-                    primary="星期六 09:00-21:00"
+                    primary={`假日與例假日: ${openhoursJson["weekendTimeStart"]}- ${openhoursJson["weekendTimeEnd"]}`}
                     classes={{ primary: classes.listItemText }}
                   />
                 </Box>
@@ -344,14 +315,14 @@ const MapList = () => {
                   <Box p={1} bgcolor="grey.300">
                     建議交通方式
                     <ListItemText
-                      primary="開車往"
+                      primary={`${dbData[no].traffic}`}
                       classes={{ primary: classes.listItemText }}
                     />
                   </Box>
                   <Box p={1} bgcolor="grey.300">
                     介紹
                     <ListItemText
-                      primary="是滑板好地方"
+                      primary={`${dbData[no].intro}`}
                       classes={{ primary: classes.listItemText }}
                     />
                   </Box>
@@ -364,24 +335,6 @@ const MapList = () => {
     );
   };
 
-  InnerRow.propTypes = {
-    row: PropTypes.shape({
-      calories: PropTypes.number.isRequired,
-      carbs: PropTypes.number.isRequired,
-      fat: PropTypes.number.isRequired,
-      history: PropTypes.arrayOf(
-        PropTypes.shape({
-          amount: PropTypes.number.isRequired,
-          customerId: PropTypes.string.isRequired,
-          date: PropTypes.string.isRequired,
-        })
-      ).isRequired,
-      name: PropTypes.string.isRequired,
-      price: PropTypes.number.isRequired,
-      protein: PropTypes.number.isRequired,
-    }).isRequired,
-  };
-  
   return (
     <div className={classes.root}>
       <Grid container>
@@ -429,10 +382,10 @@ const MapList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {dbData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <InnerRow key={row.name} row={row} />
+              .map((row, index) => (
+                <InnerRow key={index} row={row} no={index} />
               ))}
           </TableBody>
         </Table>

@@ -132,13 +132,13 @@ const App = () => {
                 技術交流
               </Link>
             </li>
-            {/* {state.isAuthenticated && */}
+            {state.isAuthenticated &&
             <li className="nav-link-item">
               <Link to="/user" className="link">
                 會員中心
               </Link>
             </li>
-            {/* } */}
+            }
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
@@ -175,6 +175,12 @@ const App = () => {
           path={"/guidemap"}
           key={"route-guidemap"}
           render={() => <Guidemap />}
+        />
+        <Route
+          exact
+          path={"/friends"}
+          key={"route-friends"}
+          render={() => <Friends />}
         />
         <Route
           exact

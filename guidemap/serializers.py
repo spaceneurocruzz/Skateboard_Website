@@ -35,17 +35,18 @@ class GuideMapSerializer(serializers.ModelSerializer):
                   'modified_user',
                   )
 
-    def create(self, validated_data):
-        return GuideMap.objects.create(**validated_data)
+    # def create(self, validated_data):
+    #     return GuideMap.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
+    #     instance.save()
+    #     return instance
 
 
 class GuideMapCommentsSerializer(serializers.ModelSerializer):
+    map_id = serializers.PrimaryKeyRelatedField(queryset=GuideMap.objects.all())
     comment = serializers.CharField(max_length=500)
     username = serializers.CharField(max_length=120)
     create_dt = serializers.DateTimeField()
@@ -60,11 +61,11 @@ class GuideMapCommentsSerializer(serializers.ModelSerializer):
                   'update_dt',
                   )
 
-    def create(self, validated_data):
-        return GuideMapComments.objects.create(**validated_data)
+    # def create(self, validated_data):
+    #     return GuideMapComments.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
+    #     instance.save()
+    #     return instance

@@ -84,8 +84,6 @@ const User = () => {
     if (event.target.name == "password") {
       setPassword(event.target.value);
     }
-
-    console.log(dbData);
   };
 
   useEffect(() => {
@@ -94,6 +92,7 @@ const User = () => {
       .then((res) => {
         console.table(res.data);
         setDbdata(res.data);
+        console.table(dbData);
       })
       .catch((error) => {
         console.error(error);

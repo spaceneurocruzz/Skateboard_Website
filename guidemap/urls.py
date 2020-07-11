@@ -11,6 +11,6 @@ router.register(r'guideMap', views.GuideMapViewSet)
 router.register(r'guideMapComments', views.GuideMapCommentsViewSet)
 
 urlpatterns = [
-    url(r'^guideMap/', include(router.urls)),
-    url(r'^guideMapComments/', include(router.urls))
+    url(r'^map/', include(router.urls)),
+    # url(r'^guideMapComments/', include(router.urls))
 ]

@@ -1,10 +1,8 @@
-import React, { useState, Fragment } from "react";
-import Container from "@material-ui/core/Container";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import React, { useState } from "react";
+import axios from "axios";
+
+import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import { Map, GoogleApiWrapper } from "google-maps-react";
-import GoogleMapReact from "google-map-react";
-import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Grid from "@material-ui/core/Grid";
@@ -13,7 +11,6 @@ import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
-  KeyboardDatePicker,
 } from "@material-ui/pickers";
 import Dialog from "@material-ui/core/Dialog";
 import TextField from "@material-ui/core/TextField";
@@ -21,14 +18,8 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
-
 import MuiPhoneNumber from "material-ui-phone-number";
-
-import MuiDialogActions from "@material-ui/core/DialogActions";
-
-// import Card, { CardActions, CardContent, CardMedia } from '@material-ui/Card';
-// import Typography from '@material-ui/Typography';
+import AddLocationIcon from "@material-ui/icons/AddLocation";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
     },
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
-      // width: "25ch",
     },
   },
   modal: {
@@ -51,12 +41,10 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     backgroundColor: theme.palette.background.paper,
-    border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
   },
   button: {
-    // color: blue[900],
     margin: 10,
     paddingTop: 20,
   },
@@ -67,25 +55,75 @@ const useStyles = makeStyles((theme) => ({
     height: 0,
     paddingTop: "56.25%",
   },
+  chips: {
+    display: "flex",
+    flexWrap: "wrap",
+  },
+  chip: {
+    margin: 2,
+  },
+  buttonAdd: {
+    margin: theme.spacing(1),
+  },
 }));
 
 const MapModalInput = (props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("park");
-  const [phone, setPhone] = useState();
+  const [input, setInput] = useState({
+    location_type: "park",
+    location_name: "",
+    address: "",
+    latitude: 0,
+    longitude: 0,
+    traffic: "",
+    intro: "",
+    create_dt: new Date().toISOString(),
+    update_dt: new Date().toISOString(),
+    modified_user: "admin",
+  });
 
-  // const [selectedDate, handleDateChange] = useState(new Date());
-  const [selectedDate, setSelectedDate] = React.useState(
+  const [phone, setPhone] = useState();
+  const [weekdayTimeStart, setWeekdayTimeStart] = useState(
     new Date("2014-08-18T21:11:54")
   );
+  const [weekdayTimeEnd, setWeekdayTimeEnd] = useState(
+    new Date("2014-08-18T21:11:54")
+  );
+  const [weekendTimeStart, setWeekendTimeStart] = useState(
+    new Date("2014-08-18T21:11:54")
+  );
+  const [weekendTimeEnd, setWeekendTimeEnd] = useState(
+    new Date("2014-08-18T21:11:54")
+  );
+  const [pickWeekTime, setPickWeekTime] = useState([<PickWeekTime />]);
+  let dbPost;
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
+  const handleWeekdayTimeStartChange = (event) => {
+    setWeekdayTimeStart(event);
   };
 
-  const handleChange = (event) => {
-    setValue(event.target.value);
+  const handleWeekdayTimeEndChange = (event) => {
+    setWeekdayTimeEnd(event);
+  };
+
+  const handleWeekendTimeStartChange = (event) => {
+    setWeekendTimeStart(event);
+  };
+
+  const handleWeekendTimeEndChange = (event) => {
+    setWeekendTimeEnd(event);
+  };
+
+  const handleInputChange = (event) => {
+    setInput({
+      ...input,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleInputPhoneChange = (value) => {
+    setPhone(value);
   };
 
   const handleOpen = () => {
@@ -96,30 +134,125 @@ const MapModalInput = (props) => {
     setOpen(false);
   };
 
-  const handleOnChange = (value) => {
-    setPhone(value);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit");
-    // axios
-    //   .patch(`api/user/update/username=${state.username}`, dbData)
-    //   .then((res) => {
-    //     console.table(dbData);
-    //     console.table(res.data);
-    //     alert("更新成功！");
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   })
-    //   .finally(() => {});
+
+    dbPost = input;
+    dbPost["phone"] = phone;
+    dbPost["openhours"] = {
+      weekdayTimeStart: weekdayTimeStart.toLocaleTimeString(),
+    };
+    dbPost["openhours"] = {
+      weekdayTimeEnd: weekdayTimeEnd.toLocaleTimeString(),
+    };
+    dbPost["openhours"] = {
+      weekendTimeStart: weekendTimeStart.toLocaleTimeString(),
+    };
+    dbPost["openhours"] = {
+      weekendTimeEnd: weekendTimeEnd.toLocaleTimeString(),
+    };
+    dbPost["create_dt"] = new Date();
+    dbPost["update_dt"] = new Date();
+    console.log(input);
+
+    axios
+      .post(`api/map/guideMap/`, dbPost)
+      .then((res) => {
+        console.table(dbPost);
+        console.table(res.data);
+        alert("更新成功！");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
+
+  const PickWeekTime = () => {
+    return (
+      <Grid container>
+        <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
+          開放時間
+        </Grid>
+        <FormControl className={classes.formControl}>
+          <div className={classes.flexContainer}>
+            <div style={{ marginRight: 20, paddingRight: 70 }}>平日</div>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <Grid container>
+                <KeyboardTimePicker
+                  style={{ width: 150 }}
+                  margin="normal"
+                  label="開始"
+                  name="weekdayTimeStart"
+                  value={weekdayTimeStart}
+                  onChange={handleWeekdayTimeStartChange}
+                  KeyboardButtonProps={{
+                    "aria-label": "change time",
+                  }}
+                />
+                <KeyboardTimePicker
+                  style={{ width: 150 }}
+                  margin="normal"
+                  label="結束"
+                  name="weekdayTimeEnd"
+                  value={weekdayTimeEnd}
+                  onChange={handleWeekdayTimeEndChange}
+                  KeyboardButtonProps={{
+                    "aria-label": "change time",
+                  }}
+                />
+              </Grid>
+            </MuiPickersUtilsProvider>
+          </div>
+          <div className={classes.flexContainer}>
+            <div style={{ marginRight: 20, paddingRight: 20 }}>
+              假日與例假日
+            </div>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <Grid container justify="space-around">
+                <KeyboardTimePicker
+                  style={{ width: 150 }}
+                  margin="normal"
+                  label="開始"
+                  name="weekendTimeStart"
+                  value={weekendTimeStart}
+                  onChange={handleWeekendTimeStartChange}
+                  KeyboardButtonProps={{
+                    "aria-label": "change time",
+                  }}
+                />
+                <KeyboardTimePicker
+                  style={{ width: 150 }}
+                  margin="normal"
+                  label="結束"
+                  name="weekendTimeEnd"
+                  value={weekendTimeEnd}
+                  onChange={handleWeekendTimeEndChange}
+                  KeyboardButtonProps={{
+                    "aria-label": "change time",
+                  }}
+                />
+              </Grid>
+            </MuiPickersUtilsProvider>
+          </div>
+        </FormControl>
+      </Grid>
+    );
   };
 
   return (
     <>
       <Grid container>
-        <Button onClick={handleOpen}>新增地點</Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.buttonAdd}
+          onClick={handleOpen}
+          startIcon={<AddLocationIcon />}
+        >
+          新增地點
+        </Button>
       </Grid>
       <Dialog
         aria-labelledby="transition-modal-title"
@@ -133,25 +266,20 @@ const MapModalInput = (props) => {
           timeout: 500,
         }}
       >
-        {/* <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Modal title
-        </DialogTitle> */}
         <Fade in={open}>
           <>
             <h3 id="transition-modal-title">來新增滑板場或店家吧！</h3>
-
             <div className={classes.paper}>
               <form className={classes.root} noValidate autoComplete="off">
                 <Grid container>
                   <Grid container>
                     <FormControl component="fieldset">
-                      {/* <FormLabel component="legend">Gender</FormLabel> */}
                       <RadioGroup
+                        onChange={handleInputChange}
                         row
                         aria-label="gender"
-                        name="gender1"
-                        value={value}
-                        onChange={handleChange}
+                        name="location_type"
+                        value={input.locationType}
                       >
                         <FormControlLabel
                           value="park"
@@ -168,10 +296,11 @@ const MapModalInput = (props) => {
                   </Grid>
                   <Grid container>
                     <TextField
+                      onChange={handleInputChange}
                       size="small"
                       required
-                      id="filled-required"
-                      name="nickname"
+                      id="location_name"
+                      name="location_name"
                       label="名稱"
                       variant="filled"
                       style={{ width: 300 }}
@@ -179,65 +308,34 @@ const MapModalInput = (props) => {
                   </Grid>
                   <Grid container>
                     <TextField
+                      onChange={handleInputChange}
                       size="small"
                       required
-                      id="filled-required"
-                      name="nickname"
+                      id="address"
+                      name="address"
                       label="地址"
                       variant="filled"
                       fullWidth
                     />
                   </Grid>
-
-                  <Grid container>
-                    開放時間
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                      <Grid container justify="space-around">
-                        <KeyboardTimePicker
-                          margin="normal"
-                          id="time-picker"
-                          label="開始"
-                          value={selectedDate}
-                          onChange={handleDateChange}
-                          KeyboardButtonProps={{
-                            "aria-label": "change time",
-                          }}
-                        />
-                        <KeyboardTimePicker
-                          margin="normal"
-                          id="time-picker"
-                          label="結束"
-                          value={selectedDate}
-                          onChange={handleDateChange}
-                          KeyboardButtonProps={{
-                            "aria-label": "change time",
-                          }}
-                        />
-                      </Grid>
-                    </MuiPickersUtilsProvider>
-                  </Grid>
-                  <Grid container>
-                    {/* <TextField
-                    type="number"
-                      size="small"
-                      id="filled-required"
-                      name="nickname"
-                      label="電話"
-                      variant="filled"
-                      style={{ width: 300 }}
-                    /> */}
+                  {/* {pickWeekTime} */}
+                  {pickWeekTime.map((item, index) => (
+                    <PickWeekTime key={index} id={index} />
+                  ))}
+                  <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
                     電話:{" "}
                     <MuiPhoneNumber
                       defaultCountry={"tw"}
-                      onChange={handleOnChange}
+                      onChange={handleInputPhoneChange}
                     />
                   </Grid>
                   <Grid container>
                     <TextField
+                      onChange={handleInputChange}
                       size="small"
-                      id="filled-search"
+                      id="traffic"
                       label="建議交通方式"
-                      name="location"
+                      name="traffic"
                       variant="filled"
                       multiline
                       fullWidth
@@ -246,10 +344,11 @@ const MapModalInput = (props) => {
                   </Grid>
                   <Grid container>
                     <TextField
+                      onChange={handleInputChange}
                       size="small"
-                      id="filled-search"
+                      id="intro"
                       label="場地介紹"
-                      name="location"
+                      name="intro"
                       variant="filled"
                       multiline
                       fullWidth

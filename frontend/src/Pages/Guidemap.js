@@ -1,21 +1,16 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
+
 import Container from "@material-ui/core/Container";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import { Map, GoogleApiWrapper } from "google-maps-react";
-import GoogleMapReact from "google-map-react";
+import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import { Card, CardActions, CardContent, CardMedia } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
-
-import MapMarker from "../Components/Map/MapMarker";
-import MapModalInput from "../Components/Map/MapModalInput";
-import MapInfoWindow from "../Components/Map/MapInfoWindow";
-import MapList from "../Components/Map/MapList";
-
 import Paper from "@material-ui/core/Paper";
 import TagFacesIcon from "@material-ui/icons/TagFaces";
 import Chip from "@material-ui/core/Chip";
+
+import MapModalInput from "../Components/Map/MapModalInput";
+import MapList from "../Components/Map/MapList";
 import skateboardMarker from "../imgs/skateboardMarker.png";
 
 const useStyles = makeStyles((theme) => ({
@@ -71,10 +66,25 @@ const AnyReactComponent = ({ text }) => <div>{text}</div>;
 const Guidemap = (props) => {
   const classes = useStyles();
   const [marker, showMarker] = useState(false);
+  const [place, setPlace] = useState(0);
   const [chipData, setChipData] = React.useState([
     { key: 0, label: "滑板場" },
     { key: 1, label: "店家" },
   ]);
+
+  const [dbData, setDbdata] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`api/map/guideMap/`)
+      .then((res) => {
+        setDbdata(...dbData, res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -85,37 +95,33 @@ const Guidemap = (props) => {
     );
   };
 
-  const handleApiLoaded = (map, maps) => {
-    // use map and maps objects
-    console.log("載入完成!"); // 印出「載入完成」
+  const [state, setState] = useState({
+    activeMarker: {},
+    selectedPlace: {},
+    showingInfoWindow: false,
+  });
+
+  const onMarkerClick = (props, marker) =>
+    setState({
+      activeMarker: marker,
+      selectedPlace: props,
+      showingInfoWindow: true,
+    });
+
+  const onInfoWindowClose = () =>
+    setState({
+      activeMarker: null,
+      showingInfoWindow: false,
+    });
+
+  const onMapClicked = () => {
+    if (state.showingInfoWindow)
+      setState({
+        activeMarker: null,
+        showingInfoWindow: false,
+      });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("submit");
-    axios
-      .patch(`api/user/update/username=${state.username}`, dbData)
-      .then((res) => {
-        console.table(dbData);
-        console.table(res.data);
-        alert("更新成功！");
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {});
-  };
-
-  const _onChildClick = () => {
-    showMarker(!marker);
-  };
-  // _onChildClick = (key, childProps) => {
-  //   const markerId = childProps.marker.get('id');
-  //   const index = this.props.markers.findIndex(m => m.get('id') === markerId);
-  //   if (this.props.onChildClick) {
-  //     this.props.onChildClick(index);
-  //   }
-  // }
   const LocationFilter = () => {
     return (
       <Paper component="ul" className={classes.root}>
@@ -142,53 +148,52 @@ const Guidemap = (props) => {
     );
   };
 
-  const SBMarker = ({ icon, text }) => (
-    <div>
-      <img style={{ height: "30px", width: "30px" }} src={skateboardMarker} />
-      <div>{text}</div>
-    </div>
-  );
-
   return (
-    <Container component="main" maxWidth="md">
+    <Container component="main" maxWidth="lg">
       <Grid container>
         <MapModalInput />
-        <LocationFilter />
+        {/* <LocationFilter /> */}
+      </Grid>
+      <Grid container>
         <div style={{ height: "100vh", width: "100%" }}>
-          <GoogleMapReact
-            onChildClick={_onChildClick}
-            bootstrapURLKeys={{
-              key: "AIzaSyB7KldR4x33szhmh1Q8Vit9YynpWfvcOOs",
+          <Map
+            className="map"
+            google={props.google}
+            initialCenter={{
+              lat: 25.04,
+              lng: 121.51,
             }}
-            defaultCenter={props.center}
-            defaultZoom={props.zoom}
-            yesIWantToUseGoogleMapApiInternals
-            onGoogleApiLoaded={({ map, maps }) => handleApiLoaded(map, maps)}
+            onClick={onMapClicked}
+            zoom={13}
           >
-            <SBMarker
-              lat={25.04}
-              lng={121.512}
-              name="hello"
-              color="red"
-              show={marker}
-            />
+            {dbData.map((data, index) => (
+              <Marker
+                key={index}
+                name={data.location_name}
+                position={{ lat: data.latitude, lng: data.longitude }}
+                onClick={onMarkerClick}
+              />
+            ))}
 
-            {/* <AnyReactComponent lat={25.04} lng={121.512} text="My Marker" /> */}
-            <MapInfoWindow show={marker} />
-          </GoogleMapReact>
+            <InfoWindow
+              marker={state.activeMarker}
+              onClose={onInfoWindowClose}
+              visible={state.showingInfoWindow}
+            >
+              <div>
+                <h4>{state.selectedPlace.name}</h4>
+              </div>
+            </InfoWindow>
+          </Map>
         </div>
       </Grid>
-      <MapList />
+      <Grid container>
+        <MapList />
+      </Grid>
     </Container>
   );
 };
 
-Guidemap.defaultProps = {
-  center: {
-    lat: 25.04,
-    lng: 121.5,
-  },
-  zoom: 15,
-};
-
-export default Guidemap;
+export default GoogleApiWrapper({
+  apiKey: "AIzaSyB7KldR4x33szhmh1Q8Vit9YynpWfvcOOs",
+})(Guidemap);
