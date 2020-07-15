@@ -49,7 +49,7 @@ class GuideMapSerializer(serializers.ModelSerializer):
 
 class GuideMapCommentsSerializer(serializers.ModelSerializer):
     map_id = serializers.PrimaryKeyRelatedField(queryset=GuideMap.objects.all())
-    commentTitle = serializers.CharField(max_length=50)
+    comment_title = serializers.CharField(max_length=50)
     comment = serializers.CharField(max_length=500)
     username = serializers.CharField(max_length=120)
     create_dt = serializers.DateTimeField()
@@ -58,7 +58,7 @@ class GuideMapCommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuideMapComments
         fields = ('map_id',
-                  'commentTitle',
+                  'comment_title',
                   'comment',
                   'rating',
                   'username',

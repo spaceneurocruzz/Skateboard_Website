@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../axiosApi";
-import axios from "axios";
+import { getUserApi, patchUserApi } from "../axiosApi";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { AuthContext } from "../App";
@@ -34,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   button: {
     // color: blue[900],
     margin: 10,
-    paddingTop: 20
+    paddingTop: 20,
   },
   input: {
     display: "none",
@@ -87,8 +86,7 @@ const User = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`api/user/get/username=${state.username}`)
+    getUserApi(state.username)
       .then((res) => {
         console.table(res.data);
         setDbdata(res.data);
@@ -109,18 +107,18 @@ const User = () => {
     // form_data.append("content", state.username);
     //form_data.append("_method", 'PATCH');
 
-    axios
-      .patch(`api/user/update/username=${state.username}`, form_data, {
-        headers: {
-          "content-type": "multipart/form-data",
-          //"application/x-www-form-urlencoded"
-        },
-      })
-      .then((res) => {
-        // console.log(img.selectedFile[0]);
-        console.log(res.data);
-      })
-      .catch((err) => console.log(err));
+    // axios
+    //   .patch(`api/user/update/username=${state.username}`, form_data, {
+    //     headers: {
+    //       "content-type": "multipart/form-data",
+    //       //"application/x-www-form-urlencoded"
+    //     },
+    //   })
+    //   .then((res) => {
+    //     // console.log(img.selectedFile[0]);
+    //     console.log(res.data);
+    //   })
+    //   .catch((err) => console.log(err));
   };
 
   const handleUploadClick = (event) => {
@@ -151,8 +149,7 @@ const User = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(img);
-    axios
-      .patch(`api/user/update/username=${state.username}`, dbData)
+    patchUserApi(state.username, dbData)
       .then((res) => {
         console.table(dbData);
         console.table(res.data);

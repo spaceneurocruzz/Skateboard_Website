@@ -36,14 +36,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
                   'intro',
                   'nickname',
                   'avatar',
-                  "map_like",
-                  "map_add",
-                  "map_comment",
-                  "activity_like",
-                  "activity_add",
-                  "group_joined",
-                  "article_like",
-                  "article_add",
+                #   "map_like",
+                #   "map_add",
+                #   "map_comment",
+                #   "activity_like",
+                #   "activity_add",
+                #   "group_joined",
+                #   "article_like",
+                #   "article_add",
                   )
         extra_kwargs = {'password': {'write_only': True}}
 

@@ -11,7 +11,7 @@ import Friends from "./Pages/Friends";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance from "./axiosApi";
+import axiosInstance, {logoutApi} from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 
 import Button from "@material-ui/core/Button";
@@ -59,8 +59,7 @@ const App = () => {
   const history = useHistory();
 
   const handleLogout = () => {
-    axiosInstance
-      .post("/blacklist/", {
+    logoutApi({
         refresh_token: localStorage.getItem("refresh_token"),
       })
       .then(() => {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { postGuidemapApi } from "../../axiosApi";
+import { AuthContext } from "../../App";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -20,6 +21,8 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import MuiPhoneNumber from "material-ui-phone-number";
 import AddLocationIcon from "@material-ui/icons/AddLocation";
+import Geocode from "react-geocode";
+import { blueGrey } from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
+    paddingBottom: 20,
   },
   button: {
     margin: 10,
@@ -68,10 +72,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MapModalInput = (props) => {
+  const { state } = React.useContext(AuthContext);
+  Geocode.setApiKey("AIzaSyB7KldR4x33szhmh1Q8Vit9YynpWfvcOOs");
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState({
-    location_type: "park",
+    location_type: "場地",
     location_name: "",
     address: "",
     latitude: 0,
@@ -80,24 +86,23 @@ const MapModalInput = (props) => {
     intro: "",
     create_dt: new Date().toISOString(),
     update_dt: new Date().toISOString(),
-    modified_user: "admin",
+    modified_user: state.username,
   });
 
   const [phone, setPhone] = useState();
   const [weekdayTimeStart, setWeekdayTimeStart] = useState(
-    new Date("2014-08-18T21:11:54")
+    new Date("2014-08-18T09:00:00")
   );
   const [weekdayTimeEnd, setWeekdayTimeEnd] = useState(
-    new Date("2014-08-18T21:11:54")
+    new Date("2014-08-18T21:00:00")
   );
   const [weekendTimeStart, setWeekendTimeStart] = useState(
-    new Date("2014-08-18T21:11:54")
+    new Date("2014-08-18T09:00:00")
   );
   const [weekendTimeEnd, setWeekendTimeEnd] = useState(
-    new Date("2014-08-18T21:11:54")
+    new Date("2014-08-18T21:00:00")
   );
   const [pickWeekTime, setPickWeekTime] = useState([<PickWeekTime />]);
-  let dbPost;
 
   const handleWeekdayTimeStartChange = (event) => {
     setWeekdayTimeStart(event);
@@ -134,39 +139,52 @@ const MapModalInput = (props) => {
     setOpen(false);
   };
 
+  //insert user
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit");
+    let dbPost;
 
     dbPost = input;
     dbPost["phone"] = phone;
     dbPost["openhours"] = {
       weekdayTimeStart: weekdayTimeStart.toLocaleTimeString(),
-    };
-    dbPost["openhours"] = {
       weekdayTimeEnd: weekdayTimeEnd.toLocaleTimeString(),
-    };
-    dbPost["openhours"] = {
       weekendTimeStart: weekendTimeStart.toLocaleTimeString(),
-    };
-    dbPost["openhours"] = {
       weekendTimeEnd: weekendTimeEnd.toLocaleTimeString(),
     };
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
-    console.log(input);
 
-    axios
-      .post(`api/map/guideMap/`, dbPost)
-      .then((res) => {
-        console.table(dbPost);
-        console.table(res.data);
-        alert("更新成功！");
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
+    Geocode.enableDebug();
+    Geocode.fromAddress(input.address)
+      .then(
+        (response) => {
+          const { lat, lng } = response.results[0].geometry.location;
+          console.log(lat, lng);
+          setInput({ latitude: lat, longitude: lng });
+          dbPost["latitude"] = lat;
+          dbPost["longitude"] = lng;
+        },
+        (error) => {
+          console.error(error);
+        }
+      )
+      .then(() => {
+        postGuidemapApi(dbPost)
+          .then((res) => {
+            console.log(dbPost);
+            console.log(props.formerDbData);
+            props.updateDB(dbPost);
+            alert("更新成功！");
+            handleClose();
+            console.log(props.formerDbData);
+          })
+          .catch((error) => {
+            console.error(error.response);
+          })
+          .finally(() => {});
+      });
   };
 
   const PickWeekTime = () => {
@@ -244,15 +262,27 @@ const MapModalInput = (props) => {
   return (
     <>
       <Grid container>
-        <Button
-          variant="contained"
-          color="secondary"
-          className={classes.buttonAdd}
-          onClick={handleOpen}
-          startIcon={<AddLocationIcon />}
-        >
-          新增地點
-        </Button>
+        {state.isAuthenticated ? (
+          <Button
+            variant="contained"
+            color="secondary"
+            className={classes.buttonAdd}
+            onClick={handleOpen}
+            startIcon={<AddLocationIcon />}
+          >
+            新增地點
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            color="default"
+            className={classes.buttonAdd}
+            // disabled ="true"
+            startIcon={<AddLocationIcon />}
+          >
+            請登入即可新增地點及發表評論
+          </Button>
+        )}
       </Grid>
       <Dialog
         aria-labelledby="transition-modal-title"
@@ -267,107 +297,109 @@ const MapModalInput = (props) => {
         }}
       >
         <Fade in={open}>
-          <>
+          <Grid
+            container
+            style={{ paddingRight: 20, paddingLeft: 20, paddingBottom: 20 }}
+          >
             <h3 id="transition-modal-title">來新增滑板場或店家吧！</h3>
             <div className={classes.paper}>
               <form className={classes.root} noValidate autoComplete="off">
-                <Grid container>
-                  <Grid container>
-                    <FormControl component="fieldset">
-                      <RadioGroup
-                        onChange={handleInputChange}
-                        row
-                        aria-label="gender"
-                        name="location_type"
-                        value={input.locationType}
-                      >
-                        <FormControlLabel
-                          value="park"
-                          control={<Radio />}
-                          label="場地"
-                        />
-                        <FormControlLabel
-                          value="shop"
-                          control={<Radio />}
-                          label="店家"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                  <Grid container>
-                    <TextField
-                      onChange={handleInputChange}
-                      size="small"
-                      required
-                      id="location_name"
-                      name="location_name"
-                      label="名稱"
-                      variant="filled"
-                      style={{ width: 300 }}
-                    />
-                  </Grid>
-                  <Grid container>
-                    <TextField
-                      onChange={handleInputChange}
-                      size="small"
-                      required
-                      id="address"
-                      name="address"
-                      label="地址"
-                      variant="filled"
-                      fullWidth
-                    />
-                  </Grid>
-                  {/* {pickWeekTime} */}
-                  {pickWeekTime.map((item, index) => (
-                    <PickWeekTime key={index} id={index} />
-                  ))}
-                  <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
-                    電話:{" "}
-                    <MuiPhoneNumber
-                      defaultCountry={"tw"}
-                      onChange={handleInputPhoneChange}
-                    />
-                  </Grid>
-                  <Grid container>
-                    <TextField
-                      onChange={handleInputChange}
-                      size="small"
-                      id="traffic"
-                      label="建議交通方式"
-                      name="traffic"
-                      variant="filled"
-                      multiline
-                      fullWidth
-                      rows={2}
-                    />
-                  </Grid>
-                  <Grid container>
-                    <TextField
-                      onChange={handleInputChange}
-                      size="small"
-                      id="intro"
-                      label="場地介紹"
-                      name="intro"
-                      variant="filled"
-                      multiline
-                      fullWidth
-                      rows={5}
-                    />
-                  </Grid>
-                  <Button
-                    onClick={handleSubmit}
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
+                {/* <Grid container>
+                  <Grid container> */}
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    onChange={handleInputChange}
+                    row
+                    aria-label="gender"
+                    name="location_type"
+                    value={input.location_type}
                   >
-                    確認修改
-                  </Button>
+                    <FormControlLabel
+                      value="場地"
+                      control={<Radio />}
+                      label="場地"
+                    />
+                    <FormControlLabel
+                      value="店家"
+                      control={<Radio />}
+                      label="店家"
+                    />
+                  </RadioGroup>
+                </FormControl>
+                {/* </Grid> */}
+
+                <TextField
+                  onChange={handleInputChange}
+                  size="small"
+                  required
+                  id="location_name"
+                  name="location_name"
+                  label="名稱"
+                  variant="filled"
+                  style={{ width: 300 }}
+                />
+
+                <TextField
+                  onChange={handleInputChange}
+                  size="small"
+                  required
+                  id="address"
+                  name="address"
+                  label="地址"
+                  variant="filled"
+                  fullWidth
+                />
+
+                {/* {pickWeekTime} */}
+                {pickWeekTime.map((item, index) => (
+                  <PickWeekTime key={index} id={index} />
+                ))}
+                <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
+                  電話:{" "}
+                  <MuiPhoneNumber
+                    defaultCountry={"tw"}
+                    onChange={handleInputPhoneChange}
+                  />
                 </Grid>
+                <Grid container>
+                  <TextField
+                    onChange={handleInputChange}
+                    size="small"
+                    id="traffic"
+                    label="建議交通方式"
+                    name="traffic"
+                    variant="filled"
+                    multiline
+                    fullWidth
+                    rows={2}
+                  />
+                </Grid>
+                <Grid container>
+                  <TextField
+                    onChange={handleInputChange}
+                    size="small"
+                    id="intro"
+                    label="場地介紹"
+                    name="intro"
+                    variant="filled"
+                    multiline
+                    fullWidth
+                    rows={5}
+                  />
+                </Grid>
+                <Button
+                  onClick={handleSubmit}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  確認修改
+                </Button>
+                {/* </Grid> */}
               </form>
             </div>
-          </>
+          </Grid>
         </Fade>
       </Dialog>
     </>

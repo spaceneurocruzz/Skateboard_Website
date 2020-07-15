@@ -28,7 +28,7 @@ class GuideMap(models.Model):
 class GuideMapComments(models.Model):
     comment_id = models.AutoField(primary_key=True)
     map_id = models.ForeignKey(GuideMap, related_name='guidemaps', on_delete=models.CASCADE)
-    commentTitle = models.CharField(blank=True, max_length=50)
+    comment_title = models.CharField(blank=True, max_length=50)
     comment = models.CharField(blank=True, max_length=500)
     rating = models.DecimalField(default=0, max_digits=4, decimal_places=1)
     username = models.CharField(blank=True, max_length=120)
