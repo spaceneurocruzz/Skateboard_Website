@@ -7,11 +7,11 @@ from .models import GuideMapComments
 class GuideMapSerializer(serializers.ModelSerializer):
     location_name = serializers.CharField(max_length=120)
     location_type = serializers.CharField(max_length=50)
-    latitude = serializers.DecimalField(max_digits=9, decimal_places=6)
-    longitude = serializers.DecimalField(max_digits=9, decimal_places=6)
+    latitude = serializers.DecimalField(max_digits=11, decimal_places=7)
+    longitude = serializers.DecimalField(max_digits=11, decimal_places=7)
     address = serializers.CharField(max_length=200)
     traffic = serializers.CharField(max_length=200)
-    traffic = serializers.CharField(max_length=200)
+    intro = serializers.CharField(max_length=200)
     openhours = serializers.JSONField()
     phone = serializers.CharField(max_length=20)
     # rating = serializers.PositiveSmallIntegerField()
@@ -21,12 +21,14 @@ class GuideMapSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GuideMap
-        fields = ('location_name',
+        fields = ('location_id',
+                  'location_name',
                   'location_type',
                   'latitude',
                   'longitude',
                   'address',
                   'traffic',
+                  "intro",
                   'openhours',
                   'phone',
                   'rating',
@@ -47,6 +49,7 @@ class GuideMapSerializer(serializers.ModelSerializer):
 
 class GuideMapCommentsSerializer(serializers.ModelSerializer):
     map_id = serializers.PrimaryKeyRelatedField(queryset=GuideMap.objects.all())
+    commentTitle = serializers.CharField(max_length=50)
     comment = serializers.CharField(max_length=500)
     username = serializers.CharField(max_length=120)
     create_dt = serializers.DateTimeField()
@@ -55,7 +58,9 @@ class GuideMapCommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuideMapComments
         fields = ('map_id',
+                  'commentTitle',
                   'comment',
+                  'rating',
                   'username',
                   'create_dt',
                   'update_dt',
