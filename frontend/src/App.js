@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
 import User from "./Pages/User";
@@ -34,7 +34,7 @@ const reducer = (state, action) => {
         access: action.payload.data.access,
         refresh: action.payload.data.refresh,
         username: JSON.parse(action.payload.config.data).username,
-     };
+      };
     case "LOGOUT":
       return {
         ...state,
@@ -43,8 +43,8 @@ const reducer = (state, action) => {
         refresh: null,
       };
     case "UPDATE":
-      console.log(state)
-      console.log(action)
+      console.log(state);
+      console.log(action);
       return {
         ...state,
         isAuthenticated: true,
@@ -148,20 +148,20 @@ const App = () => {
               </li>
             ) : (
               <li className="nav-link-btn">
-              <Button onClick={handleLogout} variant="contained">
-                登出
-              </Button>
+                <Button onClick={handleLogout} variant="contained">
+                  登出
+                </Button>
               </li>
             )}
-            {!state.isAuthenticated &&
-            <li className="nav-link-btn">
-              <Link to="/signup/" className="link">
-                <Button variant="contained" color="primary">
-                  註冊
-                </Button>
-              </Link>
-            </li>
-            }
+            {!state.isAuthenticated && (
+              <li className="nav-link-btn">
+                <Link to="/signup/" className="link">
+                  <Button variant="contained" color="primary">
+                    註冊
+                  </Button>
+                </Link>
+              </li>
+            )}
             {/* <SocialLogin /> */}
           </ul>
         </div>
