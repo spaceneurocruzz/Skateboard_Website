@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getUserApi, patchUserApi } from "../axiosApi";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { AuthContext } from "../App";
@@ -10,28 +11,38 @@ import Fab from "@material-ui/core/Fab";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import red from "@material-ui/core/colors/red";
 import Button from "@material-ui/core/Button";
-import axiosInstance from "../axiosApi";
-import axios from "axios";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import Collapse from "@material-ui/core/Collapse";
+import InboxIcon from "@material-ui/icons/MoveToInbox";
+import DraftsIcon from "@material-ui/icons/Drafts";
+import SendIcon from "@material-ui/icons/Send";
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import StarBorder from "@material-ui/icons/StarBorder";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
-      width: "25ch",
+      // width: "25ch",
     },
   },
   button: {
     // color: blue[900],
     margin: 10,
+    paddingTop: 20,
   },
   input: {
     display: "none",
   },
   icon: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
   iconHover: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     "&:hover": {
       color: red[800],
     },
@@ -42,14 +53,23 @@ const User = () => {
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const { dispatch } = React.useContext(AuthContext);
-  const [img, setImg] = useState({});
+  const [img, setImg] = useState({
+    mainState: "initial",
+    selectedFile: null,
+    imageUploaded: 0,
+  });
+  const [open, setOpen] = React.useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
 
   const initialState = {
     nickname: "",
     email: "",
     location: "",
     intro: "",
-    avatar:"",
+    avatar: "",
   };
 
   const [dbData, setDbdata] = useState(initialState);
@@ -63,16 +83,14 @@ const User = () => {
     if (event.target.name == "password") {
       setPassword(event.target.value);
     }
-
-    console.log(dbData);
   };
 
   useEffect(() => {
-    axios
-      .get(`api/user/get/username=${state.username}`)
+    getUserApi(state.username)
       .then((res) => {
         console.table(res.data);
         setDbdata(res.data);
+        console.table(dbData);
       })
       .catch((error) => {
         console.error(error);
@@ -80,51 +98,58 @@ const User = () => {
       .finally(() => {});
   }, []);
 
-  const handleAvatarSubmit = (event) => {
+  const handleAvatarSubmit = (e) => {
+    e.preventDefault();
+    console.log(img);
     let form_data = new FormData();
-    form_data.append("image", img);
-    form_data.append("title", state.username);
-    form_data.append("content", state.username);
+    form_data.append("image", img.selectedFile[0]);
+    // form_data.append("title", state.username);
+    // form_data.append("content", state.username);
     //form_data.append("_method", 'PATCH');
-    console.log(form_data)
-    axios
-      .patch(`api/user/update/username=${state.username}`, form_data, {
-        headers: {
-          "content-type": "multipart/form-data"
-          //"application/x-www-form-urlencoded"  
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => console.log(err));
+
+    // axios
+    //   .patch(`api/user/update/username=${state.username}`, form_data, {
+    //     headers: {
+    //       "content-type": "multipart/form-data",
+    //       //"application/x-www-form-urlencoded"
+    //     },
+    //   })
+    //   .then((res) => {
+    //     // console.log(img.selectedFile[0]);
+    //     console.log(res.data);
+    //   })
+    //   .catch((err) => console.log(err));
   };
 
   const handleUploadClick = (event) => {
     console.log();
-    var file = event.target.files[0];
+    let file = event.target.files[0];
+    console.log(file);
     const reader = new FileReader();
-    var url = reader.readAsDataURL(file);
+    let url = reader.readAsDataURL(file);
 
-    reader.onloadend = function (e) {
+    reader.onloadend = (e) => {
       setImg({
         selectedFile: [reader.result],
       });
-    }.bind(this);
-    console.log(url); // Would see a path?
+      console.log(img.selectedFile);
+      console.log([reader.result]);
+    };
+    // url = reader.readAsDataURL(file)
 
     setImg({
       mainState: "uploaded",
-      selectedFile: event.target.files[0],
+      selectedFile: file,
       imageUploaded: 1,
     });
+
+    console.log(img);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    axios
-      .patch(`api/user/update/username=${state.username}`, dbData)
+    console.log(img);
+    patchUserApi(state.username, dbData)
       .then((res) => {
         console.table(dbData);
         console.table(res.data);
@@ -137,7 +162,6 @@ const User = () => {
   };
   return (
     <Container component="main" maxWidth="md">
-      個人資料
       <form className={classes.root} noValidate autoComplete="off">
         <div>
           <Grid container>
@@ -160,7 +184,7 @@ const User = () => {
               className={classes.media}
               src={img.selectedFile}
             />
-             <img
+            <img
               width="200px"
               className={classes.media}
               src={`../..${dbData.avatar}`}
@@ -197,6 +221,18 @@ const User = () => {
               onChange={handleInputChange}
               required
               id="filled-required"
+              name="email"
+              label="Email(必填)"
+              value={dbData.email}
+              variant="filled"
+              style={{ width: 300 }}
+            />
+          </Grid>
+          <Grid container>
+            <TextField
+              onChange={handleInputChange}
+              required
+              id="filled-required"
               name="nickname"
               label="暱稱"
               value={dbData.nickname}
@@ -204,65 +240,120 @@ const User = () => {
             />
             <TextField
               onChange={handleInputChange}
-              required
-              id="filled-required"
-              name="email"
-              label="Email(必填)"
-              value={dbData.email}
-              // defaultValue=""
-              variant="filled"
-            />
-            <TextField
-              onChange={handleInputChange}
               id="filled-search"
               label="所在城市"
               name="location"
-              //defaultValue={dbData.location}
               value={dbData.location}
               variant="filled"
             />
+          </Grid>
+
+          <Grid container>
             <TextField
               onChange={handleInputChange}
               id="filled-multiline-static"
               label="自我介紹"
               name="intro"
               multiline
-              rows={10}
-              // defaultValue=""
+              fullWidth
+              rows={8}
               value={dbData.intro}
               variant="filled"
             />
-            {/* <TextField
-            id="filled-read-only-input"
-            label="Read Only"
-            defaultValue="Hello World"
-            InputProps={{
-              readOnly: true,
-            }}
-            variant="filled"
-          /> */}
-            {/* <TextField
-            id="filled-number"
-            label="Number"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            variant="filled"
-          />
-          <TextField
-            id="filled-search"
-            label="Search field"
-            type="search"
-            variant="filled"
-          />
-          <TextField
-            id="filled-helperText"
-            label="Helper text"
-            defaultValue="Default Value"
-            helperText="Some important text"
-            variant="filled"
-          /> */}
+          </Grid>
+          <Grid container>
+            <ListItem button onClick={handleClick}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="地圖" />
+              {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我喜愛的地點" />
+                </ListItem>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我新增的地圖" />
+                </ListItem>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我評論過的地點" />
+                </ListItem>
+              </List>
+            </Collapse>
+            <ListItem button onClick={handleClick}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="活動" />
+              {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我收藏的活動" />
+                </ListItem>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我發表過的活動" />
+                </ListItem>
+              </List>
+            </Collapse>
+            <ListItem button onClick={handleClick}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="揪團" />
+              {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我參與的滑板團" />
+                </ListItem>
+              </List>
+            </Collapse>
+            <ListItem button onClick={handleClick}>
+              <ListItemIcon>
+                <InboxIcon />
+              </ListItemIcon>
+              <ListItemText primary="文章" />
+              {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我收藏的文章" />
+                </ListItem>
+                <ListItem button className={classes.nested}>
+                  <ListItemIcon>
+                    <StarBorder />
+                  </ListItemIcon>
+                  <ListItemText primary="我發表的文章" />
+                </ListItem>
+              </List>
+            </Collapse>
           </Grid>
         </div>
         <Button

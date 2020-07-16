@@ -8,6 +8,7 @@ from .models import CustomUser
 # from settings import SOCIAL_GOOGLE_CLIENT_ID
 # from authentication.models import SocialAccount
 
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
@@ -26,12 +27,29 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'username', 'password', 'last_login', 'location','intro', 'nickname', 'avatar')
+        fields = ('id',
+                  'email',
+                  'username',
+                  'password',
+                  'last_login',
+                  'location',
+                  'intro',
+                  'nickname',
+                  'avatar',
+                #   "map_like",
+                #   "map_add",
+                #   "map_comment",
+                #   "activity_like",
+                #   "activity_add",
+                #   "group_joined",
+                #   "article_like",
+                #   "article_add",
+                  )
         extra_kwargs = {'password': {'write_only': True}}
-        
+
     def create(self, validated_data):
         password = validated_data.pop('password', None)
-        instance = self.Meta.model(**validated_data)  
+        instance = self.Meta.model(**validated_data)
         if password is not None:
             instance.set_password(password)
         instance.save()

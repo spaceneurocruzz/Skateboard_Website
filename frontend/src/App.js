@@ -5,13 +5,13 @@ import User from "./Pages/User";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
 import Home from "./Pages/Home";
-import Map from "./Pages/Map";
+import Guidemap from "./Pages/Guidemap";
 import Calendar from "./Pages/Calendar";
 import Friends from "./Pages/Friends";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance from "./axiosApi";
+import axiosInstance, {logoutApi} from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 
 import Button from "@material-ui/core/Button";
@@ -59,8 +59,7 @@ const App = () => {
   const history = useHistory();
 
   const handleLogout = () => {
-    axiosInstance
-      .post("/blacklist/", {
+    logoutApi({
         refresh_token: localStorage.getItem("refresh_token"),
       })
       .then(() => {
@@ -113,7 +112,7 @@ const App = () => {
         <div className="nav">
           <ul className="nav-link">
             <li className="nav-link-item">
-              <Link to="/map" className="link">
+              <Link to="/guidemap" className="link">
                 地圖
               </Link>
             </li>
@@ -132,13 +131,13 @@ const App = () => {
                 技術交流
               </Link>
             </li>
-            {/* {state.isAuthenticated && */}
+            {state.isAuthenticated &&
             <li className="nav-link-item">
               <Link to="/user" className="link">
                 會員中心
               </Link>
             </li>
-            {/* } */}
+            }
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
@@ -170,6 +169,18 @@ const App = () => {
 
       <Switch>
         <Route exact path="/" render={() => <Home />} />
+        <Route
+          exact
+          path={"/guidemap"}
+          key={"route-guidemap"}
+          render={() => <Guidemap />}
+        />
+        <Route
+          exact
+          path={"/friends"}
+          key={"route-friends"}
+          render={() => <Friends />}
+        />
         <Route
           exact
           path={"/user"}

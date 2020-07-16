@@ -71,9 +71,11 @@ body {
   font-size: 0.8em;
   color: #fcf3ea;
   text-align: center;
+  margin-top: 100px;
   padding-top: 50px;
   bottom: 0;
   height: 150px;
+  
 }
 
 .user_conatainer {
@@ -192,4 +194,18 @@ input {
   top: 0;
   left: 0;
   pointer-events: none;
+}
+
+.marker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  /* background-color: #000; */
+  border: 2px solid #fff;
+  border-radius: 100%;
+  user-select: none;
+  transform: translate(-50%, -50%);
+  background-image: url("../imgs/skateboardMarker.png");
 }

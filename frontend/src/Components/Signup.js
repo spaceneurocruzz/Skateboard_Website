@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Switch, Route, useHistory } from "react-router";
-import axiosInstance from "../axiosApi";
+import {userSignupApi} from "../axiosApi";
 import Login from "./Login";
 import { NavLink } from "react-router-dom";
 
@@ -85,8 +85,8 @@ const Signup = () => {
       ...authData,
       [event.target.name]: event.target.value,
       isUsernameFilled:false,
-    isEmailFilled:false,
-    isPasswordValid:false
+      isEmailFilled:false,
+      isPasswordValid:false
     });
 
     if(event.target.name == 'username' && event.target.value.length == 0)
@@ -122,13 +122,12 @@ const Signup = () => {
         isEmailFilled: true,
       });
     }
-    
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axiosInstance
-      .post("/user/create/", {
+    userSignupApi
+    ({
         username: authData.username,
         email: authData.email,
         password: authData.password,
@@ -138,6 +137,7 @@ const Signup = () => {
         history.push("/");
       })
       .catch(function (error) {
+        console.log(error.response)
         setAuthData({
           ...authData,
           errorMsg: error.message || error.statusText,

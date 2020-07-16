@@ -1,11 +1,10 @@
 import React, { useState, useContext } from "react";
 import { Switch, Route, useHistory } from "react-router";
-import axiosInstance from "../axiosApi";
+import axiosInstance, {loginApi} from "../axiosApi";
 import Signup from "./Signup";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../App";
 
-// import { FlatButton } from 'material-ui';
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -107,8 +106,7 @@ export const Login = () => {
       errorMsg: null,
     });
 
-    axiosInstance
-      .post("/token/obtain/", {
+    loginApi({
         username: authData.username,
         password: authData.password,
       })
