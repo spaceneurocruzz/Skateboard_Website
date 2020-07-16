@@ -16,7 +16,14 @@ import Typography from "@material-ui/core/Typography";
 import MapModalInput from "../Components/Map/MapModalInput";
 import MapList from "../Components/Map/MapList";
 import skateboardMarker from "../imgs/skateboardMarker.png";
+import CssBaseline from '@material-ui/core/CssBaseline';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import Box from '@material-ui/core/Box';
+import Fab from '@material-ui/core/Fab';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import Zoom from '@material-ui/core/Zoom';
 
+import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
@@ -72,6 +79,11 @@ const useStyles = makeStyles((theme) => ({
   },
   cardAction: {
     padding: 10,
+  },
+  scrolltop: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
   },
 }));
 
@@ -170,9 +182,30 @@ const Guidemap = (props) => {
     console.log(dbData);
   };
 
+  const ScrollTop = (props) => {
+    const { children } = props;
+    const classes = useStyles();
+  
+    const handleClick = (event) => {
+      const anchor = (event.target.ownerDocument || document).querySelector('#back-to-top-anchor');
+  
+      if (anchor) {
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+  
+    return (
+        <div onClick={handleClick} role="presentation" className={classes.scrolltop}>
+          {children}
+        </div>
+
+    );
+  }
+
   return (
+    <>
     <Container component="main" maxWidth="lg">
-      <Grid container>
+      <Grid container id="back-to-top-anchor">
         <MapModalInput updateDB={updateDB} formerDbData={dbData} />
         {/* <LocationFilter /> */}
       </Grid>
@@ -240,6 +273,12 @@ const Guidemap = (props) => {
         <MapList formerDbData={dbData} updateDB={updateDB} />
       </Grid>
     </Container>
+    <ScrollTop {...props}>
+        <Fab color="secondary" size="small" aria-label="scroll back to top">
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </ScrollTop>
+      </>
   );
 };
 

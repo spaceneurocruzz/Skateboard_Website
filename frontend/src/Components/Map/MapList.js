@@ -498,6 +498,19 @@ const MapList = (props) => {
     console.log(commentData);
   };
 
+  const getTaiwanCityList = () => {
+    let cityJson={};
+    TaiwanMapJson.map((data, index) => {
+      {
+        cityJson[data.CityName] = data.CityName;
+      }
+    });
+    // console.log(cityJson)
+    return cityJson;
+  };
+
+// console.log(getTaiwanCityList())
+
   return (
     <>
       <ShowCommentsDialog
@@ -514,6 +527,7 @@ const MapList = (props) => {
         commentData={commentData}
         updateComments={updateComments}
       />
+
       <Container component="main" maxWidth="lg">
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
@@ -527,7 +541,7 @@ const MapList = (props) => {
                   width: 100,
                 },
                 { title: "場地名稱", field: "location_name", width: 225 },
-                { title: "地址", field: "address" },
+                { title: "地址", field: "address"},
                 {
                   title: "綜合評分",
                   field: "rating",
