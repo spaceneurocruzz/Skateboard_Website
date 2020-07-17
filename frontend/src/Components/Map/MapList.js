@@ -424,8 +424,6 @@ const MapList = (props) => {
   const [openShowCommentsMapId, setOpenShowCommentsMapId] = React.useState(0);
 
   const handleShowCommentsOpen = (event, map_id) => {
-    // console.log(map_id)
-    // console.log("123")
     setOpenShowComments(true);
     setOpenShowCommentsMapId(map_id);
     console.log(openShowCommentsMapId);

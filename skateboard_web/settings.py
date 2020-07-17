@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'social_django',
     'guidemap',
+    'friendsgroup'
 ]
 
 SOCIAL_GOOGLE_CLIENT_ID = '150926167922-v60e6s4va6hqgbnaan1qia4tkqogbju6.apps.googleusercontent.com'

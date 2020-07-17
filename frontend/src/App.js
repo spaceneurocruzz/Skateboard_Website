@@ -7,7 +7,9 @@ import Signup from "./Components/Signup";
 import Home from "./Pages/Home";
 import Guidemap from "./Pages/Guidemap";
 import Calendar from "./Pages/Calendar";
-import Friends from "./Pages/Friends";
+import FriendsGroup from "./Pages/FriendsGroup";
+
+import FriendsGroupCreate from "./Pages/FriendsGroupCreate"
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
@@ -122,7 +124,7 @@ const App = () => {
               </Link>
             </li>
             <li className="nav-link-item">
-              <Link to="/friends" className="link">
+              <Link to="/friendsgroup" className="link">
                 揪團
               </Link>
             </li>
@@ -177,15 +179,21 @@ const App = () => {
         />
         <Route
           exact
-          path={"/friends"}
-          key={"route-friends"}
-          render={() => <Friends />}
+          path={"/friendsgroup"}
+          key={"route-friendsgroup"}
+          render={() => <FriendsGroup />}
         />
         <Route
           exact
           path={"/user"}
           key={"route-user"}
           render={() => <User />}
+        />
+          <Route
+          exact
+          path={"/friendsGroup/create"}
+          key={"route-friendsGroupCreate"}
+          render={() => <FriendsGroupCreate />}
         />
         <Route exact path={"/login/"} component={Login} />
         <Route exact path={"/signup/"} component={Signup} />

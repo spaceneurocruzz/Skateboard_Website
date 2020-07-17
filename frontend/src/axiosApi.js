@@ -12,6 +12,10 @@ const axiosInstance = axios.create({
   },
 });
 
+const friendsGroupAxiosInstance = axios.create({
+  baseURL: `http://127.0.0.1:8000/api/friends/`,
+});
+
 const mapAxiosInstance = axios.create({
   baseURL: `http://127.0.0.1:8000/api/map/`,
 });
@@ -106,12 +110,21 @@ export const getGuidemapApi = () => {
 export const postGuidemapApi = (data) => {
   return mapAxiosInstance.post(`guideMap/`, data);
 };
+
 export const getGuideMapCommentsApi = () => {
   return mapAxiosInstance.get(`guideMapComments/`);
 };
 
 export const postGuideMapCommentsApi = (data) => {
   return mapAxiosInstance.post(`guideMapComments/`, data);
+};
+
+export const getFriendsGroupApi = () => {
+  return friendsGroupAxiosInstance.get(`friendsGroup/`);
+};
+
+export const postFriendsGroupApi = (data) => {
+  return friendsGroupAxiosInstance.post(`friendsGroup/`, data);
 };
 
 export default axiosInstance;
