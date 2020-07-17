@@ -15,15 +15,16 @@ import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
 import MapModalInput from "../Components/Map/MapModalInput";
 import MapList from "../Components/Map/MapList";
+import shopMarker from "../imgs/shopping-bag.png";
 import skateboardMarker from "../imgs/skateboardMarker.png";
-import CssBaseline from '@material-ui/core/CssBaseline';
-import useScrollTrigger from '@material-ui/core/useScrollTrigger';
-import Box from '@material-ui/core/Box';
-import Fab from '@material-ui/core/Fab';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import Zoom from '@material-ui/core/Zoom';
+import CssBaseline from "@material-ui/core/CssBaseline";
+import useScrollTrigger from "@material-ui/core/useScrollTrigger";
+import Box from "@material-ui/core/Box";
+import Fab from "@material-ui/core/Fab";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import Zoom from "@material-ui/core/Zoom";
 
-import Toolbar from '@material-ui/core/Toolbar';
+import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
@@ -56,6 +57,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
   },
+  inlineContainer: {
+    display: "inline",
+  },
   paper: {
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
@@ -81,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     padding: 10,
   },
   scrolltop: {
-    position: 'fixed',
+    position: "fixed",
     bottom: theme.spacing(2),
     right: theme.spacing(2),
   },
@@ -185,31 +189,48 @@ const Guidemap = (props) => {
   const ScrollTop = (props) => {
     const { children } = props;
     const classes = useStyles();
-  
+
     const handleClick = (event) => {
-      const anchor = (event.target.ownerDocument || document).querySelector('#back-to-top-anchor');
-  
+      const anchor = (event.target.ownerDocument || document).querySelector(
+        "#back-to-top-anchor"
+      );
+
       if (anchor) {
-        anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        anchor.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     };
-  
-    return (
-        <div onClick={handleClick} role="presentation" className={classes.scrolltop}>
-          {children}
-        </div>
 
+    return (
+      <div
+        onClick={handleClick}
+        role="presentation"
+        className={classes.scrolltop}
+      >
+        {children}
+      </div>
     );
-  }
+  };
 
   return (
     <>
-    <Container component="main" maxWidth="lg">
-      <Grid container id="back-to-top-anchor">
-        <MapModalInput updateDB={updateDB} formerDbData={dbData} />
-        {/* <LocationFilter /> */}
-      </Grid>
-      <Grid container>
+      <Container component="main" maxWidth="lg">
+        <Grid container id="back-to-top-anchor">
+          <div className={classes.flexContainer}>
+            <MapModalInput updateDB={updateDB} formerDbData={dbData} />
+            {/* <LocationFilter /> */}
+            <h3 style={{ marginLeft: 20, marginBottom:20, marginTop:50 }}>
+              <span style={{ verticalAlign: "middle" }}>場地</span>
+              <img src={skateboardMarker} style={{ height: 32 }} />
+              <span style={{ verticalAlign: "middle" }}>店家</span>
+              <img src={shopMarker} style={{ height: 32 }} />
+            </h3>
+          </div>
+        </Grid>
+      </Container>
+      <Grid
+        container
+        style={{ width: "80%", height: "100vh", textAlign: "center" }}
+      >
         <div style={{ height: "100vh" }}>
           <Map
             className="map"
@@ -221,20 +242,35 @@ const Guidemap = (props) => {
             onClick={onMapClicked}
             zoom={13}
           >
-            {dbData.map((data, index) => (
-              <Marker
-                icon={{
-                  url: skateboardMarker,
-                  anchor: new google.maps.Point(32, 32),
-                  scaledSize: new google.maps.Size(32, 32),
-                }}
-                key={index}
-                name={data.location_name}
-                address={data.address}
-                position={{ lat: data.latitude, lng: data.longitude }}
-                onClick={onMarkerClick}
-              />
-            ))}
+            {dbData.map((data, index) =>
+              data.location_type === "場地" ? (
+                <Marker
+                  icon={{
+                    url: skateboardMarker,
+                    anchor: new google.maps.Point(32, 32),
+                    scaledSize: new google.maps.Size(32, 32),
+                  }}
+                  key={index}
+                  name={data.location_name}
+                  address={data.address}
+                  position={{ lat: data.latitude, lng: data.longitude }}
+                  onClick={onMarkerClick}
+                />
+              ) : (
+                <Marker
+                  icon={{
+                    url: shopMarker,
+                    anchor: new google.maps.Point(32, 32),
+                    scaledSize: new google.maps.Size(32, 32),
+                  }}
+                  key={index}
+                  name={data.location_name}
+                  address={data.address}
+                  position={{ lat: data.latitude, lng: data.longitude }}
+                  onClick={onMarkerClick}
+                />
+              )
+            )}
 
             <InfoWindow
               marker={mapMarker.activeMarker}
@@ -269,16 +305,17 @@ const Guidemap = (props) => {
           </Map>
         </div>
       </Grid>
-      <Grid container>
-        <MapList formerDbData={dbData} updateDB={updateDB} />
-      </Grid>
-    </Container>
-    <ScrollTop {...props}>
+      <Container component="main" maxWidth="lg">
+        <Grid container>
+          <MapList formerDbData={dbData} updateDB={updateDB} />
+        </Grid>
+      </Container>
+      <ScrollTop {...props}>
         <Fab color="secondary" size="small" aria-label="scroll back to top">
           <KeyboardArrowUpIcon />
         </Fab>
       </ScrollTop>
-      </>
+    </>
   );
 };
 

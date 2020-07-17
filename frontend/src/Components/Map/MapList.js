@@ -54,6 +54,8 @@ import MapModalInput from "./MapModalInput";
 import Avatar from "@material-ui/core/Avatar";
 import TaiwanMapJson from "../../Data/TaiwanMap.json";
 import { ReloadContext } from "../../Pages/Guidemap";
+import shopMarker from "../../imgs/shopping-bag.png";
+import skateboardMarker from "../../imgs/skateboardMarker.png";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -530,7 +532,7 @@ const MapList = (props) => {
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
             <MaterialTable
-              title="場地或店家列表"
+              title={"場地或店家列表"}
               columns={[
                 {
                   title: "類型",

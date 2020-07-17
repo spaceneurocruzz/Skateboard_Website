@@ -7,8 +7,10 @@ import Grid from "@material-ui/core/Grid";
 
 import Container from "@material-ui/core/Container";
 import AddLocationIcon from "@material-ui/icons/AddLocation";
-
+import PlusOneIcon from '@material-ui/icons/PlusOne';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import MaterialTable from "material-table";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -78,7 +80,7 @@ const FriendsGroupList = () => {
   return (
     <Container component="main" maxWidth="lg">
       <div className={classes.root}>
-        <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
+        <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
           <MaterialTable
             title="開團列表"
             columns={[
@@ -92,11 +94,11 @@ const FriendsGroupList = () => {
               //   { title: "地區", field: "city", width:100 },
               { title: "地點", field: "location_name", width: 120 },
               { title: "時間", field: "group_dt", width: 70 },
-              { title: "主題", field: "group_title", width: 300 },
+              { title: "主題", field: "group_title", width: 280 },
               {
                 title: "剩餘名額",
                 field: "remain_count",
-                width: 90,
+                width:100,
               },
               {
                 title: "目前參加人數",
@@ -137,22 +139,20 @@ const FriendsGroupList = () => {
                 possible_user: "10",
               },
             ]}
-            // actions={[
-            //   (rowData) => ({
-            //     icon: () => <CommentIcon />,
-            //     tooltip: "參加",
-            //     onClick: (event, rowData) =>
-            //       handleShowCommentsOpen(event, rowData.location_id),
-            //     //disabled: state.isAuthenticated,
-            //   }),
-            //   (rowData) => ({
-            //     icon: () => <RateReviewIcon />,
-            //     tooltip: "發表評論",
-            //     onClick: (event, rowData) =>
-            //       handleWriteCommentsOpen(event, rowData.location_id),
-            //     disabled: !state.isAuthenticated,
-            //   }),
-            // ]}
+            actions={[
+              (rowData) => ({
+                icon: () => <AddCircleIcon />,
+                tooltip: "參加",
+                onClick: (event, rowData) =>{},
+                //disabled: state.isAuthenticated,
+              }),
+              (rowData) => ({
+                icon: () => <FavoriteBorderIcon />,
+                tooltip: "追蹤",
+                onClick: (event, rowData) =>{},
+                // disabled: !state.isAuthenticated,
+              }),
+            ]}
             options={{
               filtering: true,
               headerStyle: {
@@ -164,7 +164,7 @@ const FriendsGroupList = () => {
             }}
             localization={{
               header: {
-                actions: "評論",
+                actions: "參加或追蹤",
               },
             }}
             // detailPanel={(rowData) => {

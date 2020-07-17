@@ -8,7 +8,7 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 
 import Container from "@material-ui/core/Container";
-import AddLocationIcon from "@material-ui/icons/AddLocation";
+import PostAddIcon from '@material-ui/icons/PostAdd';
 import FriendsGroupCreate from "../../Pages/FriendsGroupCreate"
 import MaterialTable from "material-table";
 
@@ -28,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonAdd: {
     margin: theme.spacing(1),
+    marginBottom:20,
+    marginTop:50
+    //background:'#f05a27'
   },
 }));
 
@@ -41,20 +44,11 @@ const FriendsGroupModalInput = () => {
           variant="contained"
           color="secondary"
           className={classes.buttonAdd}
-          startIcon={<AddLocationIcon />}
+          startIcon={<PostAddIcon />}
         >
           我要揪團
         </Button>
       </Link>
-
-      {/* <Switch>
-        <Route
-          exact
-          path={"/friendsGroup/create"}
-          key={"route-friendsGroupCreate"}
-          render={() => <FriendsGroupCreate />}
-        />
-      </Switch> */}
     </>
   );
 };

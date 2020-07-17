@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
 import User from "./Pages/User";
 import Login from "./Components/Login";
@@ -9,14 +9,21 @@ import Guidemap from "./Pages/Guidemap";
 import Calendar from "./Pages/Calendar";
 import FriendsGroup from "./Pages/FriendsGroup";
 
-import FriendsGroupCreate from "./Pages/FriendsGroupCreate"
+import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance, {logoutApi} from "./axiosApi";
+import axiosInstance, { logoutApi } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
-
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import MapIcon from "@material-ui/icons/Map";
+import EventIcon from '@material-ui/icons/Event';
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
+import ForumIcon from '@material-ui/icons/Forum';
 
 export const AuthContext = React.createContext();
 
@@ -56,14 +63,47 @@ const reducer = (state, action) => {
   }
 };
 
+const useStyles = makeStyles((theme) => ({
+  link: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 10,
+    paddingLeft: 10,
+    "&:hover": {
+      background: "#c6f0a6",
+      paddingTop: 10,
+      paddingBottom: 10,
+      paddingRight: 10,
+      paddingLeft: 10,
+      borderRadius: 10,
+    },
+    color: "#e9710f",
+    fontWeight: 600,
+    fontSize: 20,
+    textDecoration: "none",
+    // backgroundColor: '#2e1534',
+    backgroundSize: "cover",
+  },
+  activelink: {
+    background: "#c6f0a6",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 10,
+    paddingLeft: 10,
+    borderRadius: 10,
+  },
+}));
+
 const App = () => {
+  const classes = useStyles();
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const history = useHistory();
+  const [value, setValue] = React.useState(0);
 
   const handleLogout = () => {
     logoutApi({
-        refresh_token: localStorage.getItem("refresh_token"),
-      })
+      refresh_token: localStorage.getItem("refresh_token"),
+    })
       .then(() => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
@@ -110,36 +150,60 @@ const App = () => {
             <img src={logo} alt="logo" />
           </Link>
         </div>
-
         <div className="nav">
           <ul className="nav-link">
             <li className="nav-link-item">
-              <Link to="/guidemap" className="link">
-                地圖
-              </Link>
+              <NavLink
+                to="/guidemap"
+                activeClassName={classes.activelink}
+                className={classes.link}
+              >
+                <MapIcon style={{ verticalAlign: "middle" }} />
+                <span style={{ verticalAlign: "middle" }}>地圖</span>
+              </NavLink>
             </li>
             <li className="nav-link-item">
-              <Link to="/calendar" className="link">
-                活動日曆
-              </Link>
+              <NavLink
+                to="/calendar"
+                activeClassName={classes.activelink}
+                className={classes.link}
+              >
+                <EventIcon style={{ verticalAlign: "middle" }} />
+                <span style={{ verticalAlign: "middle" }}>活動日曆</span>
+              </NavLink>
             </li>
             <li className="nav-link-item">
-              <Link to="/friendsgroup" className="link">
-                揪團
-              </Link>
+              <NavLink
+                to="/friendsgroup"
+                activeClassName={classes.activelink}
+                className={classes.link}
+              >
+                <PeopleAltIcon style={{ verticalAlign: "middle" }} />
+                <span style={{ verticalAlign: "middle" }}>揪團</span>
+              </NavLink>
             </li>
             <li className="nav-link-item">
-              <Link to="/discussion" className="link">
-                技術交流
-              </Link>
+              <NavLink
+                to="/discussion"
+                activeClassName={classes.activelink}
+                className={classes.link}
+              >
+                <ForumIcon style={{ verticalAlign: "middle" }} />
+                <span style={{ verticalAlign: "middle" }}>技術交流</span>
+              </NavLink>
             </li>
-            {state.isAuthenticated &&
-            <li className="nav-link-item">
-              <Link to="/user" className="link">
-                會員中心
-              </Link>
-            </li>
-            }
+            {state.isAuthenticated && (
+              <li className="nav-link-item">
+                <NavLink
+                  to="/user"
+                  activeClassName={classes.activelink}
+                  className={classes.link}
+                >
+                  <MapIcon style={{ verticalAlign: "middle" }} />
+                  <span style={{ verticalAlign: "middle" }}>會員中心</span>
+                </NavLink>
+              </li>
+            )}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
@@ -189,7 +253,7 @@ const App = () => {
           key={"route-user"}
           render={() => <User />}
         />
-          <Route
+        <Route
           exact
           path={"/friendsGroup/create"}
           key={"route-friendsGroupCreate"}

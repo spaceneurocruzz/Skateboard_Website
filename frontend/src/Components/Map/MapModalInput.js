@@ -68,6 +68,8 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonAdd: {
     margin: theme.spacing(1),
+    marginBottom:20,
+    marginTop:50
   },
 }));
 
@@ -261,7 +263,6 @@ const MapModalInput = (props) => {
 
   return (
     <>
-      <Grid container>
         {state.isAuthenticated ? (
           <Button
             variant="contained"
@@ -283,7 +284,6 @@ const MapModalInput = (props) => {
             請登入即可新增地點及發表評論
           </Button>
         )}
-      </Grid>
       <Dialog
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

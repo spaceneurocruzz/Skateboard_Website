@@ -27,7 +27,6 @@ body {
   display: flex;
 }
 .nav {
-  margin: 30px auto auto 30px;
   flex: auto;
   display: flex;
   font-size: 18px;
@@ -36,13 +35,15 @@ body {
 
 .nav-link {
   list-style: none;
-  line-height: 1.25em;
   display: flex;
+  justify-content: center;
+  align-items: center;
   margin-right: 40px;
 }
 
 .nav-link-item {
-  flex: none;
+  display: flex;
+  flex-direction: row;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   pointer-events: auto;
@@ -64,6 +65,7 @@ body {
   font-weight: 600;
   font-size: 20px;
   text-decoration: none;
+  align-items: center;
 }
 
 .footer {
