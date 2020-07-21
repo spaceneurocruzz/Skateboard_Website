@@ -127,4 +127,16 @@ export const postFriendsGroupApi = (data) => {
   return friendsGroupAxiosInstance.post(`friendsGroup/`, data);
 };
 
+export const patchFriendsGroupApi = (group_id, data) => {
+  return friendsGroupAxiosInstance.patch(`friendsGroup/${group_id}/`, data);
+};
+
+export const getFriendsGroupCommentsApi = () => {
+  return friendsGroupAxiosInstance.get(`friendsGroupComments/`);
+};
+
+export const postFriendsGroupCommentsApi = (data) => {
+  return friendsGroupAxiosInstance.post(`friendsGroupComments/`, data);
+};
+
 export default axiosInstance;

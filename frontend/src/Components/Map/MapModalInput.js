@@ -68,8 +68,8 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonAdd: {
     margin: theme.spacing(1),
-    marginBottom:20,
-    marginTop:50
+    marginBottom: 20,
+    marginTop: 50,
   },
 }));
 
@@ -141,6 +141,8 @@ const MapModalInput = (props) => {
     setOpen(false);
   };
 
+  const [userData, setUserdata] = useState([]);
+
   //insert user
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -182,11 +184,29 @@ const MapModalInput = (props) => {
             handleClose();
             console.log(props.formerDbData);
           })
+          // .then(() => {
+          //   setUserdata({
+          //     ...userData,
+          //     map_add: dbPost.location_name,
+          //   });
+          // })
           .catch((error) => {
             console.error(error.response);
           })
           .finally(() => {});
-      });
+      })
+      // .then(() => {
+      //   patchUserApi(state.username, userData)
+      //     .then((res) => {
+      //       console.table(userData);
+      //       console.table(res.data);
+      //       alert("更新使用者資料成功！");
+      //     })
+      //     .catch((error) => {
+      //       console.error(error);
+      //     })
+      //     .finally(() => {});
+      // });
   };
 
   const PickWeekTime = () => {
@@ -263,27 +283,27 @@ const MapModalInput = (props) => {
 
   return (
     <>
-        {state.isAuthenticated ? (
-          <Button
-            variant="contained"
-            color="secondary"
-            className={classes.buttonAdd}
-            onClick={handleOpen}
-            startIcon={<AddLocationIcon />}
-          >
-            新增地點
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            color="default"
-            className={classes.buttonAdd}
-            // disabled ="true"
-            startIcon={<AddLocationIcon />}
-          >
-            請登入即可新增地點及發表評論
-          </Button>
-        )}
+      {state.isAuthenticated ? (
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.buttonAdd}
+          onClick={handleOpen}
+          startIcon={<AddLocationIcon />}
+        >
+          新增地點
+        </Button>
+      ) : (
+        <Button
+          variant="contained"
+          color="default"
+          className={classes.buttonAdd}
+          // disabled ="true"
+          startIcon={<AddLocationIcon />}
+        >
+          請登入即可新增地點及發表評論
+        </Button>
+      )}
       <Dialog
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

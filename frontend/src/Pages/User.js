@@ -58,10 +58,23 @@ const User = () => {
     selectedFile: null,
     imageUploaded: 0,
   });
-  const [open, setOpen] = React.useState(true);
 
-  const handleClick = () => {
-    setOpen(!open);
+  const [openMap, setOpenMap] = React.useState(false);
+  const [openActivity, setOpenActivity] = React.useState(false);
+  const [openGroup, setOpenGroup] = React.useState(false);
+  const [openArticle, setOpenArticle] = React.useState(false);
+
+  const handleMapClick = () => {
+    setOpenMap(!openMap);
+  };
+  const handleActivityClick = () => {
+    setOpenActivity(!openActivity);
+  };
+  const handleGroupClick = () => {
+    setOpenGroup(!openGroup);
+  };
+  const handleArticleClick = () => {
+    setOpenArticle(!openArticle);
   };
 
   const initialState = {
@@ -262,14 +275,14 @@ const User = () => {
             />
           </Grid>
           <Grid container>
-            <ListItem button onClick={handleClick}>
+            <ListItem button onClick={handleMapClick}>
               <ListItemIcon>
                 <InboxIcon />
               </ListItemIcon>
               <ListItemText primary="地圖" />
-              {open ? <ExpandLess /> : <ExpandMore />}
+              {openMap ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openMap} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItem button className={classes.nested}>
                   <ListItemIcon>
@@ -291,14 +304,14 @@ const User = () => {
                 </ListItem>
               </List>
             </Collapse>
-            <ListItem button onClick={handleClick}>
+            <ListItem button onClick={handleActivityClick}>
               <ListItemIcon>
                 <InboxIcon />
               </ListItemIcon>
               <ListItemText primary="活動" />
-              {open ? <ExpandLess /> : <ExpandMore />}
+              {openActivity ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openActivity} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItem button className={classes.nested}>
                   <ListItemIcon>
@@ -314,14 +327,14 @@ const User = () => {
                 </ListItem>
               </List>
             </Collapse>
-            <ListItem button onClick={handleClick}>
+            <ListItem button onClick={handleGroupClick}>
               <ListItemIcon>
                 <InboxIcon />
               </ListItemIcon>
               <ListItemText primary="揪團" />
-              {open ? <ExpandLess /> : <ExpandMore />}
+              {openGroup ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openGroup} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItem button className={classes.nested}>
                   <ListItemIcon>
@@ -331,14 +344,14 @@ const User = () => {
                 </ListItem>
               </List>
             </Collapse>
-            <ListItem button onClick={handleClick}>
+            <ListItem button onClick={handleArticleClick}>
               <ListItemIcon>
                 <InboxIcon />
               </ListItemIcon>
               <ListItemText primary="文章" />
-              {open ? <ExpandLess /> : <ExpandMore />}
+              {openArticle ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openArticle} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItem button className={classes.nested}>
                   <ListItemIcon>

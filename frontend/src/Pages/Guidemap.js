@@ -29,6 +29,8 @@ import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -109,6 +111,7 @@ const Guidemap = (props) => {
         console.log(dbData);
         console.log(res.data);
         setDbdata(...dbData, res.data);
+        setIsLoading(true);
         console.log(dbData);
       })
       .catch((error) => {
@@ -123,12 +126,14 @@ const Guidemap = (props) => {
     );
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [mapMarker, setMapMarker] = useState({
     activeMarker: {},
     selectedLocation: {},
     showingInfoWindow: false,
   });
-
+ 
   const onMarkerClick = (props, marker) =>
     setMapMarker({
       activeMarker: marker,
@@ -227,6 +232,7 @@ const Guidemap = (props) => {
           </div>
         </Grid>
       </Container>
+      {isLoading &&
       <Grid
         container
         style={{ width: "80%", height: "100vh", textAlign: "center" }}
@@ -298,13 +304,22 @@ const Guidemap = (props) => {
                     <IconButton aria-label="share">
                       <ShareIcon />
                     </IconButton>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                      style={{padding:10}}
+                    >
+                      目前揪團數：
+                    </Typography>
                   </CardActions>
                 </Card>
               )}
             </InfoWindow>
           </Map>
         </div>
-      </Grid>
+      </Grid>}
+      {/* {!isLoading && <CircularProgressWithLabel value={progress} />} */}
       <Container component="main" maxWidth="lg">
         <Grid container>
           <MapList formerDbData={dbData} updateDB={updateDB} />

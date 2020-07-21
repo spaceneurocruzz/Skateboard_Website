@@ -1,16 +1,32 @@
-import React, { useState } from "react";
-import { postGuidemapApi } from "../../axiosApi";
+import React, { useState, useEffect } from "react";
+import {
+  getFriendsGroupCommentsApi,
+  postFriendsGroupCommentsApi,
+  patchFriendsGroupApi,
+} from "../../axiosApi";
 import { AuthContext } from "../../App";
+
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
 import Container from "@material-ui/core/Container";
 import AddLocationIcon from "@material-ui/icons/AddLocation";
-import PlusOneIcon from '@material-ui/icons/PlusOne';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
+import PlusOneIcon from "@material-ui/icons/PlusOne";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import MaterialTable from "material-table";
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import ImportContactsIcon from "@material-ui/icons/ImportContacts";
+import Icon from "@material-ui/core/Icon";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,163 +73,335 @@ const useStyles = makeStyles((theme) => ({
   buttonAdd: {
     margin: theme.spacing(1),
   },
+  button: {
+    margin: theme.spacing(1),
+  },
 }));
 
-const FriendsGroupList = () => {
+const ShowContentDialog = (props) => {
+  console.log(props);
   const classes = useStyles();
+  const { onClose, open } = props;
 
-  // data: [
-  //   {
-  //     name: "XX滑板場123",
-  //     surname: "2020/7/7",
-  //     birthYear: "練習OO",
-  //     birthCity: 63,
-  //   },
-  //   {
-  //     name: "OO極限運動中心",
-  //     surname: "2020/7/7",
-  //     birthYear: "練習XX",
-  //     birthCity: 34,
-  //   },
-  // ],
+  const handleClose = (value) => {
+    onClose(value);
+  };
+
+  const handleListItemClick = (value) => {
+    onClose(value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("submit");
+
+    let dbPost = {};
+
+    //dbPost = input;
+    dbPost["comment_user"] = "ss";
+    dbPost["comment"] = "testtt";
+    dbPost["create_dt"] = new Date();
+    dbPost["update_dt"] = new Date();
+
+    //insert user
+    //post should return commentid and post to user table
+    postFriendsGroupCommentsApi(dbPost)
+      .then((res) => {
+        console.log(dbPost);
+        alert("更新成功！");
+        props.updateComment(dbPost);
+        handleClose();
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
 
   return (
-    <Container component="main" maxWidth="lg">
-      <div className={classes.root}>
-        <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
-          <MaterialTable
-            title="開團列表"
-            columns={[
-              { title: "ID", field: "group_id", width: 30 },
-              {
-                title: "類型",
-                field: "group_type",
-                lookup: { 交流: "交流", 教學: "教學" },
-                width: 90,
-              },
-              //   { title: "地區", field: "city", width:100 },
-              { title: "地點", field: "location_name", width: 120 },
-              { title: "時間", field: "group_dt", width: 70 },
-              { title: "主題", field: "group_title", width: 280 },
-              {
-                title: "剩餘名額",
-                field: "remain_count",
-                width:100,
-              },
-              {
-                title: "目前參加人數",
-                field: "join_user",
-                width: 90,
-              },
-              //   {
-              //     title: "可能參加人數",
-              //     field: "possible_user",
-              //     width:50
-              //   },
-            ]}
-            data={[
-              {
-                group_id: "1",
-                location_name: "XX滑板場123",
-                group_dt: "2020/07/07 1200-1800",
-                city: "台北市南港區",
-                group_type: "交流",
-                group_title: "練習一下豚跳",
-                lower_limit: "2",
-                upper_limit: "12",
-                create_user: "123",
-                join_user: "12",
-                possible_user: "10",
-              },
-              {
-                group_id: "2",
-                location_name: "XX滑板場123",
-                group_dt: "2020/07/07 1200-1800",
-                city: "台北市南港區",
-                group_type: "交流",
-                group_title: "練習一下豚跳",
-                lower_limit: "2",
-                upper_limit: "12",
-                create_user: "123",
-                join_user: "12",
-                possible_user: "10",
-              },
-            ]}
-            actions={[
-              (rowData) => ({
-                icon: () => <AddCircleIcon />,
-                tooltip: "參加",
-                onClick: (event, rowData) =>{},
-                //disabled: state.isAuthenticated,
-              }),
-              (rowData) => ({
-                icon: () => <FavoriteBorderIcon />,
-                tooltip: "追蹤",
-                onClick: (event, rowData) =>{},
-                // disabled: !state.isAuthenticated,
-              }),
-            ]}
-            options={{
-              filtering: true,
-              headerStyle: {
-                backgroundColor: "#015da5",
-                color: "#FFF",
-                fontSize: 16,
-              },
-              actionsColumnIndex: -1,
-            }}
-            localization={{
-              header: {
-                actions: "參加或追蹤",
-              },
-            }}
-            // detailPanel={(rowData) => {
-            //   return (
-            //     <Grid
-            //       container
-            //       // spacing={1}
-            //       style={{ backgroundColor: "#e8f8fb" }}
-            //     >
-            //       <Grid item xs={12} sm={1}></Grid>
-            //       <Grid item xs={12} sm={4}>
-            //         <Box p={1}>{<ScheduleIcon />}開放時間</Box>
-            //         <Box p={1}>
-            //           <ListItemText
-            //             primary={`平日: ${rowData.openhours["weekdayTimeStart"]}- ${rowData.openhours["weekdayTimeEnd"]}`}
-            //             classes={{ primary: classes.listItemText }}
-            //           />
-            //           <ListItemText
-            //             primary={`假日與例假日: ${rowData.openhours["weekendTimeStart"]}- ${rowData.openhours["weekendTimeEnd"]}`}
-            //             classes={{ primary: classes.listItemText }}
-            //           />
-            //         </Box>
-            //       </Grid>
-            //       <Grid item xs={12} sm={3}>
-            //         <Box p={1}>{<CommuteIcon />}建議交通方式</Box>
-            //         <Box p={1}>
-            //           <ListItemText
-            //             primary={`${rowData.traffic}`}
-            //             classes={{ primary: classes.listItemText }}
-            //           />
-            //         </Box>
-            //       </Grid>
-            //       <Grid item xs={12} sm={4}>
-            //         <Box p={1}>{<InfoIcon />}場地介紹</Box>
-            //         <Box p={1}>
-            //           <ListItemText
-            //             primary={`${rowData.intro}`}
-            //             classes={{ primary: classes.listItemText }}
-            //           />
-            //         </Box>
-            //       </Grid>
-            //     </Grid>
-            //   );
-            // }}
-            onRowClick={(event, rowData, togglePanel) => togglePanel()}
+    // <ThemeProvider theme={theme}>
+    <Dialog
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      // className={classes.modal}
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="md"
+    >
+      <DialogTitle id="simple-dialog-title">開團詳細內容</DialogTitle>
+      <DialogContent>
+        <DialogContentText style={{ color: "black" }}>
+          {props.dbFriendsGroupData.map((data, index) => {
+            if (data.group_id == props.groupId) {
+              if (data.lower_limit === 0 && data.upper_limit === 0) {
+                data.lower_limit = "不限";
+                data.upper_limit = "不限";
+              } else if (data.lower_limit === 0) {
+                data.lower_limit = "不限";
+              } else {
+                data.upper_limit = "不限";
+              }
+
+              return (
+                <List>
+                  <ListItem key={index + "user"}>
+                    <ListItemText>{`建立者：${data.create_user}`}</ListItemText>
+                  </ListItem>
+
+                  <ListItem key={index + "content"}>
+                    <ListItemText>{`內容：${data.group_content}`}</ListItemText>
+                  </ListItem>
+
+                  <ListItem key={index + "count"}>
+                    <ListItemText>
+                      {/* {data.lower_limit === 0 && data.upper_limit === 0
+                        ? `人數上下限：${data.lower_limit} - ${data.upper_limit}`
+                        : `人數上下限：不限`} */}
+                      {`人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}
+                    </ListItemText>
+                  </ListItem>
+
+                  <ListItem key={index + "user"}>
+                    {" "}
+                    <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
+                  </ListItem>
+                </List>
+              );
+            }
+          })}
+        </DialogContentText>
+        {/* <TextField
+          // onChange={handleInputChange}
+          id="filled-multiline-static"
+          label="寫下留言..."
+          name="comment"
+          multiline
+          fullWidth
+          rows={4}
+          // value={dbData.intro}
+          variant="filled"
+        /> */}
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="secondary"
+          className={classes.button}
+          endIcon={<Icon>send</Icon>}
+        >
+          送出留言
+        </Button>
+      </DialogActions>
+      <DialogContent>
+        <DialogContentText>
+          <CommentList
+            groupId={props.group_id}
+            commentData={props.commentData}
           />
+        </DialogContentText>
+      </DialogContent>
+    </Dialog>
+    // </ThemeProvider>
+  );
+};
+
+const CommentList = (props) => {
+  if (
+    props.commentData == undefined ||
+    !props.commentData.some((t) => t.group_id === props.groupId)
+  ) {
+    return <span>目前還沒有評論哦！</span>;
+  } else {
+    return (
+      <List className={classes.root}>
+        {props.commentData.map((data, index) => {
+          if (data.group_id == props.groupId) {
+            return (
+              <>
+                <ListItem alignItems="flex-start" key={index}>
+                  {/* <ListItemAvatar>
+            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+          </ListItemAvatar> */}
+
+                  <ListItemText
+                    key={data.group_id}
+                    //primary={data.comment_title}
+                    secondary={
+                      <React.Fragment key={data.group_id + "group"}>
+                        <Typography
+                          key={data.group_id + "ty"}
+                          component="span"
+                          variant="body2"
+                          className={classes.inline}
+                          color="textPrimary"
+                        >
+                          {`${data.username} - `}
+                        </Typography>
+                        {/* {data.username} */}
+                        {data.comment}
+                      </React.Fragment>
+                    }
+                  />
+                </ListItem>
+                <Divider variant="inset" component="li" />
+              </>
+            );
+          }
+        })}
+      </List>
+    );
+  }
+};
+
+const FriendsGroupList = (props) => {
+  const classes = useStyles();
+  const { state } = React.useContext(AuthContext);
+
+  const [openShowContent, setOpenShowContent] = React.useState(false);
+  const [openShowContentGroupId, setOpenShowContentGroupId] = React.useState(0);
+
+  const handleShowContentOpen = (event, group_id) => {
+    setOpenShowContent(true);
+    setOpenShowContentGroupId(group_id);
+    console.log(openShowContentGroupId);
+  };
+
+  const handleShowContentClose = (group_id) => {
+    setOpenShowContent(false);
+  };
+
+  const [commentData, setCommentData] = useState([]);
+
+  useEffect(() => {
+    getFriendsGroupCommentsApi()
+      .then((res) => {
+        setCommentData(...commentData, res.data);
+        console.log(commentData);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
+
+  const joinGroup = (e, group_id) => {
+    e.preventDefault();
+    console.log("join success");
+
+    let preJoinUserArr = props.getFriendsGroupDBById(group_id).join_user;
+    preJoinUserArr.push(state.username);
+
+    let updateJoinUser = {
+      join_user: preJoinUserArr,
+    };
+
+    patchFriendsGroupApi(group_id, updateJoinUser)
+      .then((res) => {
+        props.updateFriendsGroupDBById(group_id, { join_user: state.username });
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
+
+  const updateComment = (newComment) => {
+    setCommentData([...commentData, newComment]);
+  };
+
+  return (
+    <>
+      <ShowContentDialog
+        open={openShowContent}
+        onClose={handleShowContentClose}
+        groupId={openShowContentGroupId}
+        dbFriendsGroupData={props.dbFriendsGroupData}
+        updateComment={updateComment}
+      />
+      <Container component="main" maxWidth="lg">
+        <div className={classes.root}>
+          <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
+            <MaterialTable
+              title="開團列表"
+              columns={[
+                { title: "ID", field: "group_id", width: 25 },
+                {
+                  title: "類型",
+                  field: "group_type",
+                  lookup: { 交流: "交流", 教學: "教學" },
+                  width: 90,
+                },
+                //   { title: "地區", field: "city", width:100 },
+                { title: "地點", field: "location_name", width: 120 },
+                { title: "時間", field: "group_startdt", width: 70 },
+                { title: "主題", field: "group_title", width: 270 },
+                {
+                  title: "剩餘名額",
+                  field: "remain_count",
+                  width: 100,
+                },
+                {
+                  title: "參加人數",
+                  field: "join_count",
+                  width: 100,
+                },
+                // {
+                //     title: "確定參加",
+                //     field: "join_user",
+                //     width:100
+                //   },
+                //   {
+                //     title: "可能參加",
+                //     field: "possible_user",
+                //     width:100
+                //   },
+              ]}
+              data={props.dbFriendsGroupData}
+              actions={[
+                (rowData) => ({
+                  icon: () => <ImportContactsIcon />,
+                  tooltip: "查看內容",
+                  onClick: (event, rowData) => {
+                    handleShowContentOpen(event, rowData.group_id);
+                  },
+                  // disabled: !state.isAuthenticated,
+                }),
+                (rowData) => ({
+                  icon: () => <AddCircleIcon />,
+                  tooltip: "參加",
+                  onClick: (event, rowData) => {
+                    joinGroup(event, rowData.group_id);
+                  },
+                  //disabled: !state.isAuthenticated,
+                }),
+                (rowData) => ({
+                  icon: () => <FavoriteBorderIcon />,
+                  tooltip: "追蹤",
+                  onClick: (event, rowData) => {},
+                  //disabled: !state.isAuthenticated,
+                }),
+              ]}
+              options={{
+                filtering: true,
+                headerStyle: {
+                  backgroundColor: "#015da5",
+                  color: "#FFF",
+                  fontSize: 16,
+                },
+                actionsColumnIndex: -1,
+              }}
+              localization={{
+                header: {
+                  actions: ["詳細內容/ ", "參加/ ", "追蹤"],
+                },
+              }}
+            />
+          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </>
   );
 };
 

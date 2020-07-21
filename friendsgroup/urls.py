@@ -5,7 +5,8 @@ from rest_framework.routers import DefaultRouter
 from friendsgroup import views
 
 router = DefaultRouter()
-router.register(r'friendsgroup', views.FriendsGroup)
+router.register(r'friendsGroup', views.FriendsGroupViewSet)
+router.register(r'friendsGroupComments', views.FriendsGroupCommentsViewSet)
 
 urlpatterns = [
     url(r'^friends/', include(router.urls)),

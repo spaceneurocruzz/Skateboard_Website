@@ -199,11 +199,11 @@ const ShowCommentsDialog = (props) => {
     <Dialog
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
-      className={classes.modal}
+      //className={classes.modal}
       open={open}
       onClose={handleClose}
-      // fullWidth
-      maxWidth="lg"
+      fullWidth
+      maxWidth="md"
     >
       <DialogTitle id="simple-dialog-title">關於這個場地的評論</DialogTitle>
       <CommentList
@@ -354,23 +354,32 @@ const WriteCommentsDialog = (props) => {
   const classes = useStyles();
   const { onClose, open } = props;
 
+  // const [open, setOpen] = useState(false);
+  // const handleOpen = () => {
+  //   setOpen(true);
+  // };
+
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
+
   const handleClose = (value) => {
     onClose(value);
   };
 
-  const handleListItemClick = (value) => {
-    onClose(value);
-  };
+  // const handleListItemClick = (value) => {
+  //   onClose(value);
+  // };
 
   return (
     <Dialog
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
-      className={classes.modal}
+      //className={classes.modal}
       open={open}
       onClose={handleClose}
-      fullWidth
-      maxWidth="lg"
+      fullWidth='true'
+      maxWidth="md"
     >
       <DialogTitle id="simple-dialog-title">我要寫評論</DialogTitle>
       <WriteComment
@@ -431,7 +440,7 @@ const MapList = (props) => {
     console.log(openShowCommentsMapId);
   };
 
-  const handleShowCommentsClose = (map_id) => {
+  const handleShowCommentsClose = () => {
     setOpenShowComments(false);
   };
 
@@ -443,7 +452,7 @@ const MapList = (props) => {
     setOpenWriteCommentsMapId(map_id);
   };
 
-  const handleWriteCommentsClose = (value) => {
+  const handleWriteCommentsClose = () => {
     setOpenWriteComments(false);
   };
   const [commentData, setCommentData] = useState([]);
