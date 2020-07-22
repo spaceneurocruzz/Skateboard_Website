@@ -145,26 +145,40 @@ const ShowContentDialog = (props) => {
 
               return (
                 <List>
+                  <ListItem key={index + "id"}>
+                    <ListItemText>{`ID：${data.group_id}`}</ListItemText>
+                  </ListItem>
+                  <ListItem key={index + "location_name"}>
+                    <ListItemText>{`場地名稱：${data.location_name}`}</ListItemText>
+                  </ListItem>
+                  <ListItem key={index + "address"}>
+                    <ListItemText>{`地址：${data.address}`}</ListItemText>
+                  </ListItem>
                   <ListItem key={index + "user"}>
                     <ListItemText>{`建立者：${data.create_user}`}</ListItemText>
+                  </ListItem>
+
+                  <ListItem key={index + "count"}>
+                    <ListItemText>
+                      {`人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}
+                    </ListItemText>
                   </ListItem>
 
                   <ListItem key={index + "content"}>
                     <ListItemText>{`內容：${data.group_content}`}</ListItemText>
                   </ListItem>
 
-                  <ListItem key={index + "count"}>
-                    <ListItemText>
-                      {/* {data.lower_limit === 0 && data.upper_limit === 0
-                        ? `人數上下限：${data.lower_limit} - ${data.upper_limit}`
-                        : `人數上下限：不限`} */}
-                      {`人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}
-                    </ListItemText>
-                  </ListItem>
-
-                  <ListItem key={index + "user"}>
-                    {" "}
+                  <ListItem key={index + "join_user"}>
                     <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
+                  </ListItem>
+                  <ListItem key={index + "possible_user"}>
+                    <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
+                  </ListItem>
+                  <ListItem key={index + "create_dt"}>
+                    <ListItemText>{`新增日期：${data.create_dt}`}</ListItemText>
+                  </ListItem>
+                  <ListItem key={index + "update_dt"}>
+                    <ListItemText>{`更新日期：${data.update_dt}`}</ListItemText>
                   </ListItem>
                 </List>
               );
@@ -232,7 +246,7 @@ const CommentList = (props) => {
                       <React.Fragment key={data.group_id + "group"}>
                         <Typography
                           key={data.group_id + "ty"}
-                          component="span"
+                          component="div"
                           variant="body2"
                           className={classes.inline}
                           color="textPrimary"
@@ -291,7 +305,8 @@ const FriendsGroupList = (props) => {
     console.log("join success");
 
     let preJoinUserArr = props.getFriendsGroupDBById(group_id).join_user;
-    preJoinUserArr.push(state.username);
+    //preJoinUserArr.push(state.username);
+    preJoinUserArr.push("ss");
 
     let updateJoinUser = {
       join_user: preJoinUserArr,
@@ -299,7 +314,30 @@ const FriendsGroupList = (props) => {
 
     patchFriendsGroupApi(group_id, updateJoinUser)
       .then((res) => {
-        props.updateFriendsGroupDBById(group_id, { join_user: state.username });
+        props.updateFriendsGroupDBById(group_id, preJoinUserArr, "JOIN");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
+
+
+  const likeGroup = (e, group_id) => {
+    e.preventDefault();
+    console.log("like success");
+
+    let prePossibleUserArr = props.getFriendsGroupDBById(group_id).possible_user;
+    //prePossibleUserArr.push(state.username);
+    prePossibleUserArr.push("ss");
+
+    let updatePossibleUser = {
+      possible_user: prePossibleUserArr,
+    };
+
+    patchFriendsGroupApi(group_id, updatePossibleUser)
+      .then((res) => {
+        props.updateFriendsGroupDBById(group_id, prePossibleUserArr, "LIKE");
       })
       .catch((error) => {
         console.error(error.response);
@@ -374,13 +412,15 @@ const FriendsGroupList = (props) => {
                   onClick: (event, rowData) => {
                     joinGroup(event, rowData.group_id);
                   },
-                  //disabled: !state.isAuthenticated,
+                  //disabled: !state.isAuthenticated || rowData.join_user.includes(state.username),
                 }),
                 (rowData) => ({
                   icon: () => <FavoriteBorderIcon />,
                   tooltip: "追蹤",
-                  onClick: (event, rowData) => {},
-                  //disabled: !state.isAuthenticated,
+                  onClick: (event, rowData) => {
+                    likeGroup(event, rowData.group_id);
+                  },
+                  //disabled: !state.isAuthenticated || rowData.possible_user.includes(state.username),
                 }),
               ]}
               options={{

@@ -47,17 +47,25 @@ const FriendsGroup = () => {
     }
   };
 
-  const updateFriendsGroupDBById = (group_id, newData) => {
-    setDbFriendsGroupData([
-      ...dbFriendsGroupData,
-      dbFriendsGroupData.map((data, index) => {
-        data.group_id === group_id
-          ? { ...data, newData } //all coloumns, data.join_user == props.dbFriendsGroupData["join_user"]
-          : data;
-      }),
-    ]);
+  const updateFriendsGroupDBById = (group_id, newData, type) => {
+    let index = dbFriendsGroupData.findIndex(
+      (data) => data.group_id === group_id
+    );
 
-    console.log(dbFriendsGroupData);
+    switch(type){
+      case "JOIN":
+        dbFriendsGroupData[index].join_user = newData;
+        console.log("join")
+        break;
+      case "LIKE":
+        dbFriendsGroupData[index].possible_user = newData;
+        console.log("like")
+        break;
+      default:
+        console.log("none");
+    }
+    console.log("set")
+    setDbFriendsGroupData([...dbFriendsGroupData]);
   };
 
   useEffect(() => {
@@ -73,17 +81,43 @@ const FriendsGroup = () => {
       .finally(() => {});
   }, []);
 
-  if(dbFriendsGroupData != undefined || dbFriendsGroupData !=null){
+  // useEffect(()=>{
+  //   if(dbFriendsGroupData != undefined || dbFriendsGroupData !=null){
+  //     dbFriendsGroupData.map((data, index) => {
+  //       if(data["join_user"]!=undefined || data["join_user"]!=null||
+  //       data["possible_user"]!=undefined || data["possible_user"]!=null||
+  //       data["upper_limit"]!=undefined || data["upper_limit"]!=null)
+  //       {
+  //         data["join_count"] = data["join_user"].length;
+  //         console.log(data["upper_limit"])
+
+  //         if(data["upper_limit"] === 0){
+  //           data["remain_count"] = 999
+  //         }
+  //         else{
+  //           data["remain_count"] = data["upper_limit"] - data["join_user"].length;
+  //         }
+  //       }
+  //     });
+  //   }
+  // },[dbFriendsGroupData])
+
+  if (dbFriendsGroupData != undefined || dbFriendsGroupData != null) {
     dbFriendsGroupData.map((data, index) => {
-      if(data["join_user"]!=undefined || data["join_user"]!=null||
-      data["upper_limit"]!=undefined || data["upper_limit"]!=null)
-      {
+      if (
+        data["join_user"] != undefined ||
+        data["join_user"] != null ||
+        data["possible_user"] != undefined ||
+        data["possible_user"] != null ||
+        data["upper_limit"] != undefined ||
+        data["upper_limit"] != null
+      ) {
         data["join_count"] = data["join_user"].length;
-        console.log(data["upper_limit"])
-        if(data["upper_limit"] === 0){
-          data["remain_count"] = "不限"
-        }
-        else{
+        console.log(data["upper_limit"]);
+
+        if (data["upper_limit"] === 0) {
+          data["remain_count"] = 999;
+        } else {
           data["remain_count"] = data["upper_limit"] - data["join_user"].length;
         }
       }
