@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import FriendsGroup, FriendsGroupComments, GuideMap
 
 class FriendsGroupSerializer(serializers.ModelSerializer):
+    group_id = serializers.CharField(max_length=50)
     map_id = serializers.PrimaryKeyRelatedField(
         queryset=GuideMap.objects.all())
     group_startdt = serializers.DateTimeField()
@@ -57,7 +58,7 @@ class FriendsGroupCommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FriendsGroupComments
-        fields = ('comment_id'
+        fields = ('comment_id',
                   'group_id',
                   'comment',
                   'comment_user',
@@ -65,8 +66,8 @@ class FriendsGroupCommentsSerializer(serializers.ModelSerializer):
                   'update_dt',
                   )
 
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
+    #     instance.save()
+    #     return instance

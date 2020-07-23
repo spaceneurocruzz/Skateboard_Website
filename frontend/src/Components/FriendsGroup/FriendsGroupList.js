@@ -28,6 +28,7 @@ import MaterialTable from "material-table";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ImportContactsIcon from "@material-ui/icons/ImportContacts";
 import Icon from "@material-ui/core/Icon";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -80,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ShowContentDialog = (props) => {
+  console.log(props.groupId);
   console.log(props);
   const classes = useStyles();
   const { onClose, open } = props;
@@ -122,6 +124,7 @@ const ShowContentDialog = (props) => {
   return (
     // <ThemeProvider theme={theme}>
     <Dialog
+      style={{}}
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
       // className={classes.modal}
@@ -130,74 +133,83 @@ const ShowContentDialog = (props) => {
       fullWidth
       maxWidth="md"
     >
-      <DialogTitle id="simple-dialog-title">開團詳細內容</DialogTitle>
-      <DialogContent>
-        <DialogContentText style={{ color: "black" }}>
-          {props.dbFriendsGroupData.map((data, index) => {
-            if (data.group_id == props.groupId) {
-              if (data.lower_limit === 0 && data.upper_limit === 0) {
-                data.lower_limit = 999;
-                data.upper_limit = 999;
-              } else if (data.lower_limit === 0) {
-                data.lower_limit = 999;
-              } else {
-                data.upper_limit = 999;
-              }
+      {props.dbFriendsGroupData.map((data, index) => {
+        if (data.group_id == props.groupId) {
+          if (data.lower_limit === 0 && data.upper_limit === 0) {
+            data.lower_limit = 999;
+            data.upper_limit = 999;
+          } else if (data.lower_limit === 0) {
+            data.lower_limit = 999;
+          } else {
+            data.upper_limit = 999;
+          }
 
-              return (
-                <List>
-                  <ListItem key={index + "id"}>
-                    <ListItemText>{`ID：${data.group_id}`}</ListItemText>
-                  </ListItem>
-                  <ListItem key={index + "location_name"}>
-                    <ListItemText>{`場地名稱：${data.location_name}`}</ListItemText>
-                  </ListItem>
-                  <ListItem key={index + "address"}>
-                    <ListItemText>{`地址：${data.address}`}</ListItemText>
-                  </ListItem>
-                  <ListItem key={index + "user"}>
-                    <ListItemText>{`建立者：${data.create_user}`}</ListItemText>
-                  </ListItem>
+          return (
+            <>
+              <DialogTitle id="simple-dialog-title">
+                <span style={{ fontSize: 24, fontWeight: "bold" }}>
+                  {`${data.group_startdt.slice(0, 10)}    `}{" "}
+                </span>
+                <span
+                  style={{ fontSize: 20, fontWeight: "bold" }}
+                >{`${data.group_startdt.slice(11, 19)}    `}</span>
+                <span style={{ fontSize: 22, fontWeight: "bold" }}>
+                  {data.location_name}
+                </span>
+                <span style={{ textAlign: "left" }}>
+                  {" "}
+                  (ID：{data.group_id})
+                </span>
+              </DialogTitle>
+              <DialogContent>
+                <ListItem>
+                  <ListItemText>{`地址：${data.address}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <span>{`     人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}</span>
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`內容：${data.group_content}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`建立者：${data.create_user}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#9a9898",
+                      alignItems: "left",
+                    }}
+                  >{`新增日期：${data.create_dt.slice(
+                    0,
+                    10
+                  )}  ${data.create_dt.slice(11, 19)}     `}</span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#9a9898",
+                      alignItems: "left",
+                    }}
+                  >{`更新日期：${data.update_dt.slice(
+                    0,
+                    10
+                  )}  ${data.update_dt.slice(11, 19)}`}</span>
+                </ListItem>
+              </DialogContent>
+            </>
+          );
+        }
+      })}
 
-                  <ListItem key={index + "count"}>
-                    <ListItemText>
-                      {`人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}
-                    </ListItemText>
-                  </ListItem>
-
-                  <ListItem key={index + "content"}>
-                    <ListItemText>{`內容：${data.group_content}`}</ListItemText>
-                  </ListItem>
-
-                  <ListItem key={index + "join_user"}>
-                    <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
-                  </ListItem>
-                  <ListItem key={index + "possible_user"}>
-                    <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
-                  </ListItem>
-                  <ListItem key={index + "create_dt"}>
-                    <ListItemText>{`新增日期：${data.create_dt}`}</ListItemText>
-                  </ListItem>
-                  <ListItem key={index + "update_dt"}>
-                    <ListItemText>{`更新日期：${data.update_dt}`}</ListItemText>
-                  </ListItem>
-                </List>
-              );
-            }
-          })}
-        </DialogContentText>
-        {/* <TextField
-          // onChange={handleInputChange}
-          id="filled-multiline-static"
-          label="寫下留言..."
-          name="comment"
-          multiline
-          fullWidth
-          rows={4}
-          // value={dbData.intro}
-          variant="filled"
-        /> */}
-      </DialogContent>
       <DialogActions>
         <Button
           onClick={handleSubmit}
@@ -209,23 +221,18 @@ const ShowContentDialog = (props) => {
           送出留言
         </Button>
       </DialogActions>
-      <DialogContent>
-        <DialogContentText>
-          <CommentList
-            groupId={props.group_id}
-            commentData={props.commentData}
-          />
-        </DialogContentText>
-      </DialogContent>
+      <CommentList groupId={props.groupId} commentData={props.commentData} />
     </Dialog>
     // </ThemeProvider>
   );
 };
 
 const CommentList = (props) => {
+  const classes = useStyles();
+  console.log(props.commentData);
   if (
     props.commentData == undefined ||
-    !props.commentData.some((t) => t.group_id === props.groupId)
+    !props.commentData.some((t) => t.group_id == props.groupId)
   ) {
     return <span>目前還沒有評論哦！</span>;
   } else {
@@ -242,22 +249,13 @@ const CommentList = (props) => {
 
                   <ListItemText
                     key={data.group_id}
-                    //primary={data.comment_title}
-                    secondary={
+                    primary={
                       <React.Fragment key={data.group_id + "group"}>
-                        <Typography
-                          key={data.group_id + "ty"}
-                          component="div"
-                          variant="body2"
-                          className={classes.inline}
-                          color="textPrimary"
-                        >
-                          {`${data.username} - `}
-                        </Typography>
-                        {/* {data.username} */}
+                        {`${data.comment_user} - `}
                         {data.comment}
                       </React.Fragment>
                     }
+                    secondary={data.create_dt}
                   />
                 </ListItem>
                 <Divider variant="inset" component="li" />
@@ -293,10 +291,10 @@ const FriendsGroupList = (props) => {
     getFriendsGroupCommentsApi()
       .then((res) => {
         setCommentData(...commentData, res.data);
-        console.log(commentData);
+        console.log(res.data);
       })
       .catch((error) => {
-        console.error(error);
+        console.error(error.response);
       })
       .finally(() => {});
   }, []);
@@ -394,12 +392,15 @@ const FriendsGroupList = (props) => {
     setCommentData([...commentData, newComment]);
   };
 
+  //props.dbFriendsGroupData["group_startdt"] =
+
   return (
     <>
       <ShowContentDialog
         open={openShowContent}
         onClose={handleShowContentClose}
         groupId={openShowContentGroupId}
+        commentData={commentData}
         dbFriendsGroupData={props.dbFriendsGroupData}
         updateComment={updateComment}
       />
