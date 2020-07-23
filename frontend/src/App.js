@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
 import User from "./Pages/User";
@@ -13,7 +13,7 @@ import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance, { logoutApi } from "./axiosApi";
+import axiosInstance, { logoutApi, getUserApi } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Tabs from "@material-ui/core/Tabs";
@@ -21,9 +21,9 @@ import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import MapIcon from "@material-ui/icons/Map";
-import EventIcon from '@material-ui/icons/Event';
-import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
-import ForumIcon from '@material-ui/icons/Forum';
+import EventIcon from "@material-ui/icons/Event";
+import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
+import ForumIcon from "@material-ui/icons/Forum";
 
 export const AuthContext = React.createContext();
 
@@ -99,6 +99,40 @@ const App = () => {
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const history = useHistory();
   const [value, setValue] = React.useState(0);
+  const initUserData = {
+    location: "",
+    nickname: "",
+    intro: "",
+    //avatar: "",
+    email: "",
+    map_like: [],
+    map_add: [],
+    map_comment: [],
+    group_create: [],
+    group_join: [],
+    group_like: [],
+  };
+
+  const [userData, setUserdata] = useState(initUserData);
+
+  const initUserDB = (newData) => {
+    setUserdata(newData);
+    console.log(userData);
+  };
+
+  const updateUserDB = (eventTarget) => {
+    setUserdata({
+      ...userData,
+      [eventTarget.name]: eventTarget.value,
+    });
+  };
+
+  const updateGroupUserDB = (newValue) => {
+    setUserdata({
+      ...userData,
+      newValue
+    });
+  };
 
   const handleLogout = () => {
     logoutApi({
@@ -162,7 +196,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>地圖</span>
               </NavLink>
             </li>
-            <li className="nav-link-item">
+            {/* <li className="nav-link-item">
               <NavLink
                 to="/calendar"
                 activeClassName={classes.activelink}
@@ -171,7 +205,7 @@ const App = () => {
                 <EventIcon style={{ verticalAlign: "middle" }} />
                 <span style={{ verticalAlign: "middle" }}>活動日曆</span>
               </NavLink>
-            </li>
+            </li> */}
             <li className="nav-link-item">
               <NavLink
                 to="/friendsgroup"
@@ -182,7 +216,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>揪團</span>
               </NavLink>
             </li>
-            <li className="nav-link-item">
+            {/* <li className="nav-link-item">
               <NavLink
                 to="/discussion"
                 activeClassName={classes.activelink}
@@ -191,8 +225,8 @@ const App = () => {
                 <ForumIcon style={{ verticalAlign: "middle" }} />
                 <span style={{ verticalAlign: "middle" }}>技術交流</span>
               </NavLink>
-            </li>
-            {state.isAuthenticated && (
+            </li> */}
+            {/* {state.isAuthenticated && ( */}
               <li className="nav-link-item">
                 <NavLink
                   to="/user"
@@ -203,7 +237,7 @@ const App = () => {
                   <span style={{ verticalAlign: "middle" }}>會員中心</span>
                 </NavLink>
               </li>
-            )}
+            {/* )} */}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
@@ -239,25 +273,40 @@ const App = () => {
           exact
           path={"/guidemap"}
           key={"route-guidemap"}
-          render={() => <Guidemap />}
+          render={() => (
+            <Guidemap userData={userData} updateUserDB={updateUserDB} />
+          )}
         />
         <Route
           exact
           path={"/friendsgroup"}
           key={"route-friendsgroup"}
-          render={() => <FriendsGroup />}
+          render={() => (
+            <FriendsGroup userData={userData} updateUserDB={updateUserDB} updateGroupUserDB={updateGroupUserDB}/>
+          )}
         />
         <Route
           exact
           path={"/user"}
           key={"route-user"}
-          render={() => <User />}
+          render={() => (
+            <User
+              userData={userData}
+              updateUserDB={updateUserDB}
+              initUserDB={initUserDB}
+            />
+          )}
         />
         <Route
           exact
           path={"/friendsGroup/create"}
           key={"route-friendsGroupCreate"}
-          render={() => <FriendsGroupCreate />}
+          render={() => (
+            <FriendsGroupCreate
+              userData={userData}
+              updateUserDB={updateUserDB}
+            />
+          )}
         />
         <Route exact path={"/login/"} component={Login} />
         <Route exact path={"/signup/"} component={Signup} />

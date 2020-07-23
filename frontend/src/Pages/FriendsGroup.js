@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FriendsGroup = () => {
+const FriendsGroup = (props) => {
   const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
 
   const updateFriendsGroupDB = (newData) => {
@@ -135,6 +135,8 @@ const FriendsGroup = () => {
           updateFriendsGroupDB={updateFriendsGroupDB}
           updateFriendsGroupDBById={updateFriendsGroupDBById}
           getFriendsGroupDBById={getFriendsGroupDBById}
+          userData={props.userData} updateUserDB={props.updateUserDB}
+          updateGroupUserDB={props.updateGroupUserDB}
         />
       </Grid>
     </Container>

@@ -160,6 +160,17 @@ const MapModalInput = (props) => {
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
 
+    let preAddMapArr = props.userData.map_add;
+    if (preAddMapArr == null) {
+      preAddMapArr = [input.location_name];
+    } else {
+      preAddMapArr.push(input.location_name);
+    }
+
+    let mapAdd = {
+      map_add: preAddMapArr
+    }
+
     Geocode.enableDebug();
     Geocode.fromAddress(input.address)
       .then(
@@ -184,29 +195,34 @@ const MapModalInput = (props) => {
             handleClose();
             console.log(props.formerDbData);
           })
-          // .then(() => {
-          //   setUserdata({
-          //     ...userData,
-          //     map_add: dbPost.location_name,
-          //   });
-          // })
+          .then(() => {
+            patchUserApi(state.username, mapAdd)
+              .then((res) => {
+                console.table(res.data);
+                props.updateGroupUserDB(mapAdd);
+              })
+              .catch((error) => {
+                console.error(error.response);
+              })
+              .finally(() => {});
+          })
           .catch((error) => {
             console.error(error.response);
           })
           .finally(() => {});
-      })
-      // .then(() => {
-      //   patchUserApi(state.username, userData)
-      //     .then((res) => {
-      //       console.table(userData);
-      //       console.table(res.data);
-      //       alert("更新使用者資料成功！");
-      //     })
-      //     .catch((error) => {
-      //       console.error(error);
-      //     })
-      //     .finally(() => {});
-      // });
+      });
+    // .then(() => {
+    //   patchUserApi(state.username, userData)
+    //     .then((res) => {
+    //       console.table(userData);
+    //       console.table(res.data);
+    //       alert("更新使用者資料成功！");
+    //     })
+    //     .catch((error) => {
+    //       console.error(error);
+    //     })
+    //     .finally(() => {});
+    // });
   };
 
   const PickWeekTime = () => {

@@ -11,9 +11,11 @@ class CustomUser(AbstractUser):
     map_like = ArrayField(models.IntegerField(blank=True, null=True), null=True)
     map_add = ArrayField(models.IntegerField(blank=True, null=True), null=True)
     map_comment = ArrayField(models.IntegerField(blank=True, null=True), null=True)
+    group_create = ArrayField(models.IntegerField(blank=True, null=True), null=True)
+    group_join = ArrayField(models.IntegerField(blank=True, null=True), null=True)
+    group_like = ArrayField(models.IntegerField(blank=True, null=True), null=True)
     # activity_like = ArrayField(models.IntegerField(blank=True))
     # activity_add = ArrayField(models.IntegerField(blank=True))
-    # group_joined = ArrayField(models.IntegerField(blank=True))
     # article_like = ArrayField(models.IntegerField(blank=True))
     # article_add = ArrayField(models.IntegerField(blank=True))
     

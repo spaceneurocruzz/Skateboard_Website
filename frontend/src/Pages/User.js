@@ -22,6 +22,11 @@ import SendIcon from "@material-ui/icons/Send";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import StarBorder from "@material-ui/icons/StarBorder";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const User = () => {
+const User = (props) => {
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const { dispatch } = React.useContext(AuthContext);
@@ -77,22 +82,24 @@ const User = () => {
     setOpenArticle(!openArticle);
   };
 
-  const initialState = {
-    nickname: "",
-    email: "",
-    location: "",
-    intro: "",
-    avatar: "",
-  };
+  // const initialState = {
+  //   nickname: "",
+  //   email: "",
+  //   location: "",
+  //   intro: "",
+  //   avatar: "",
+  // };
 
-  const [dbData, setDbdata] = useState(initialState);
+  // const [dbData, setDbdata] = useState(initialState);
   const [password, setPassword] = useState("");
 
   const handleInputChange = (event) => {
-    setDbdata({
-      ...dbData,
-      [event.target.name]: event.target.value,
-    });
+    console.log(event.target.name);
+    props.updateUserDB(event.target);
+    // setDbdata({
+    //   ...dbData,
+    //   [event.target.name]: event.target.value,
+    // });
     if (event.target.name == "password") {
       setPassword(event.target.value);
     }
@@ -102,18 +109,19 @@ const User = () => {
     getUserApi(state.username)
       .then((res) => {
         console.table(res.data);
-        setDbdata(res.data);
-        console.table(dbData);
+        props.initUserDB(res.data);
+        //setDbdata(res.data);
+        //console.table(dbData);
       })
       .catch((error) => {
-        console.error(error);
+        console.error(error.response);
       })
       .finally(() => {});
   }, []);
 
   const handleAvatarSubmit = (e) => {
     e.preventDefault();
-    console.log(img);
+    console.log(props.userData);
     let form_data = new FormData();
     form_data.append("image", img.selectedFile[0]);
     // form_data.append("title", state.username);
@@ -162,17 +170,82 @@ const User = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(img);
-    patchUserApi(state.username, dbData)
+    patchUserApi(state.username, props.userData)
       .then((res) => {
-        console.table(dbData);
+        console.table(userData);
         console.table(res.data);
         alert("更新成功！");
       })
       .catch((error) => {
-        console.error(error);
+        console.error(error.response);
       })
       .finally(() => {});
   };
+
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  const TabPanel = (props) => {
+    const { children, value, index, ...other } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`simple-tabpanel-${index}`}
+        aria-labelledby={`simple-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box p={3}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  };
+
+  function a11yProps(index) {
+    return {
+      id: `simple-tab-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
+    };
+  }
+
+  // for(let groupId in props.userData.group_join)
+  // {
+  //   dbFriendsGroupData.find((data) => data.group_id === group_id)
+
+  // }
+
+  const TabInfo = () => {
+    return (
+      <Grid container>
+        <AppBar position="static">
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="simple tabs example"
+          >
+            <Tab label="地圖" {...a11yProps(0)} />
+            <Tab label="揪團" {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
+        <TabPanel value={value} index={0}>
+          新增地點
+          收藏地點
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          參加中:{props.userData.group_join}
+          追蹤中:{props.userData.group_like}
+        </TabPanel>
+      </Grid>
+    );
+  };
+
   return (
     <Container component="main" maxWidth="md">
       <form className={classes.root} noValidate autoComplete="off">
@@ -197,11 +270,11 @@ const User = () => {
               className={classes.media}
               src={img.selectedFile}
             />
-            <img
+            {/* <img
               width="200px"
               className={classes.media}
-              src={`../..${dbData.avatar}`}
-            />
+              src={`../..${props.userData.avatar}`}
+            /> */}
             <Button
               onClick={handleAvatarSubmit}
               type="submit"
@@ -233,10 +306,10 @@ const User = () => {
             <TextField
               onChange={handleInputChange}
               required
-              id="filled-required"
+              id="filled-required-email"
               name="email"
               label="Email(必填)"
-              value={dbData.email}
+              value={props.userData.email}
               variant="filled"
               style={{ width: 300 }}
             />
@@ -248,7 +321,7 @@ const User = () => {
               id="filled-required"
               name="nickname"
               label="暱稱"
-              value={dbData.nickname}
+              value={props.userData.nickname}
               variant="filled"
             />
             <TextField
@@ -256,7 +329,7 @@ const User = () => {
               id="filled-search"
               label="所在城市"
               name="location"
-              value={dbData.location}
+              value={props.userData.location}
               variant="filled"
             />
           </Grid>
@@ -270,104 +343,11 @@ const User = () => {
               multiline
               fullWidth
               rows={8}
-              value={dbData.intro}
+              value={props.userData.intro}
               variant="filled"
             />
           </Grid>
-          <Grid container>
-            <ListItem button onClick={handleMapClick}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="地圖" />
-              {openMap ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={openMap} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我喜愛的地點" />
-                </ListItem>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我新增的地圖" />
-                </ListItem>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我評論過的地點" />
-                </ListItem>
-              </List>
-            </Collapse>
-            <ListItem button onClick={handleActivityClick}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="活動" />
-              {openActivity ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={openActivity} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我收藏的活動" />
-                </ListItem>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我發表過的活動" />
-                </ListItem>
-              </List>
-            </Collapse>
-            <ListItem button onClick={handleGroupClick}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="揪團" />
-              {openGroup ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={openGroup} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我參與的滑板團" />
-                </ListItem>
-              </List>
-            </Collapse>
-            <ListItem button onClick={handleArticleClick}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="文章" />
-              {openArticle ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={openArticle} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我收藏的文章" />
-                </ListItem>
-                <ListItem button className={classes.nested}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="我發表的文章" />
-                </ListItem>
-              </List>
-            </Collapse>
-          </Grid>
+          <TabInfo />
         </div>
         <Button
           onClick={handleSubmit}

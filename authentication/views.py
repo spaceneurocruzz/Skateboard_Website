@@ -3,7 +3,7 @@ from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 # from authentication.serializers import SocialLoginSerializer
 from rest_framework.generics import UpdateAPIView
 from .serializers import CustomTokenObtainPairSerializer, CustomUserSerializer
@@ -45,7 +45,7 @@ class CustomUserCreate(APIView):
 class CustomUserUpdate(generics.UpdateAPIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
     queryset = CustomUser.objects.all()
 
     def get_object(self, username):

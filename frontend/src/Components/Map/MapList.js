@@ -378,7 +378,7 @@ const WriteCommentsDialog = (props) => {
       //className={classes.modal}
       open={open}
       onClose={handleClose}
-      fullWidth='true'
+      fullWidth
       maxWidth="md"
     >
       <DialogTitle id="simple-dialog-title">我要寫評論</DialogTitle>
@@ -411,7 +411,7 @@ const MapList = (props) => {
       traffic: "",
       openhours: null,
       phone: "",
-      rating: null,
+      rating: 0,
       create_dt: null,
       update_dt: null,
       modified_user: "",

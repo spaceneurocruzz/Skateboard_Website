@@ -3,6 +3,7 @@ import {
   getFriendsGroupCommentsApi,
   postFriendsGroupCommentsApi,
   patchFriendsGroupApi,
+  patchUserApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
 
@@ -135,12 +136,12 @@ const ShowContentDialog = (props) => {
           {props.dbFriendsGroupData.map((data, index) => {
             if (data.group_id == props.groupId) {
               if (data.lower_limit === 0 && data.upper_limit === 0) {
-                data.lower_limit = "不限";
-                data.upper_limit = "不限";
+                data.lower_limit = 999;
+                data.upper_limit = 999;
               } else if (data.lower_limit === 0) {
-                data.lower_limit = "不限";
+                data.lower_limit = 999;
               } else {
-                data.upper_limit = "不限";
+                data.upper_limit = 999;
               }
 
               return (
@@ -305,8 +306,7 @@ const FriendsGroupList = (props) => {
     console.log("join success");
 
     let preJoinUserArr = props.getFriendsGroupDBById(group_id).join_user;
-    //preJoinUserArr.push(state.username);
-    preJoinUserArr.push("ss");
+    preJoinUserArr.push(state.username);
 
     let updateJoinUser = {
       join_user: preJoinUserArr,
@@ -320,15 +320,37 @@ const FriendsGroupList = (props) => {
         console.error(error.response);
       })
       .finally(() => {});
-  };
 
+    let preJoinArr = props.userData.group_join;
+    console.log(preJoinArr);
+    if (preJoinArr == null) {
+      preJoinArr = [group_id];
+    } else {
+      preJoinArr.push(group_id);
+    }
+
+    let groupJoin = {
+      group_join: preJoinArr,
+    };
+
+    patchUserApi(state.username, groupJoin)
+      .then((res) => {
+        console.table(res.data);
+        props.updateGroupUserDB(groupJoin);
+        alert("已參加！");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
 
   const likeGroup = (e, group_id) => {
     e.preventDefault();
     console.log("like success");
 
-    let prePossibleUserArr = props.getFriendsGroupDBById(group_id).possible_user;
-    //prePossibleUserArr.push(state.username);
+    let prePossibleUserArr = props.getFriendsGroupDBById(group_id)
+      .possible_user;
     prePossibleUserArr.push("ss");
 
     let updatePossibleUser = {
@@ -338,6 +360,29 @@ const FriendsGroupList = (props) => {
     patchFriendsGroupApi(group_id, updatePossibleUser)
       .then((res) => {
         props.updateFriendsGroupDBById(group_id, prePossibleUserArr, "LIKE");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    let preLikeArr = props.userData.group_like;
+    console.log(preLikeArr);
+    if (preLikeArr == null) {
+      preLikeArr = [group_id];
+    } else {
+      preLikeArr.push(group_id);
+    }
+
+    let groupLike = {
+      group_join: preLikeArr,
+    };
+
+    patchUserApi(state.username, groupLike)
+      .then((res) => {
+        console.table(res.data);
+        props.updateGroupUserDB(groupLike);
+        alert("已追蹤！");
       })
       .catch((error) => {
         console.error(error.response);

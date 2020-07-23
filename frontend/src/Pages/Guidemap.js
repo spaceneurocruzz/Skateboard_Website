@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getGuidemapApi } from "../axiosApi";
+import { getGuidemapApi, patchUserApi } from "../axiosApi";
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import { AuthContext } from "../App";
 
@@ -17,6 +17,10 @@ import MapModalInput from "../Components/Map/MapModalInput";
 import MapList from "../Components/Map/MapList";
 import shopMarker from "../imgs/shopping-bag.png";
 import skateboardMarker from "../imgs/skateboardMarker.png";
+import placelike from "../imgs/placelike.png";
+import placeunlike from "../imgs/placeunlike.png";
+import share from "../imgs/share.png";
+
 import CssBaseline from "@material-ui/core/CssBaseline";
 import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import Box from "@material-ui/core/Box";
@@ -30,6 +34,8 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
 
 import CircularProgress from '@material-ui/core/CircularProgress';
+
+React.useLayoutEffect = React.useEffect 
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -156,33 +162,6 @@ const Guidemap = (props) => {
       });
   };
 
-  // const LocationFilter = () => {
-  //   console.log(dbData);
-  //   return (
-  //     <Paper component="ul" className={classes.root}>
-  //       {chipData.map((data) => {
-  //         let icon;
-  //         if (data.label === "React") {
-  //           icon = <TagFacesIcon />;
-  //         }
-  //         return (
-  //           <li key={data.key}>
-  //             <Chip
-  //               icon={skateboardMarker}
-  //               label={data.label}
-  //               onDelete={
-  //                 data.label === "React" ? undefined : handleDelete(data)
-  //               }
-  //               className={classes.chip}
-  //               color="primary"
-  //             />
-  //           </li>
-  //         );
-  //       })}
-  //     </Paper>
-  //   );
-  // };
-
   const updateDB = (newData) => {
     setDbdata([...dbData, newData]);
   };
@@ -215,6 +194,34 @@ const Guidemap = (props) => {
       </div>
     );
   };
+
+  const addtoFavorite =(e,locationName)=>{
+    e.preventDefault();
+    console.log("add to favorite");
+
+    let preLikeMapArr = props.userData.map_like;
+
+    if (preLikeMapArr == null) {
+      preLikeMapArr = [locationName];
+    } else {
+      preLikeMapArr.push(locationName);
+    }
+
+    let mapLike = {
+      map_like: preLikeMapArr,
+    };
+
+    patchUserApi(state.username, mapLike)
+      .then((res) => {
+        console.table(res.data);
+        props.updateGroupUserDB(mapLike);
+        alert("已加到最愛！");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  }
 
   return (
     <>
@@ -294,16 +301,19 @@ const Guidemap = (props) => {
                       color="textSecondary"
                       component="p"
                     >
-                      {mapMarker.selectedLocation.address}
+                      <a href={"https://www.google.com/maps/dir/?api=1&destination=" + mapMarker.selectedLocation.address}>{mapMarker.selectedLocation.address}</a>
                     </Typography>
                   </CardContent>
                   <CardActions disableSpacing className={classes.cardAction}>
-                    <IconButton aria-label="add to favorites">
+                  <a href="#" onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}><img src={placeunlike} alt="placeunlike" style={{ height: 32, zIndex:500 }} /></a>
+                    {/* <IconButton aria-label="add to favorites" onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}>
                       <FavoriteIcon />
-                    </IconButton>
-                    <IconButton aria-label="share">
+                    </IconButton> */}
+                    <img src={share} alt="share" style={{ height: 32 }} onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}/>
+                   
+                    {/* <IconButton aria-label="share">
                       <ShareIcon />
-                    </IconButton>
+                    </IconButton> */}
                     <Typography
                       variant="body2"
                       color="textSecondary"
