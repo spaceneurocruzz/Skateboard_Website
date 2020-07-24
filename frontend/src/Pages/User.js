@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getUserApi, patchUserApi } from "../axiosApi";
+import { getUserApi, patchUserApi, getFriendsGroupApi } from "../axiosApi";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { AuthContext } from "../App";
@@ -27,6 +27,7 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
+import { eachDayOfInterval } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -215,12 +216,6 @@ const User = (props) => {
     };
   }
 
-  // for(let groupId in props.userData.group_join)
-  // {
-  //   dbFriendsGroupData.find((data) => data.group_id === group_id)
-
-  // }
-
   const TabInfo = () => {
     return (
       <Grid container>
@@ -235,12 +230,92 @@ const User = (props) => {
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
-          新增地點
-          收藏地點
+          <div>
+            新增地點 :
+            <ul>
+              {props.userData.group_join != undefined ||
+              props.userData.group_join != null ? (
+                props.userData.group_join.map((joinId, index) => {
+                  let data = props.dbFriendsGroupData.find(
+                    (group) => group.group_id == joinId
+                  );
+                  return (
+                    <li>
+                      {data.group_startdt.slice(0, 10)}{" "}
+                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
+                    </li>
+                  );
+                })
+              ) : (
+                <div></div>
+              )}
+            </ul>
+          </div>
+          <div>
+            收藏地點:
+            <ul>
+              {props.userData.group_like != undefined ||
+              props.userData.group_like != null ? (
+                props.userData.group_like.map((likeId, index) => {
+                  let data = props.dbFriendsGroupData.find(
+                    (group) => group.group_id == likeId
+                  );
+                  return (
+                    <li>
+                      {data.group_startdt.slice(0, 10)}{" "}
+                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
+                    </li>
+                  );
+                })
+              ) : (
+                <div></div>
+              )}
+            </ul>
+          </div>
         </TabPanel>
         <TabPanel value={value} index={1}>
-          參加中:{props.userData.group_join}
-          追蹤中:{props.userData.group_like}
+          <div>
+            參加中:
+            <ul>
+              {props.userData.group_join != undefined ||
+              props.userData.group_join != null ? (
+                props.userData.group_join.map((joinId, index) => {
+                  let data = props.dbFriendsGroupData.find(
+                    (group) => group.group_id == joinId
+                  );
+                  return (
+                    <li>
+                      {data.group_startdt.slice(0, 10)}{" "}
+                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
+                    </li>
+                  );
+                })
+              ) : (
+                <div></div>
+              )}
+            </ul>
+          </div>
+          <div>
+            追蹤中:
+            <ul>
+              {props.userData.group_like != undefined ||
+              props.userData.group_like != null ? (
+                props.userData.group_like.map((likeId, index) => {
+                  let data = props.dbFriendsGroupData.find(
+                    (group) => group.group_id == likeId
+                  );
+                  return (
+                    <li>
+                      {data.group_startdt.slice(0, 10)}{" "}
+                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
+                    </li>
+                  );
+                })
+              ) : (
+                <div></div>
+              )}
+            </ul>
+          </div>
         </TabPanel>
       </Grid>
     );

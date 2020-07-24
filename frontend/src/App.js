@@ -13,7 +13,7 @@ import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance, { logoutApi, getUserApi } from "./axiosApi";
+import axiosInstance, { logoutApi, getFriendsGroupApi } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Tabs from "@material-ui/core/Tabs";
@@ -134,6 +134,12 @@ const App = () => {
     });
   };
 
+  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
+
+  const updateFriendsGroupDB = (newData) => {
+    setDbFriendsGroupData([...dbFriendsGroupData, newData]);
+  };
+
   const handleLogout = () => {
     logoutApi({
       refresh_token: localStorage.getItem("refresh_token"),
@@ -169,6 +175,23 @@ const App = () => {
         },
       });
     }
+  }, []);
+
+  useEffect(() => {
+    getFriendsGroupApi()
+      .then((res) => {
+        console.log(dbFriendsGroupData);
+        console.log(res.data);
+        for(let ix in res.data){
+          res.data[ix]["group_startdt"] = `${(res.data[ix].group_startdt).slice(0, 10)}  ${res.data[ix].group_startdt.slice(11, 19)}`
+        }
+
+        setDbFriendsGroupData(...dbFriendsGroupData, res.data);
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
   }, []);
 
   return (
@@ -286,6 +309,8 @@ const App = () => {
               userData={userData}
               updateUserDB={updateUserDB}
               updateGroupUserDB={updateGroupUserDB}
+              dbFriendsGroupData = {dbFriendsGroupData}
+              updateFriendsGroupDB={updateFriendsGroupDB}
             />
           )}
         />
@@ -298,6 +323,7 @@ const App = () => {
               userData={userData}
               updateUserDB={updateUserDB}
               initUserDB={initUserDB}
+              dbFriendsGroupData = {dbFriendsGroupData}
             />
           )}
         />

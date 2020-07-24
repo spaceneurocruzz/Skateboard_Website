@@ -35,15 +35,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FriendsGroup = (props) => {
-  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
-
-  const updateFriendsGroupDB = (newData) => {
-    setDbFriendsGroupData([...dbFriendsGroupData, newData]);
-  };
 
   const getFriendsGroupDBById = (group_id) => {
-    if (dbFriendsGroupData != undefined) {
-      return dbFriendsGroupData.find((data) => data.group_id === group_id);
+    if (props.dbFriendsGroupData != undefined) {
+      return props.dbFriendsGroupData.find((data) => data.group_id === group_id);
     } else {
       console.log("nothing");
       return null;
@@ -51,32 +46,32 @@ const FriendsGroup = (props) => {
   };
 
   const updateFriendsGroupDBById = (group_id, newData, type) => {
-    let index = dbFriendsGroupData.findIndex(
+    let index = props.dbFriendsGroupData.findIndex(
       (data) => data.group_id === group_id
     );
 
     switch (type) {
       case "JOIN":
-        dbFriendsGroupData[index].join_user = newData;
+        props.dbFriendsGroupData[index].join_user = newData;
         console.log("join");
         break;
       case "LIKE":
-        dbFriendsGroupData[index].possible_user = newData;
+        props.dbFriendsGroupData[index].possible_user = newData;
         console.log("like");
         break;
       default:
         console.log("none");
     }
     console.log("set");
-    setDbFriendsGroupData([...dbFriendsGroupData]);
+    setDbFriendsGroupData([...props.dbFriendsGroupData]);
   };
 
   useEffect(() => {
     getFriendsGroupApi()
       .then((res) => {
-        console.log(dbFriendsGroupData);
+        console.log(props.dbFriendsGroupData);
         console.log(res.data);
-        setDbFriendsGroupData(...dbFriendsGroupData, res.data);
+        setDbFriendsGroupData(...props.dbFriendsGroupData, res.data);
       })
       .catch((error) => {
         console.error(error);
@@ -105,8 +100,8 @@ const FriendsGroup = (props) => {
   //   }
   // },[dbFriendsGroupData])
 
-  if (dbFriendsGroupData != undefined || dbFriendsGroupData != null) {
-    dbFriendsGroupData.map((data, index) => {
+  if (props.dbFriendsGroupData != undefined || props.dbFriendsGroupData != null) {
+    props.dbFriendsGroupData.map((data, index) => {
       if (
         data["join_user"] != undefined ||
         data["join_user"] != null ||
@@ -131,12 +126,12 @@ const FriendsGroup = (props) => {
     <>
       <Container component="main" maxWidth="lg">
         <Grid container>
-          <FriendsGroupModalInput dbFriendsGroupData={dbFriendsGroupData} />
+          <FriendsGroupModalInput dbFriendsGroupData={props.dbFriendsGroupData} />
         </Grid>
         <Grid container>
           <FriendsGroupList
-            dbFriendsGroupData={dbFriendsGroupData}
-            updateFriendsGroupDB={updateFriendsGroupDB}
+            dbFriendsGroupData={props.dbFriendsGroupData}
+            updateFriendsGroupDB={props.updateFriendsGroupDB}
             updateFriendsGroupDBById={updateFriendsGroupDBById}
             getFriendsGroupDBById={getFriendsGroupDBById}
             userData={props.userData}
