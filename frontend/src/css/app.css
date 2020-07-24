@@ -211,3 +211,25 @@ input {
   transform: translate(-50%, -50%);
   background-image: url("../imgs/skateboardMarker.png");
 }
+
+.box {
+  width: 70%;
+  height: 70px;
+  background-color: black;
+  color: #fff;
+  padding: 20px;
+  position: relative;
+  margin: 40px;
+  float: left;
+}
+
+.box.arrow-left:after {
+  content: " ";
+  position: absolute;
+  left: -15px;
+  top: 15px;
+  border-top: 15px solid transparent;
+  border-right: 15px solid black;
+  border-left: none;
+  border-bottom: 15px solid transparent;
+}

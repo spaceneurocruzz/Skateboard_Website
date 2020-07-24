@@ -21,6 +21,11 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Geocode from "react-geocode";
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import { Alert, AlertTitle } from "@material-ui/lab";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
+
+import Dialog from "@material-ui/core/Dialog";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -118,7 +123,7 @@ const FriendsGroupCreate = (props) => {
     create_dt: new Date().toISOString(),
     update_dt: new Date().toISOString(),
     lower_limit: 0,
-    uppper_limit: 0,
+    upper_limit: 0,
   });
 
   const [dbData, setDbData] = useState([]);
@@ -145,7 +150,8 @@ const FriendsGroupCreate = (props) => {
       setInput({
         ...input,
         [event.target.name]: event.target.value
-          .toLocaleString().replace("T", " ")
+          .toLocaleString()
+          .replace("T", " "),
       });
       console.log(event.target.value.toLocaleString().replace("T", " "));
     } else {
@@ -153,6 +159,60 @@ const FriendsGroupCreate = (props) => {
         ...input,
         [event.target.name]: event.target.value,
       });
+    }
+  };
+
+  const [errorText, setErrorText] = useState("");
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const [isValid, setIsValid]=useState(true)
+  const [errorFields, setErrorFields]=useState([])
+
+  const checkValid = () => {
+
+    let errorArr=[];
+    setErrorFields({errorFields: []}); //no clear
+
+    if (!input.location_name) {
+      console.log("場地名稱");
+      errorArr.push("場地名稱");
+      setIsValid(false)
+    }
+    if (!input.group_title) {
+      console.log("主題");
+      errorArr.push("主題");
+    }
+    if (!input.group_startdt) {
+      console.log("開始日期");
+      errorArr.push("開始日期");
+    }
+    if (!input.group_enddt) {
+      console.log("結束日期");
+      errorArr.push("結束日期");
+    }
+    // if (!input.lower_limit) {
+    //   console.log("下限");
+    //   errorArr.push("下限");
+    // }
+    // if (!input.upper_limit) {
+    //   console.log("上限");
+    //   errorArr.push("上限");
+    // }
+    if (!input.group_content) {
+      console.log("內容");
+      errorArr.push("內容");
+      setErrorFields([...errorFields,errorArr]);
+      setOpen(true);
+   
+      console.log(errorFields)
+      return false;
     }
   };
 
@@ -165,14 +225,21 @@ const FriendsGroupCreate = (props) => {
     console.log(value.location_name);
   };
 
+  const getMapDatabyLocationName = (locationName) => {
+    return dbData.find((data) => data.location_name == locationName);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit");
-    let dbPost;
 
-    dbPost = input;
+    if(!checkValid())
+      return;
+
+    let dbPost = input;
     if (input.address == "") {
-      input["address"] = "台北市松山區延吉街";
+      input["address"] = getMapDatabyLocationName(dbPost.location_name).address;
+      console.log(getMapDatabyLocationName(dbPost.location_name).address);
     }
     console.log(input);
     dbPost["create_dt"] = new Date();
@@ -180,36 +247,35 @@ const FriendsGroupCreate = (props) => {
 
     Geocode.setApiKey("AIzaSyB7KldR4x33szhmh1Q8Vit9YynpWfvcOOs");
     Geocode.enableDebug();
-    Geocode.fromAddress(input.address)
-      .then(
-        (response) => {
-          const { lat, lng } = response.results[0].geometry.location;
-          console.log(lat, lng);
-          setInput({ latitude: lat, longitude: lng });
-          dbPost["latitude"] = lat;
-          dbPost["longitude"] = lng;
-        },
-        (error) => {
-          console.error(error);
-        }
-      )
-      .then(() => {
-        // dbPost["group_content"];
-        postFriendsGroupApi(dbPost)
-          .then((res) => {
-            console.log(dbPost);
-            setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
-            // updateFriendsGroupDB(dbPost);
-            alert("更新成功！");
-            //redirect
-          })
-          .catch((error) => {
-            console.error(error.response);
-          })
-          .finally(() => {
-            <Redirect to="/friendsgroup" />;
-          });
-      });
+    Geocode.fromAddress(input.address).then(
+      (response) => {
+        const { lat, lng } = response.results[0].geometry.location;
+        console.log(lat, lng);
+        setInput({ latitude: lat, longitude: lng });
+        dbPost["latitude"] = lat;
+        dbPost["longitude"] = lng;
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+    // .then(() => {
+    //   // dbPost["group_content"];
+    //   postFriendsGroupApi(dbPost)
+    //     .then((res) => {
+    //       console.log(dbPost);
+    //       setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
+    //       // updateFriendsGroupDB(dbPost);
+    //       alert("更新成功！");
+    //       //redirect
+    //     })
+    //     .catch((error) => {
+    //       console.error(error.response);
+    //     })
+    //     .finally(() => {
+    //       <Redirect to="/friendsgroup" />;
+    //     });
+    // });
   };
   const [isAddressChecked, setIsAddressChecked] = React.useState(false);
 
@@ -221,6 +287,29 @@ const FriendsGroupCreate = (props) => {
 
   return (
     <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
+      <Dialog
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        className={classes.modal}
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={open}>
+          <Alert severity="error">
+            <AlertTitle>以下資料不可為空！</AlertTitle>
+            <span>{errorFields.join(", ")}</span>
+            {/* {errorFields.map((field, index) => {
+              <span>{field}</span>
+            })} */}
+          </Alert>
+        </Fade>
+      </Dialog>
+      ;
       <Container component="main" maxWidth="md">
         <form className={classes.formControl} noValidate autoComplete="off">
           <h2>填寫開團資訊</h2>
@@ -259,10 +348,14 @@ const FriendsGroupCreate = (props) => {
               </FormControl>
 
               <FormControl>
-                <div className={classes.flexContainer}>
+                <div
+                  className={classes.flexContainer}
+                  style={{ marginBottom: 20 }}
+                >
                   <h3>開團時間</h3>
                   {/* <form className={classes.datetime} noValidate> */}
                   <TextField
+                    required
                     onChange={handleInputChange}
                     // value={input.start_dt}
                     id="datetime-local"
@@ -278,6 +371,7 @@ const FriendsGroupCreate = (props) => {
                   {/* </form>
                   <form className={classes.datetime} noValidate> */}
                   <TextField
+                    required
                     onChange={handleInputChange}
                     // value={input.end_dt}
                     id="datetime-local"
@@ -318,7 +412,7 @@ const FriendsGroupCreate = (props) => {
                       variant="outlined"
                     />
                   )}
-                  style={{ marginTop: 20, width: 500, marginBottom: 20 }}
+                  style={{ width: 500, marginBottom: 20 }}
                 />
               )}
               {/* <div className={classes.flexContainer}> */}
@@ -361,6 +455,7 @@ const FriendsGroupCreate = (props) => {
               )}
               <div className={classes.flexContainer}>
                 <TextField
+                  required
                   id="lower_limit"
                   label="人數下限"
                   type="number"
@@ -371,6 +466,7 @@ const FriendsGroupCreate = (props) => {
                   style={{ marginTop: 20, marginRight: 20 }}
                 />
                 <TextField
+                  required
                   id="uppper_limit"
                   label="人數上限"
                   type="number"
@@ -394,6 +490,7 @@ const FriendsGroupCreate = (props) => {
               />
               <h3>內容</h3>
               <TextField
+                required
                 onChange={handleInputChange}
                 id="filled-multiline-static"
                 label="填寫相關內容"

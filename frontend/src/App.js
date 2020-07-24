@@ -8,7 +8,7 @@ import Home from "./Pages/Home";
 import Guidemap from "./Pages/Guidemap";
 import Calendar from "./Pages/Calendar";
 import FriendsGroup from "./Pages/FriendsGroup";
-
+import FriendsGroupDetail from "./Pages/FriendsGroupDetail";
 import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
@@ -130,7 +130,7 @@ const App = () => {
   const updateGroupUserDB = (newValue) => {
     setUserdata({
       ...userData,
-      newValue
+      newValue,
     });
   };
 
@@ -227,16 +227,16 @@ const App = () => {
               </NavLink>
             </li> */}
             {/* {state.isAuthenticated && ( */}
-              <li className="nav-link-item">
-                <NavLink
-                  to="/user"
-                  activeClassName={classes.activelink}
-                  className={classes.link}
-                >
-                  <MapIcon style={{ verticalAlign: "middle" }} />
-                  <span style={{ verticalAlign: "middle" }}>會員中心</span>
-                </NavLink>
-              </li>
+            <li className="nav-link-item">
+              <NavLink
+                to="/user"
+                activeClassName={classes.activelink}
+                className={classes.link}
+              >
+                <MapIcon style={{ verticalAlign: "middle" }} />
+                <span style={{ verticalAlign: "middle" }}>會員中心</span>
+              </NavLink>
+            </li>
             {/* )} */}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
@@ -282,7 +282,11 @@ const App = () => {
           path={"/friendsgroup"}
           key={"route-friendsgroup"}
           render={() => (
-            <FriendsGroup userData={userData} updateUserDB={updateUserDB} updateGroupUserDB={updateGroupUserDB}/>
+            <FriendsGroup
+              userData={userData}
+              updateUserDB={updateUserDB}
+              updateGroupUserDB={updateGroupUserDB}
+            />
           )}
         />
         <Route
@@ -308,6 +312,20 @@ const App = () => {
             />
           )}
         />
+
+        <Route
+          exact
+          path={"/friendsGroupDetail/:id"}
+          key={"route-friendsGroupDetail"}
+          //children={<FriendsGroupDetail />}
+          render={() => (
+            <FriendsGroupDetail
+            //userData={props.userData}
+            // dbFriendsGroupData={dbFriendsGroupData}
+            />
+          )}
+        />
+
         <Route exact path={"/login/"} component={Login} />
         <Route exact path={"/signup/"} component={Signup} />
       </Switch>

@@ -3,14 +3,17 @@ import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-
+import { Switch, Route, useHistory } from "react-router";
 import Container from "@material-ui/core/Container";
 import AddLocationIcon from "@material-ui/icons/AddLocation";
 
 import MaterialTable from "material-table";
 import FriendsGroupList from "../Components/FriendsGroup/FriendsGroupList";
+import FriendsGroupDetail from "../Pages/FriendsGroupDetail";
+
 import FriendsGroupModalInput from "../Components/FriendsGroup/FriendsGroupModalInput";
 import { getFriendsGroupApi } from "../axiosApi";
+//import { Switch } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,19 +55,19 @@ const FriendsGroup = (props) => {
       (data) => data.group_id === group_id
     );
 
-    switch(type){
+    switch (type) {
       case "JOIN":
         dbFriendsGroupData[index].join_user = newData;
-        console.log("join")
+        console.log("join");
         break;
       case "LIKE":
         dbFriendsGroupData[index].possible_user = newData;
-        console.log("like")
+        console.log("like");
         break;
       default:
         console.log("none");
     }
-    console.log("set")
+    console.log("set");
     setDbFriendsGroupData([...dbFriendsGroupData]);
   };
 
@@ -125,21 +128,25 @@ const FriendsGroup = (props) => {
   }
 
   return (
-    <Container component="main" maxWidth="lg">
-      <Grid container>
-        <FriendsGroupModalInput dbFriendsGroupData={dbFriendsGroupData} />
-      </Grid>
-      <Grid container>
-        <FriendsGroupList
-          dbFriendsGroupData={dbFriendsGroupData}
-          updateFriendsGroupDB={updateFriendsGroupDB}
-          updateFriendsGroupDBById={updateFriendsGroupDBById}
-          getFriendsGroupDBById={getFriendsGroupDBById}
-          userData={props.userData} updateUserDB={props.updateUserDB}
-          updateGroupUserDB={props.updateGroupUserDB}
-        />
-      </Grid>
-    </Container>
+    <>
+      <Container component="main" maxWidth="lg">
+        <Grid container>
+          <FriendsGroupModalInput dbFriendsGroupData={dbFriendsGroupData} />
+        </Grid>
+        <Grid container>
+          <FriendsGroupList
+            dbFriendsGroupData={dbFriendsGroupData}
+            updateFriendsGroupDB={updateFriendsGroupDB}
+            updateFriendsGroupDBById={updateFriendsGroupDBById}
+            getFriendsGroupDBById={getFriendsGroupDBById}
+            userData={props.userData}
+            updateUserDB={props.updateUserDB}
+            updateGroupUserDB={props.updateGroupUserDB}
+          />
+        </Grid>
+      </Container>
+
+    </>
   );
 };
 

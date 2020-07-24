@@ -6,7 +6,7 @@ import {
   patchUserApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
-
+import { Link, NavLink } from "react-router-dom";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -29,7 +29,9 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ImportContactsIcon from "@material-ui/icons/ImportContacts";
 import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
+import FriendsGroupDetail from "../../Pages/FriendsGroupDetail";
 
+import { Switch, Route, useHistory } from "react-router";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -80,211 +82,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ShowContentDialog = (props) => {
-  console.log(props.groupId);
-  console.log(props);
-  const classes = useStyles();
-  const { onClose, open } = props;
-
-  const handleClose = (value) => {
-    onClose(value);
-  };
-
-  const handleListItemClick = (value) => {
-    onClose(value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("submit");
-
-    let dbPost = {};
-
-    //dbPost = input;
-    dbPost["comment_user"] = "ss";
-    dbPost["comment"] = "testtt";
-    dbPost["create_dt"] = new Date();
-    dbPost["update_dt"] = new Date();
-
-    //insert user
-    //post should return commentid and post to user table
-    postFriendsGroupCommentsApi(dbPost)
-      .then((res) => {
-        console.log(dbPost);
-        alert("更新成功！");
-        props.updateComment(dbPost);
-        handleClose();
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-  };
-
-  return (
-    // <ThemeProvider theme={theme}>
-    <Dialog
-      style={{}}
-      aria-labelledby="transition-modal-title"
-      aria-describedby="transition-modal-description"
-      // className={classes.modal}
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      maxWidth="md"
-    >
-      {props.dbFriendsGroupData.map((data, index) => {
-        if (data.group_id == props.groupId) {
-          if (data.lower_limit === 0 && data.upper_limit === 0) {
-            data.lower_limit = 999;
-            data.upper_limit = 999;
-          } else if (data.lower_limit === 0) {
-            data.lower_limit = 999;
-          } else {
-            data.upper_limit = 999;
-          }
-
-          return (
-            <>
-              <DialogTitle id="simple-dialog-title">
-                <span style={{ fontSize: 24, fontWeight: "bold" }}>
-                  {`${data.group_startdt.slice(0, 10)}    `}{" "}
-                </span>
-                <span
-                  style={{ fontSize: 20, fontWeight: "bold" }}
-                >{`${data.group_startdt.slice(11, 19)}    `}</span>
-                <span style={{ fontSize: 22, fontWeight: "bold" }}>
-                  {data.location_name}
-                </span>
-                <span style={{ textAlign: "left" }}>
-                  {" "}
-                  (ID：{data.group_id})
-                </span>
-              </DialogTitle>
-              <DialogContent>
-                <ListItem>
-                  <ListItemText>{`地址：${data.address}`}</ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>
-                    <span>{`     人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}</span>
-                  </ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>{`內容：${data.group_content}`}</ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
-                </ListItem>
-                <ListItem>
-                  <ListItemText>{`建立者：${data.create_user}`}</ListItemText>
-                </ListItem>
-                <ListItem>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      color: "#9a9898",
-                      alignItems: "left",
-                    }}
-                  >{`新增日期：${data.create_dt.slice(
-                    0,
-                    10
-                  )}  ${data.create_dt.slice(11, 19)}     `}</span>
-                  <span
-                    style={{
-                      fontSize: 12,
-                      color: "#9a9898",
-                      alignItems: "left",
-                    }}
-                  >{`更新日期：${data.update_dt.slice(
-                    0,
-                    10
-                  )}  ${data.update_dt.slice(11, 19)}`}</span>
-                </ListItem>
-              </DialogContent>
-            </>
-          );
-        }
-      })}
-
-      <DialogActions>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          color="secondary"
-          className={classes.button}
-          endIcon={<Icon>send</Icon>}
-        >
-          送出留言
-        </Button>
-      </DialogActions>
-      <CommentList groupId={props.groupId} commentData={props.commentData} />
-    </Dialog>
-    // </ThemeProvider>
-  );
-};
-
-const CommentList = (props) => {
-  const classes = useStyles();
-  console.log(props.commentData);
-  if (
-    props.commentData == undefined ||
-    !props.commentData.some((t) => t.group_id == props.groupId)
-  ) {
-    return <span>目前還沒有評論哦！</span>;
-  } else {
-    return (
-      <List className={classes.root}>
-        {props.commentData.map((data, index) => {
-          if (data.group_id == props.groupId) {
-            return (
-              <>
-                <ListItem alignItems="flex-start" key={index}>
-                  {/* <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-          </ListItemAvatar> */}
-
-                  <ListItemText
-                    key={data.group_id}
-                    primary={
-                      <React.Fragment key={data.group_id + "group"}>
-                        {`${data.comment_user} - `}
-                        {data.comment}
-                      </React.Fragment>
-                    }
-                    secondary={data.create_dt}
-                  />
-                </ListItem>
-                <Divider variant="inset" component="li" />
-              </>
-            );
-          }
-        })}
-      </List>
-    );
-  }
-};
-
 const FriendsGroupList = (props) => {
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
-
-  const [openShowContent, setOpenShowContent] = React.useState(false);
-  const [openShowContentGroupId, setOpenShowContentGroupId] = React.useState(0);
-
-  const handleShowContentOpen = (event, group_id) => {
-    setOpenShowContent(true);
-    setOpenShowContentGroupId(group_id);
-    console.log(openShowContentGroupId);
-  };
-
-  const handleShowContentClose = (group_id) => {
-    setOpenShowContent(false);
-  };
-
   const [commentData, setCommentData] = useState([]);
 
   useEffect(() => {
@@ -396,14 +196,6 @@ const FriendsGroupList = (props) => {
 
   return (
     <>
-      <ShowContentDialog
-        open={openShowContent}
-        onClose={handleShowContentClose}
-        groupId={openShowContentGroupId}
-        commentData={commentData}
-        dbFriendsGroupData={props.dbFriendsGroupData}
-        updateComment={updateComment}
-      />
       <Container component="main" maxWidth="lg">
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
@@ -445,11 +237,12 @@ const FriendsGroupList = (props) => {
               data={props.dbFriendsGroupData}
               actions={[
                 (rowData) => ({
-                  icon: () => <ImportContactsIcon />,
+                  icon: () => <NavLink to={`friendsGroupDetail/${rowData.group_id}`}  style={{color:'black'}}><ImportContactsIcon /></NavLink>,
                   tooltip: "查看內容",
-                  onClick: (event, rowData) => {
-                    handleShowContentOpen(event, rowData.group_id);
-                  },
+                  // onClick: (event, rowData) => {
+                  //   <Link to={`friendsGroupDetail/${rowData.group_id}`}></Link>
+                  //   //handleShowContentOpen(event, rowData.group_id);
+                  // },
                   // disabled: !state.isAuthenticated,
                 }),
                 (rowData) => ({
