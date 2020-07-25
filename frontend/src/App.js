@@ -13,7 +13,11 @@ import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance, { logoutApi, getFriendsGroupApi } from "./axiosApi";
+import axiosInstance, {
+  logoutApi,
+  getFriendsGroupApi,
+  getGuidemapApi,
+} from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Tabs from "@material-ui/core/Tabs";
@@ -79,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     },
     color: "#e9710f",
     fontWeight: 600,
-    fontSize: 20,
+    fontSize: 24,
     textDecoration: "none",
     // backgroundColor: '#2e1534',
     backgroundSize: "cover",
@@ -140,6 +144,12 @@ const App = () => {
     setDbFriendsGroupData([...dbFriendsGroupData, newData]);
   };
 
+  const [dbGuideMapData, setDbGuideMapData] = useState([]);
+
+  const updateGuideMapDB = (newData) => {
+    setDbGuideMapData([...dbGuideMapData, newData]);
+  };
+
   const handleLogout = () => {
     logoutApi({
       refresh_token: localStorage.getItem("refresh_token"),
@@ -178,12 +188,28 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    getGuidemapApi()
+      .then((res) => {
+        console.log(dbGuideMapData);
+        console.log(res.data);
+        setDbGuideMapData(...dbGuideMapData, res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
+
+  useEffect(() => {
     getFriendsGroupApi()
       .then((res) => {
         console.log(dbFriendsGroupData);
         console.log(res.data);
-        for(let ix in res.data){
-          res.data[ix]["group_startdt"] = `${(res.data[ix].group_startdt).slice(0, 10)}  ${res.data[ix].group_startdt.slice(11, 19)}`
+        for (let ix in res.data) {
+          res.data[ix]["group_startdt"] = `${res.data[ix].group_startdt.slice(
+            0,
+            10
+          )}  ${res.data[ix].group_startdt.slice(11, 19)}`;
         }
 
         setDbFriendsGroupData(...dbFriendsGroupData, res.data);
@@ -297,7 +323,13 @@ const App = () => {
           path={"/guidemap"}
           key={"route-guidemap"}
           render={() => (
-            <Guidemap userData={userData} updateUserDB={updateUserDB} />
+            <Guidemap
+              userData={userData}
+              updateUserDB={updateUserDB}
+              dbGuideMapData={dbGuideMapData}
+              updateGuideMapDB={updateGuideMapDB}
+              dbFriendsGroupData={dbFriendsGroupData}
+            />
           )}
         />
         <Route
@@ -309,7 +341,7 @@ const App = () => {
               userData={userData}
               updateUserDB={updateUserDB}
               updateGroupUserDB={updateGroupUserDB}
-              dbFriendsGroupData = {dbFriendsGroupData}
+              dbFriendsGroupData={dbFriendsGroupData}
               updateFriendsGroupDB={updateFriendsGroupDB}
             />
           )}
@@ -323,7 +355,8 @@ const App = () => {
               userData={userData}
               updateUserDB={updateUserDB}
               initUserDB={initUserDB}
-              dbFriendsGroupData = {dbFriendsGroupData}
+              dbFriendsGroupData={dbFriendsGroupData}
+              dbGuideMapData={dbGuideMapData}
             />
           )}
         />

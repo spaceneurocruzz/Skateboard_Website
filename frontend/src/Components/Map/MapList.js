@@ -273,6 +273,14 @@ const WriteComment = (props) => {
     });
   };
 
+  const countComment = (mapId) => {
+
+    //props.commentData.filter((group) => group.map_id == mapId).
+
+    return props.commentData.filter((group) => group.map_id == mapId)
+      .length;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit");

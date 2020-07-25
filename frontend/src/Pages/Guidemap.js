@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getGuidemapApi, patchUserApi } from "../axiosApi";
+import { patchUserApi } from "../axiosApi";
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import { AuthContext } from "../App";
 
@@ -33,9 +33,9 @@ import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import ShareIcon from "@material-ui/icons/Share";
 
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-React.useLayoutEffect = React.useEffect 
+React.useLayoutEffect = React.useEffect;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -109,37 +109,23 @@ const Guidemap = (props) => {
     { key: 1, label: "店家" },
   ]);
 
-  const [dbData, setDbdata] = useState([]);
-
-  useEffect(() => {
-    getGuidemapApi()
-      .then((res) => {
-        console.log(dbData);
-        console.log(res.data);
-        setDbdata(...dbData, res.data);
-        setIsLoading(true);
-        console.log(dbData);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {});
-  }, []);
-
   const handleDelete = (chipToDelete) => () => {
     setChipData((chips) =>
       chips.filter((chip) => chip.key !== chipToDelete.key)
     );
   };
 
-  const [isLoading, setIsLoading] = useState(false);
+  const countMap = (mapId) => {
+    return props.dbFriendsGroupData.filter((group) => group.map_id == mapId)
+      .length;
+  };
 
   const [mapMarker, setMapMarker] = useState({
     activeMarker: {},
     selectedLocation: {},
     showingInfoWindow: false,
   });
- 
+
   const onMarkerClick = (props, marker) =>
     setMapMarker({
       activeMarker: marker,
@@ -154,20 +140,11 @@ const Guidemap = (props) => {
     });
 
   const onMapClicked = () => {
-    console.log(mapMarker.showingInfoWindow);
     if (mapMarker.showingInfoWindow)
       setMapMarker({
         activeMarker: null,
         showingInfoWindow: false,
       });
-  };
-
-  const updateDB = (newData) => {
-    setDbdata([...dbData, newData]);
-  };
-
-  const show = () => {
-    console.log(dbData);
   };
 
   const ScrollTop = (props) => {
@@ -195,7 +172,7 @@ const Guidemap = (props) => {
     );
   };
 
-  const addtoFavorite =(e,locationName)=>{
+  const addtoFavorite = (e, locationName) => {
     e.preventDefault();
     console.log("add to favorite");
 
@@ -221,31 +198,41 @@ const Guidemap = (props) => {
         console.error(error.response);
       })
       .finally(() => {});
-  }
+  };
 
   return (
     <>
       <Container component="main" maxWidth="lg">
         <Grid container id="back-to-top-anchor">
           <div className={classes.flexContainer}>
-            <MapModalInput updateDB={updateDB} formerDbData={dbData} />
+            <MapModalInput
+              updateDB={props.updateGuideMapDB}
+              formerDbData={props.dbGuideMapData}
+              userData={props.userData}
+            />
             {/* <LocationFilter /> */}
-            <h3 style={{ marginLeft: 20, marginBottom:20, marginTop:50 }}>
+            <h3 style={{ marginLeft: 20, marginBottom: 20, marginTop: 50 }}>
               <span style={{ verticalAlign: "middle" }}>場地</span>
-              <img src={skateboardMarker} style={{ height: 32 }} />
+              <img
+                src={skateboardMarker}
+                style={{ height: 32, verticalAlign: "middle" }}
+              />
               <span style={{ verticalAlign: "middle" }}>店家</span>
-              <img src={shopMarker} style={{ height: 32 }} />
+              <img
+                src={shopMarker}
+                style={{ height: 32, verticalAlign: "middle" }}
+              />
             </h3>
           </div>
         </Grid>
       </Container>
-      {isLoading &&
       <Grid
         container
-        style={{ width: "80%", height: "100vh", textAlign: "center" }}
+        style={{ width: "80%", height: "60vh", textAlign: "center" }}
       >
-        <div style={{ height: "100vh" }}>
+        <div>
           <Map
+            style={{ height: "60vh" }}
             className="map"
             google={props.google}
             initialCenter={{
@@ -255,7 +242,7 @@ const Guidemap = (props) => {
             onClick={onMapClicked}
             zoom={13}
           >
-            {dbData.map((data, index) =>
+            {props.dbGuideMapData.map((data, index) =>
               data.location_type === "場地" ? (
                 <Marker
                   icon={{
@@ -266,6 +253,7 @@ const Guidemap = (props) => {
                   key={index}
                   name={data.location_name}
                   address={data.address}
+                  groupCount={countMap(data.location_id)}
                   position={{ lat: data.latitude, lng: data.longitude }}
                   onClick={onMarkerClick}
                 />
@@ -279,6 +267,7 @@ const Guidemap = (props) => {
                   key={index}
                   name={data.location_name}
                   address={data.address}
+                  groupCount={countMap(data.location_id)}
                   position={{ lat: data.latitude, lng: data.longitude }}
                   onClick={onMarkerClick}
                 />
@@ -301,16 +290,41 @@ const Guidemap = (props) => {
                       color="textSecondary"
                       component="p"
                     >
-                      <a href={"https://www.google.com/maps/dir/?api=1&destination=" + mapMarker.selectedLocation.address}>{mapMarker.selectedLocation.address}</a>
+                      <a
+                        href={
+                          "https://www.google.com/maps/dir/?api=1&destination=" +
+                          mapMarker.selectedLocation.address
+                        }
+                      >
+                        {mapMarker.selectedLocation.address}
+                      </a>
                     </Typography>
                   </CardContent>
                   <CardActions disableSpacing className={classes.cardAction}>
-                  <a href="#" onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}><img src={placeunlike} alt="placeunlike" style={{ height: 32, zIndex:500 }} /></a>
+                    <a
+                      href="#"
+                      onClick={() =>
+                        addtoFavorite(mapMarker.selectedLocation.name)
+                      }
+                    >
+                      <img
+                        src={placeunlike}
+                        alt="placeunlike"
+                        style={{ height: 32, zIndex: 500 }}
+                      />
+                    </a>
                     {/* <IconButton aria-label="add to favorites" onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}>
                       <FavoriteIcon />
                     </IconButton> */}
-                    <img src={share} alt="share" style={{ height: 32 }} onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}/>
-                   
+                    <img
+                      src={share}
+                      alt="share"
+                      style={{ height: 32 }}
+                      onClick={() =>
+                        addtoFavorite(mapMarker.selectedLocation.name)
+                      }
+                    />
+
                     {/* <IconButton aria-label="share">
                       <ShareIcon />
                     </IconButton> */}
@@ -318,9 +332,9 @@ const Guidemap = (props) => {
                       variant="body2"
                       color="textSecondary"
                       component="p"
-                      style={{padding:10}}
+                      style={{ padding: 10 }}
                     >
-                      目前揪團數：
+                      目前揪團數：{mapMarker.selectedLocation.groupCount}
                     </Typography>
                   </CardActions>
                 </Card>
@@ -328,11 +342,14 @@ const Guidemap = (props) => {
             </InfoWindow>
           </Map>
         </div>
-      </Grid>}
+      </Grid>
       {/* {!isLoading && <CircularProgressWithLabel value={progress} />} */}
       <Container component="main" maxWidth="lg">
         <Grid container>
-          <MapList formerDbData={dbData} updateDB={updateDB} />
+          <MapList
+            formerDbData={props.dbGuideMapData}
+            updateGuideMapDB={props.updateGuideMapDB}
+          />
         </Grid>
       </Container>
       <ScrollTop {...props}>

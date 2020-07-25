@@ -10,7 +10,8 @@ import AddLocationIcon from "@material-ui/icons/AddLocation";
 import MaterialTable from "material-table";
 import FriendsGroupList from "../Components/FriendsGroup/FriendsGroupList";
 import FriendsGroupDetail from "../Pages/FriendsGroupDetail";
-
+import Fab from "@material-ui/core/Fab";
+import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import FriendsGroupModalInput from "../Components/FriendsGroup/FriendsGroupModalInput";
 import { getFriendsGroupApi } from "../axiosApi";
 //import { Switch } from "@material-ui/core";
@@ -32,13 +33,19 @@ const useStyles = makeStyles((theme) => ({
   buttonAdd: {
     margin: theme.spacing(1),
   },
+  scrolltop: {
+    position: "fixed",
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+  },
 }));
 
 const FriendsGroup = (props) => {
-
   const getFriendsGroupDBById = (group_id) => {
     if (props.dbFriendsGroupData != undefined) {
-      return props.dbFriendsGroupData.find((data) => data.group_id === group_id);
+      return props.dbFriendsGroupData.find(
+        (data) => data.group_id === group_id
+      );
     } else {
       console.log("nothing");
       return null;
@@ -100,7 +107,10 @@ const FriendsGroup = (props) => {
   //   }
   // },[dbFriendsGroupData])
 
-  if (props.dbFriendsGroupData != undefined || props.dbFriendsGroupData != null) {
+  if (
+    props.dbFriendsGroupData != undefined ||
+    props.dbFriendsGroupData != null
+  ) {
     props.dbFriendsGroupData.map((data, index) => {
       if (
         data["join_user"] != undefined ||
@@ -122,11 +132,38 @@ const FriendsGroup = (props) => {
     });
   }
 
+  const ScrollTop = (props) => {
+    const { children } = props;
+    const classes = useStyles();
+
+    const handleClick = (event) => {
+      const anchor = (event.target.ownerDocument || document).querySelector(
+        "#back-to-top-anchor"
+      );
+
+      if (anchor) {
+        anchor.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    };
+
+    return (
+      <div
+        onClick={handleClick}
+        role="presentation"
+        className={classes.scrolltop}
+      >
+        {children}
+      </div>
+    );
+  };
+
   return (
     <>
       <Container component="main" maxWidth="lg">
-        <Grid container>
-          <FriendsGroupModalInput dbFriendsGroupData={props.dbFriendsGroupData} />
+        <Grid container id="back-to-top-anchor">
+          <FriendsGroupModalInput
+            dbFriendsGroupData={props.dbFriendsGroupData}
+          />
         </Grid>
         <Grid container>
           <FriendsGroupList
@@ -140,7 +177,11 @@ const FriendsGroup = (props) => {
           />
         </Grid>
       </Container>
-
+      <ScrollTop {...props}>
+        <Fab color="secondary" size="small" aria-label="scroll back to top">
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </ScrollTop>
     </>
   );
 };

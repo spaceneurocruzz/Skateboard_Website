@@ -258,24 +258,24 @@ const FriendsGroupCreate = (props) => {
       (error) => {
         console.error(error);
       }
-    );
-    // .then(() => {
-    //   // dbPost["group_content"];
-    //   postFriendsGroupApi(dbPost)
-    //     .then((res) => {
-    //       console.log(dbPost);
-    //       setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
-    //       // updateFriendsGroupDB(dbPost);
-    //       alert("更新成功！");
-    //       //redirect
-    //     })
-    //     .catch((error) => {
-    //       console.error(error.response);
-    //     })
-    //     .finally(() => {
-    //       <Redirect to="/friendsgroup" />;
-    //     });
-    // });
+    )
+    .then(() => {
+      // dbPost["group_content"];
+      postFriendsGroupApi(dbPost)
+        .then((res) => {
+          console.log(dbPost);
+          setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
+          // updateFriendsGroupDB(dbPost);
+          alert("更新成功！");
+          //redirect
+        })
+        .catch((error) => {
+          console.error(error.response);
+        })
+        .finally(() => {
+          <Redirect to="/friendsgroup" />;
+        });
+    });
   };
   const [isAddressChecked, setIsAddressChecked] = React.useState(false);
 

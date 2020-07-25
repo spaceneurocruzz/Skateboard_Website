@@ -160,6 +160,8 @@ const MapModalInput = (props) => {
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
 
+    console.log(props.userData)
+
     let preAddMapArr = props.userData.map_add;
     if (preAddMapArr == null) {
       preAddMapArr = [input.location_name];

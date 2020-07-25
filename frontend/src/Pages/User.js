@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getUserApi, patchUserApi, getFriendsGroupApi } from "../axiosApi";
+import { getUserApi, patchUserApi } from "../axiosApi";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { AuthContext } from "../App";
@@ -233,16 +233,15 @@ const User = (props) => {
           <div>
             新增地點 :
             <ul>
-              {props.userData.group_join != undefined ||
-              props.userData.group_join != null ? (
-                props.userData.group_join.map((joinId, index) => {
-                  let data = props.dbFriendsGroupData.find(
-                    (group) => group.group_id == joinId
+              {props.userData.map_add != undefined ||
+              props.userData.map_add != null ? (
+                props.userData.map_add.map((addId, index) => {
+                  let data = props.dbGuideMapData.find(
+                    (map) => map.location_id == addId
                   );
                   return (
                     <li>
-                      {data.group_startdt.slice(0, 10)}{" "}
-                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
+                      {data.location_name} {data.address}
                     </li>
                   );
                 })
@@ -254,16 +253,15 @@ const User = (props) => {
           <div>
             收藏地點:
             <ul>
-              {props.userData.group_like != undefined ||
-              props.userData.group_like != null ? (
-                props.userData.group_like.map((likeId, index) => {
-                  let data = props.dbFriendsGroupData.find(
+              {props.userData.map_like != undefined ||
+              props.userData.map_like != null ? (
+                props.userData.map_like.map((likeId, index) => {
+                  let data = props.dbGuideMapData.find(
                     (group) => group.group_id == likeId
                   );
                   return (
                     <li>
-                      {data.group_startdt.slice(0, 10)}{" "}
-                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
+                      {data.location_name} {data.address}
                     </li>
                   );
                 })

@@ -270,6 +270,7 @@ const FriendsGroupList = (props) => {
                   fontSize: 16,
                 },
                 actionsColumnIndex: -1,
+                pageSize:10
               }}
               localization={{
                 header: {
