@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/",
+  baseURL: "/api/",
   timeout: 5000,
   headers: {
     Authorization: localStorage.getItem("access_token")
@@ -13,15 +13,15 @@ const axiosInstance = axios.create({
 });
 
 const friendsGroupAxiosInstance = axios.create({
-  baseURL: `http://127.0.0.1:8000/api/friends/`,
+  baseURL: `/api/friends/`,
 });
 
 const mapAxiosInstance = axios.create({
-  baseURL: `http://127.0.0.1:8000/api/map/`,
+  baseURL: `api/map/`,
 });
 
 const userAxiosInstance = axios.create({
-  baseURL: `http://127.0.0.1:8000/api/user/`,
+  baseURL: `api/user/`,
 });
 
 axiosInstance.interceptors.response.use(
