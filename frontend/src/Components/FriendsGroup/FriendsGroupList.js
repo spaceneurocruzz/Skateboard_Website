@@ -251,7 +251,7 @@ const FriendsGroupList = (props) => {
                   onClick: (event, rowData) => {
                     joinGroup(event, rowData.group_id);
                   },
-                  //disabled: !state.isAuthenticated || rowData.join_user.includes(state.username),
+                  disabled: !state.isAuthenticated || rowData.join_user.includes(state.username),
                 }),
                 (rowData) => ({
                   icon: () => <FavoriteBorderIcon />,
@@ -259,7 +259,7 @@ const FriendsGroupList = (props) => {
                   onClick: (event, rowData) => {
                     likeGroup(event, rowData.group_id);
                   },
-                  //disabled: !state.isAuthenticated || rowData.possible_user.includes(state.username),
+                  disabled: !state.isAuthenticated || rowData.possible_user.includes(state.username),
                 }),
               ]}
               options={{

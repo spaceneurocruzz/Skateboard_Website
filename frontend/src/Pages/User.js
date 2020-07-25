@@ -28,6 +28,7 @@ import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import { eachDayOfInterval } from "date-fns";
+import profile from "../imgs/profile.png";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -323,8 +324,12 @@ const User = (props) => {
     <Container component="main" maxWidth="md">
       <form className={classes.root} noValidate autoComplete="off">
         <div>
-          <Grid container>
-            <input
+          <Grid container style={{ marginTop: 70, marginBottom: 20}}>
+          <img
+                src={`https://ui-avatars.com/api/?name=${state.username}&size=128&rounded=true&background=040404&color=fff`}
+                style={{ verticalAlign: "middle", alignItems:'center' }}
+              />
+            {/* <input
               accept="image/*"
               className={classes.input}
               id="contained-button-file"
@@ -337,18 +342,18 @@ const User = (props) => {
               <Fab component="span" className={classes.button}>
                 <AddPhotoAlternateIcon />
               </Fab>
-            </label>
-            <img
+            </label> */}
+            {/* <img
               width="200px"
               className={classes.media}
               src={img.selectedFile}
-            />
+            /> */}
             {/* <img
               width="200px"
               className={classes.media}
               src={`../..${props.userData.avatar}`}
             /> */}
-            <Button
+            {/* <Button
               onClick={handleAvatarSubmit}
               type="submit"
               variant="contained"
@@ -356,7 +361,9 @@ const User = (props) => {
               className={classes.submit}
             >
               確認
-            </Button>
+            </Button> */}
+            <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span>
+            {/* <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span> */}
           </Grid>
           {/* <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" /> */}
           <Grid container>

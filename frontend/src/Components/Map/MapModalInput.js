@@ -301,7 +301,7 @@ const MapModalInput = (props) => {
 
   return (
     <>
-      {/* {state.isAuthenticated ? ( */}
+      {state.isAuthenticated ? (
         <Button
           variant="contained"
           color="secondary"
@@ -311,7 +311,7 @@ const MapModalInput = (props) => {
         >
           新增地點
         </Button>
-      {/* ) : (
+      ) : (
         <Button
           variant="contained"
           color="default"
@@ -321,7 +321,7 @@ const MapModalInput = (props) => {
         >
           請登入即可新增地點及發表評論
         </Button>
-      )} */}
+      )}
       <Dialog
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

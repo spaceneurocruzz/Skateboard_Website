@@ -275,7 +275,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>技術交流</span>
               </NavLink>
             </li> */}
-            {/* {state.isAuthenticated && ( */}
+            {state.isAuthenticated && (
             <li className="nav-link-item">
               <NavLink
                 to="/user"
@@ -286,7 +286,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>會員中心</span>
               </NavLink>
             </li>
-            {/* )} */}
+            )}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
