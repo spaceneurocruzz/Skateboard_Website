@@ -88,7 +88,7 @@ const MapModalInput = (props) => {
     intro: "",
     create_dt: new Date().toISOString(),
     update_dt: new Date().toISOString(),
-    modified_user:  "admin"//state.username,
+    modified_user:  state.username,
   });
 
   const [phone, setPhone] = useState();
