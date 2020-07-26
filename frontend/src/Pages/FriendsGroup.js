@@ -159,7 +159,7 @@ const FriendsGroup = (props) => {
 
   return (
     <>
-      <Container component="main" maxWidth="lg">
+      <Container component="main" maxWidth="lg" style={{textAlign: "center" }}>
         <Grid container id="back-to-top-anchor">
           <FriendsGroupModalInput
             dbFriendsGroupData={props.dbFriendsGroupData}

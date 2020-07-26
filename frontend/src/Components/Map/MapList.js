@@ -57,6 +57,7 @@ import { ReloadContext } from "../../Pages/Guidemap";
 import shopMarker from "../../imgs/shopping-bag.png";
 import skateboardMarker from "../../imgs/skateboardMarker.png";
 
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -195,6 +196,18 @@ const ShowCommentsDialog = (props) => {
     onClose(value);
   };
 
+  const countCommentRating = (mapId) => {
+    let ratingTotal = 0;
+    let dataByMapId = props.commentData.filter(
+      (group) => group.map_id == mapId
+    );
+    for (let x in dataByMapId) {
+      ratingTotal += Number(dataByMapId[x].rating);
+    }
+    console.log(ratingTotal / dataByMapId.length);
+    return ratingTotal / dataByMapId.length;
+  };
+
   return (
     <Dialog
       aria-labelledby="transition-modal-title"
@@ -273,14 +286,6 @@ const WriteComment = (props) => {
     });
   };
 
-  const countComment = (mapId) => {
-
-    //props.commentData.filter((group) => group.map_id == mapId).
-
-    return props.commentData.filter((group) => group.map_id == mapId)
-      .length;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit");
@@ -301,9 +306,8 @@ const WriteComment = (props) => {
         handleClose();
       })
       .then(() => {
-        dispatch({
-          type: "Reload",
-        });
+        //updatemaprating
+        //props.updateGuideMapDB();
       })
       .catch((error) => {
         console.error(error.response);
@@ -516,7 +520,7 @@ const MapList = (props) => {
   };
 
   const getTaiwanCityList = () => {
-    let cityJson={};
+    let cityJson = {};
     TaiwanMapJson.map((data, index) => {
       {
         cityJson[data.CityName] = data.CityName;
@@ -526,7 +530,7 @@ const MapList = (props) => {
     return cityJson;
   };
 
-// console.log(getTaiwanCityList())
+  // console.log(getTaiwanCityList())
 
   return (
     <>
@@ -558,7 +562,7 @@ const MapList = (props) => {
                   width: 100,
                 },
                 { title: "場地名稱", field: "location_name", width: 225 },
-                { title: "地址", field: "address"},
+                { title: "地址", field: "address" },
                 {
                   title: "綜合評分",
                   field: "rating",
@@ -590,6 +594,13 @@ const MapList = (props) => {
                     handleWriteCommentsOpen(event, rowData.location_id),
                   disabled: !state.isAuthenticated,
                 }),
+                (rowData) => ({
+                  icon: () => <FavoriteBorderIcon />,
+                  tooltip: "加入最愛",
+                  onClick: (event, rowData) =>
+                    handleWriteCommentsOpen(event, rowData.location_id),
+                  disabled: !state.isAuthenticated,
+                }),
               ]}
               options={{
                 filtering: true,
@@ -602,7 +613,7 @@ const MapList = (props) => {
               }}
               localization={{
                 header: {
-                  actions: "評論",
+                  actions: "評論/加入最愛",
                 },
               }}
               detailPanel={(rowData) => {

@@ -17,6 +17,8 @@ import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import "../css/app.css";
+import PersonPinIcon from '@material-ui/icons/PersonPin';
+import FaceIcon from '@material-ui/icons/Face';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,8 +94,8 @@ const CommentList = (props) => {
                     key={data.group_id}
                     primary={
                       <React.Fragment key={data.group_id + "group"}>
-                        {`${data.comment_user} - `}
-                        {data.comment}
+                        <PersonPinIcon />{`${data.comment_user}`}
+                        <div>{data.comment}</div>
                       </React.Fragment>
                     }
                   />
@@ -208,17 +210,22 @@ const FriendsGroupDetail = (props) => {
           } */
           }
           return (
-            <Container component="main" maxWidth="md">
-              <span style={{ fontSize: 24, fontWeight: "bold" }}>
-                {`${data.group_startdt.slice(0, 10)}    `}{" "}
-              </span>
-              <span
-                style={{ fontSize: 20, fontWeight: "bold" }}
-              >{`${data.group_startdt.slice(11, 19)}    `}</span>
-              <span style={{ fontSize: 22, fontWeight: "bold" }}>
-                {data.location_name}
-              </span>
-              <span style={{ textAlign: "left" }}> (ID：{data.group_id})</span>
+            <Container component="main" maxWidth="md" style={{ marginTop: 70 }}>
+              <div style={{ marginTop: 70, marginBottom:50 }}>
+                <span style={{ fontSize: 24, fontWeight: "bold" }}>
+                  {`${data.group_startdt.slice(0, 10)}    `}{" "}
+                </span>
+                <span
+                  style={{ fontSize: 20, fontWeight: "bold" }}
+                >{`${data.group_startdt.slice(11, 19)}    `}</span>
+                <span style={{ fontSize: 22, fontWeight: "bold" }}>
+                  {data.location_name}
+                </span>
+                <span style={{ textAlign: "left" }}>
+                  {" "}
+                  (ID：{data.group_id})
+                </span>
+              </div>
               <ListItem>
                 <ListItemText>{`地址：${data.address}`}</ListItemText>
               </ListItem>
@@ -245,11 +252,12 @@ const FriendsGroupDetail = (props) => {
                     fontSize: 12,
                     color: "#9a9898",
                     alignItems: "left",
+                    marginRight:10
                   }}
                 >{`新增日期：${data.create_dt.slice(
                   0,
                   10
-                )}  ${data.create_dt.slice(11, 19)}     `}</span>
+                )}  ${data.create_dt.slice(11, 19)}`}</span>
                 <span
                   style={{
                     fontSize: 12,
@@ -261,29 +269,9 @@ const FriendsGroupDetail = (props) => {
                   10
                 )}  ${data.update_dt.slice(11, 19)}`}</span>
               </ListItem>
-              {/* <TextField
-                //onChange={handleInputChange}
-                id="filled-multiline-static"
-                label="我有問題..."
-                name="comment"
-                multiline
-                fullWidth
-                rows={3}
-                value={data.comment}
-                variant="filled"
-              /> */}
-              {/* <Grid container spacing={6}>
-                <Grid item xs={8}> */}
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {/* <span
-                  onChange={handleInputChange}
-                  contentEditable="true"
-                  class="box arrow-left"
-                  style={{ display: "inline-block" }}
-                  name="comment"
-                >
-                  
-                </span> */}
+              <div
+                style={{ display: "flex", alignItems: "center", marginTop: 70 }}
+              >
                 <TextField
                   onChange={handleInputChange}
                   size="small"
@@ -291,11 +279,8 @@ const FriendsGroupDetail = (props) => {
                   name="comment"
                   label="我有問題"
                   variant="filled"
-                  style={{ width: 300 }}
+                  style={{ width: 300, marginRight:20 }}
                 />
-
-                {/* </Grid> */}
-                {/* <Grid item xs={3}> */}
                 <Button
                   style={{ height: 40 }}
                   onClick={handleSubmit}
@@ -307,8 +292,6 @@ const FriendsGroupDetail = (props) => {
                   送出留言
                 </Button>
               </div>
-              {/* </Grid> */}
-              {/* </Grid> */}
               <CommentList groupId={id} commentData={commentData} />
             </Container>
           );

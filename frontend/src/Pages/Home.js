@@ -5,7 +5,7 @@ import "../css/app.css";
 
 const Home = () => {
   return (
-    <div className="banner_conatainer">
+    <div className="banner_conatainer" style={{textAlign: "center"}} >
       <img src={banner} alt="banner" />
       {/* <img src={banner} alt="banner" /> */}
     </div>

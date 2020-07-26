@@ -219,15 +219,17 @@ const User = (props) => {
 
   const TabInfo = () => {
     return (
-      <Grid container>
+      <Grid container style={{ width: "80%"  }}>
         <AppBar position="static">
           <Tabs
             value={value}
             onChange={handleChange}
             aria-label="simple tabs example"
+            style={{ backgroundColor: "#2c8efd" }}
           >
             <Tab label="地圖" {...a11yProps(0)} />
             <Tab label="揪團" {...a11yProps(1)} />
+            <Tab label="修改個人資料" {...a11yProps(2)} />
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
@@ -242,7 +244,7 @@ const User = (props) => {
                   );
                   return (
                     <li>
-                      {data.location_name} {data.address}
+                      {data.location_type} {data.location_name}: {data.address}
                     </li>
                   );
                 })
@@ -252,7 +254,7 @@ const User = (props) => {
             </ul>
           </div>
           <div>
-            收藏地點:
+            最愛地點:
             <ul>
               {props.userData.map_like != undefined ||
               props.userData.map_like != null ? (
@@ -316,20 +318,103 @@ const User = (props) => {
             </ul>
           </div>
         </TabPanel>
+        <TabPanel value={value} index={2}><EditProfile /></TabPanel>
       </Grid>
     );
   };
 
-  return (
-    <Container component="main" maxWidth="md">
+  const EditProfile = () => {
+    return (
       <form className={classes.root} noValidate autoComplete="off">
-        <div>
-          <Grid container style={{ marginTop: 70, marginBottom: 20}}>
-          <img
-                src={`https://ui-avatars.com/api/?name=${state.username}&size=128&rounded=true&background=040404&color=fff`}
-                style={{ verticalAlign: "middle", alignItems:'center' }}
-              />
-            {/* <input
+        <Grid container>
+          <TextField
+            disabled
+            id="filled-disabled"
+            label="帳號"
+            defaultValue={state.username}
+            variant="filled"
+          />
+          <TextField
+            onChange={handleInputChange}
+            id="filled-password-input"
+            label="密碼"
+            type="password"
+            value={password}
+            autoComplete="current-password"
+            variant="filled"
+          />
+          <TextField
+            onChange={handleInputChange}
+            required
+            id="filled-required-email"
+            name="email"
+            label="Email(必填)"
+            value={props.userData.email}
+            variant="filled"
+            style={{ width: 300 }}
+          />
+        </Grid>
+        <Grid container>
+          <TextField
+            onChange={handleInputChange}
+            required
+            id="filled-required"
+            name="nickname"
+            label="暱稱"
+            value={props.userData.nickname}
+            variant="filled"
+          />
+          <TextField
+            onChange={handleInputChange}
+            id="filled-search"
+            label="所在城市"
+            name="location"
+            value={props.userData.location}
+            variant="filled"
+          />
+        </Grid>
+
+        <Grid container>
+          <TextField
+            onChange={handleInputChange}
+            id="filled-multiline-static"
+            label="自我介紹"
+            name="intro"
+            multiline
+            style={{ width: 800 }}
+            rows={5}
+            value={props.userData.intro}
+            variant="filled"
+          />
+        </Grid>
+        {/* </div> */}
+        <Button
+          onClick={handleSubmit}
+          type="submit"
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+        >
+          確認修改
+        </Button>
+      </form>
+    );
+  };
+
+  return (
+    <Container
+      component="main"
+      maxWidth="lg"
+      style={{ marginRight: 20, marginLeft: 20 }}
+    >
+      <Grid
+        container
+        style={{ marginTop: 70, marginBottom: 20, display: "flex" }}
+      >
+        <img
+          src={`https://ui-avatars.com/api/?name=${state.username}&size=128&rounded=true&background=040404&color=fff`}
+        />
+        {/* <input
               accept="image/*"
               className={classes.input}
               id="contained-button-file"
@@ -343,17 +428,17 @@ const User = (props) => {
                 <AddPhotoAlternateIcon />
               </Fab>
             </label> */}
-            {/* <img
+        {/* <img
               width="200px"
               className={classes.media}
               src={img.selectedFile}
             /> */}
-            {/* <img
+        {/* <img
               width="200px"
               className={classes.media}
               src={`../..${props.userData.avatar}`}
             /> */}
-            {/* <Button
+        {/* <Button
               onClick={handleAvatarSubmit}
               type="submit"
               variant="contained"
@@ -362,83 +447,19 @@ const User = (props) => {
             >
               確認
             </Button> */}
-            <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span>
-            {/* <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span> */}
-          </Grid>
-          {/* <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" /> */}
-          <Grid container>
-            <TextField
-              disabled
-              id="filled-disabled"
-              label="帳號"
-              defaultValue={state.username}
-              variant="filled"
-            />
-            <TextField
-              onChange={handleInputChange}
-              id="filled-password-input"
-              label="密碼"
-              type="password"
-              value={password}
-              autoComplete="current-password"
-              variant="filled"
-            />
-            <TextField
-              onChange={handleInputChange}
-              required
-              id="filled-required-email"
-              name="email"
-              label="Email(必填)"
-              value={props.userData.email}
-              variant="filled"
-              style={{ width: 300 }}
-            />
-          </Grid>
-          <Grid container>
-            <TextField
-              onChange={handleInputChange}
-              required
-              id="filled-required"
-              name="nickname"
-              label="暱稱"
-              value={props.userData.nickname}
-              variant="filled"
-            />
-            <TextField
-              onChange={handleInputChange}
-              id="filled-search"
-              label="所在城市"
-              name="location"
-              value={props.userData.location}
-              variant="filled"
-            />
-          </Grid>
-
-          <Grid container>
-            <TextField
-              onChange={handleInputChange}
-              id="filled-multiline-static"
-              label="自我介紹"
-              name="intro"
-              multiline
-              fullWidth
-              rows={8}
-              value={props.userData.intro}
-              variant="filled"
-            />
-          </Grid>
-          <TabInfo />
+        {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
+          <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
+        <div style={{ marginLeft: 50 }}>
+          <h2>props.userData.nickname</h2>
+          <div style={{ display: "flex" }}>
+            <span>@state.username</span>
+            <span></span>
+          </div>
         </div>
-        <Button
-          onClick={handleSubmit}
-          type="submit"
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          確認修改
-        </Button>
-      </form>
+        {/* <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span> */}
+      </Grid>
+
+      <TabInfo />
     </Container>
   );
 };
