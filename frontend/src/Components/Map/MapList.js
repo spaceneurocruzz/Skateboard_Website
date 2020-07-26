@@ -130,7 +130,7 @@ const useStyles = makeStyles((theme) => ({
 
 const CommentList = (props) => {
   const classes = useStyles();
-  console.log(props.commentData);
+
   if (!props.commentData.some((t) => t.map_id === props.locationId)) {
     return <h4>目前還沒有評論哦！</h4>;
   } else {
@@ -189,7 +189,6 @@ const ShowCommentsDialog = (props) => {
 
   const handleClose = (value) => {
     onClose(value);
-    console.log(props);
   };
 
   const handleListItemClick = (value) => {
@@ -204,7 +203,7 @@ const ShowCommentsDialog = (props) => {
     for (let x in dataByMapId) {
       ratingTotal += Number(dataByMapId[x].rating);
     }
-    console.log(ratingTotal / dataByMapId.length);
+ 
     return ratingTotal / dataByMapId.length;
   };
 
@@ -288,7 +287,6 @@ const WriteComment = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
     let dbPost;
 
     dbPost = input;
@@ -300,7 +298,6 @@ const WriteComment = (props) => {
     //post should return commentid and post to user table
     postGuideMapCommentsApi(dbPost)
       .then((res) => {
-        console.log(dbPost);
         alert("更新成功！");
         props.updateComments(dbPost);
         handleClose();
@@ -449,7 +446,6 @@ const MapList = (props) => {
   const handleShowCommentsOpen = (event, map_id) => {
     setOpenShowComments(true);
     setOpenShowCommentsMapId(map_id);
-    console.log(openShowCommentsMapId);
   };
 
   const handleShowCommentsClose = () => {
@@ -472,11 +468,8 @@ const MapList = (props) => {
   useEffect(() => {
     getGuideMapCommentsApi()
       .then((res) => {
-        console.log(commentData);
-        console.log(res.data);
         // setCommentData(commentData => ({...commentData, commentData:res.data}));
         setCommentData(...commentData, res.data);
-        console.log(commentData);
       })
       .catch((error) => {
         console.error(error);
@@ -516,7 +509,6 @@ const MapList = (props) => {
 
   const updateComments = (newValue) => {
     setCommentData([...commentData, newValue]);
-    console.log(commentData);
   };
 
   const getTaiwanCityList = () => {

@@ -146,10 +146,10 @@ const MapModalInput = (props) => {
   //insert user
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
     let dbPost;
 
     dbPost = input;
+    dbPost["modified_user"] = state.username,
     dbPost["phone"] = phone;
     dbPost["openhours"] = {
       weekdayTimeStart: weekdayTimeStart.toLocaleTimeString(),
@@ -159,8 +159,6 @@ const MapModalInput = (props) => {
     };
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
-
-    console.log(props.userData)
 
     let preAddMapArr = props.userData.map_add;
     if (preAddMapArr == null) {
@@ -178,7 +176,6 @@ const MapModalInput = (props) => {
       .then(
         (response) => {
           const { lat, lng } = response.results[0].geometry.location;
-          console.log(lat, lng);
           setInput({ latitude: lat, longitude: lng });
           dbPost["latitude"] = lat;
           dbPost["longitude"] = lng;
@@ -190,12 +187,9 @@ const MapModalInput = (props) => {
       .then(() => {
         postGuidemapApi(dbPost)
           .then((res) => {
-            console.log(dbPost);
-            console.log(props.formerDbData);
             props.updateDB(dbPost);
             alert("更新成功！");
             handleClose();
-            console.log(props.formerDbData);
           })
           .then(() => {
             patchUserApi(state.username, mapAdd)

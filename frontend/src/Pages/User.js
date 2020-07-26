@@ -96,7 +96,6 @@ const User = (props) => {
   const [password, setPassword] = useState("");
 
   const handleInputChange = (event) => {
-    console.log(event.target.name);
     props.updateUserDB(event.target);
     // setDbdata({
     //   ...dbData,
@@ -123,7 +122,7 @@ const User = (props) => {
 
   const handleAvatarSubmit = (e) => {
     e.preventDefault();
-    console.log(props.userData);
+
     let form_data = new FormData();
     form_data.append("image", img.selectedFile[0]);
     // form_data.append("title", state.username);
@@ -145,9 +144,7 @@ const User = (props) => {
   };
 
   const handleUploadClick = (event) => {
-    console.log();
     let file = event.target.files[0];
-    console.log(file);
     const reader = new FileReader();
     let url = reader.readAsDataURL(file);
 
@@ -155,8 +152,6 @@ const User = (props) => {
       setImg({
         selectedFile: [reader.result],
       });
-      console.log(img.selectedFile);
-      console.log([reader.result]);
     };
     // url = reader.readAsDataURL(file)
 
@@ -166,12 +161,11 @@ const User = (props) => {
       imageUploaded: 1,
     });
 
-    console.log(img);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(img);
+    
     patchUserApi(state.username, props.userData)
       .then((res) => {
         console.table(userData);
@@ -450,9 +444,9 @@ const User = (props) => {
         {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
           <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
         <div style={{ marginLeft: 50 }}>
-          <h2>props.userData.nickname</h2>
+          <h2>暱稱：{props.userData.nickname}</h2>
           <div style={{ display: "flex" }}>
-            <span>@state.username</span>
+            <span>@{state.username}</span>
             <span></span>
           </div>
         </div>

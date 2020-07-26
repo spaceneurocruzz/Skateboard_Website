@@ -47,7 +47,6 @@ const FriendsGroup = (props) => {
         (data) => data.group_id === group_id
       );
     } else {
-      console.log("nothing");
       return null;
     }
   };
@@ -60,25 +59,20 @@ const FriendsGroup = (props) => {
     switch (type) {
       case "JOIN":
         props.dbFriendsGroupData[index].join_user = newData;
-        console.log("join");
         break;
       case "LIKE":
         props.dbFriendsGroupData[index].possible_user = newData;
-        console.log("like");
         break;
       default:
         console.log("none");
     }
-    console.log("set");
-    setDbFriendsGroupData([...props.dbFriendsGroupData]);
+    props.updateFriendsGroupDB([...props.dbFriendsGroupData]);
   };
 
   useEffect(() => {
     getFriendsGroupApi()
       .then((res) => {
-        console.log(props.dbFriendsGroupData);
-        console.log(res.data);
-        setDbFriendsGroupData(...props.dbFriendsGroupData, res.data);
+        props.updateFriendsGroupDB(...props.dbFriendsGroupData, res.data);
       })
       .catch((error) => {
         console.error(error);
@@ -121,8 +115,7 @@ const FriendsGroup = (props) => {
         data["upper_limit"] != null
       ) {
         data["join_count"] = data["join_user"].length;
-        console.log(data["upper_limit"]);
-
+       
         if (data["upper_limit"] === 0) {
           data["remain_count"] = 999;
         } else {

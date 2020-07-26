@@ -132,7 +132,6 @@ const FriendsGroupCreate = (props) => {
   useEffect(() => {
     getGuidemapApi()
       .then((res) => {
-        console.log(res.data);
         setDbData(...dbData, res.data);
       })
       .catch((error) => {
@@ -152,7 +151,6 @@ const FriendsGroupCreate = (props) => {
           .toLocaleString()
           .replace("T", " "),
       });
-      console.log(event.target.value.toLocaleString().replace("T", " "));
     } else {
       setInput({
         ...input,
@@ -180,20 +178,16 @@ const FriendsGroupCreate = (props) => {
     setErrorFields({errorFields: []}); //no clear
 
     if (!input.location_name) {
-      console.log("場地名稱");
       errorArr.push("場地名稱");
       setIsValid(false)
     }
     if (!input.group_title) {
-      console.log("主題");
       errorArr.push("主題");
     }
     if (!input.group_startdt) {
-      console.log("開始日期");
       errorArr.push("開始日期");
     }
     if (!input.group_enddt) {
-      console.log("結束日期");
       errorArr.push("結束日期");
     }
     // if (!input.lower_limit) {
@@ -205,12 +199,10 @@ const FriendsGroupCreate = (props) => {
     //   errorArr.push("上限");
     // }
     if (!input.group_content) {
-      console.log("內容");
       errorArr.push("內容");
       setErrorFields([...errorFields,errorArr]);
       setOpen(true);
-   
-      console.log(errorFields)
+
       return false;
     }
   };
@@ -220,8 +212,6 @@ const FriendsGroupCreate = (props) => {
       ...input,
       location_name: value.location_name,
     });
-
-    console.log(value.location_name);
   };
 
   const getMapDatabyLocationName = (locationName) => {
@@ -230,17 +220,19 @@ const FriendsGroupCreate = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
 
     if(!checkValid())
       return;
 
-    let dbPost = input;
     if (input.address == "") {
-      input["address"] = getMapDatabyLocationName(dbPost.location_name).address;
-      console.log(getMapDatabyLocationName(dbPost.location_name).address);
+      let mapData = getMapDatabyLocationName(dbPost.location_name);
+      input["address"] = mapData.address;
+      input["map_id"] = mapData.map_id;
     }
-    console.log(input);
+
+    let dbPost = input;
+
+    dbPost["create_user"] = state.username;
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
 
@@ -249,7 +241,6 @@ const FriendsGroupCreate = (props) => {
     Geocode.fromAddress(input.address).then(
       (response) => {
         const { lat, lng } = response.results[0].geometry.location;
-        console.log(lat, lng);
         setInput({ latitude: lat, longitude: lng });
         dbPost["latitude"] = lat;
         dbPost["longitude"] = lng;
@@ -262,7 +253,6 @@ const FriendsGroupCreate = (props) => {
       // dbPost["group_content"];
       postFriendsGroupApi(dbPost)
         .then((res) => {
-          console.log(dbPost);
           setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
           // updateFriendsGroupDB(dbPost);
           alert("更新成功！");

@@ -56,8 +56,6 @@ const reducer = (state, action) => {
         refresh: null,
       };
     case "UPDATE":
-      console.log(state);
-      console.log(action);
       return {
         ...state,
         isAuthenticated: true,
@@ -121,7 +119,6 @@ const App = () => {
 
   const initUserDB = (newData) => {
     setUserdata(newData);
-    console.log(userData);
   };
 
   const updateUserDB = (eventTarget) => {
@@ -168,7 +165,7 @@ const App = () => {
         history.push("/");
       })
       .catch(function (error) {
-        console.log(error);
+        console.log(error.response);
       });
   };
 
@@ -190,8 +187,6 @@ const App = () => {
   useEffect(() => {
     getGuidemapApi()
       .then((res) => {
-        console.log(dbGuideMapData);
-        console.log(res.data);
         setDbGuideMapData(...dbGuideMapData, res.data);
       })
       .catch((error) => {
@@ -203,8 +198,6 @@ const App = () => {
   useEffect(() => {
     getFriendsGroupApi()
       .then((res) => {
-        console.log(dbFriendsGroupData);
-        console.log(res.data);
         for (let ix in res.data) {
           res.data[ix]["group_startdt"] = `${res.data[ix].group_startdt.slice(
             0,
@@ -275,7 +268,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>技術交流</span>
               </NavLink>
             </li> */}
-            {/* {state.isAuthenticated && ( */}
+            {state.isAuthenticated && (
             <li className="nav-link-item">
               <NavLink
                 to="/user"
@@ -286,7 +279,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>會員中心</span>
               </NavLink>
             </li>
-            {/* )} */}
+            )}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">

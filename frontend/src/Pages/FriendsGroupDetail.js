@@ -72,7 +72,6 @@ const useStyles = makeStyles((theme) => ({
 
 const CommentList = (props) => {
   const classes = useStyles();
-  console.log(props.commentData);
   if (
     props.commentData == undefined ||
     !props.commentData.some((t) => t.group_id == props.groupId)
@@ -138,8 +137,6 @@ const FriendsGroupDetail = (props) => {
   useEffect(() => {
     getFriendsGroupApi()
       .then((res) => {
-        console.log(dbFriendsGroupData);
-        console.log(res.data);
         setDbFriendsGroupData(...dbFriendsGroupData, res.data);
       })
       .catch((error) => {
@@ -152,7 +149,6 @@ const FriendsGroupDetail = (props) => {
     getFriendsGroupCommentsApi()
       .then((res) => {
         setCommentData(...commentData, res.data);
-        console.log(res.data);
       })
       .catch((error) => {
         console.error(error.response);
@@ -165,12 +161,10 @@ const FriendsGroupDetail = (props) => {
       ...input,
       [event.target.name]: event.target.value,
     });
-    console.log(event.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submit");
 
     let dbPost = {};
 
@@ -182,7 +176,6 @@ const FriendsGroupDetail = (props) => {
     //post should return commentid and post to user table
     postFriendsGroupCommentsApi(dbPost)
       .then((res) => {
-        console.log(dbPost);
         alert("更新成功！");
 
         setCommentData([...commentData, dbPost]);

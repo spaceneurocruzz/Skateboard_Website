@@ -118,7 +118,6 @@ export const Login = () => {
         return response;
       })
       .then((json) => {
-        console.log(json);
         dispatch({
           type: "LOGIN",
           payload: json,

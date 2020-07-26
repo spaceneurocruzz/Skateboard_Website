@@ -91,7 +91,6 @@ const FriendsGroupList = (props) => {
     getFriendsGroupCommentsApi()
       .then((res) => {
         setCommentData(...commentData, res.data);
-        console.log(res.data);
       })
       .catch((error) => {
         console.error(error.response);
@@ -101,7 +100,6 @@ const FriendsGroupList = (props) => {
 
   const joinGroup = (e, group_id) => {
     e.preventDefault();
-    console.log("join success");
 
     let preJoinUserArr = props.getFriendsGroupDBById(group_id).join_user;
     preJoinUserArr.push(state.username);
@@ -120,7 +118,7 @@ const FriendsGroupList = (props) => {
       .finally(() => {});
 
     let preJoinArr = props.userData.group_join;
-    console.log(preJoinArr);
+
     if (preJoinArr == null) {
       preJoinArr = [group_id];
     } else {
@@ -145,7 +143,6 @@ const FriendsGroupList = (props) => {
 
   const likeGroup = (e, group_id) => {
     e.preventDefault();
-    console.log("like success");
 
     let prePossibleUserArr = props.getFriendsGroupDBById(group_id)
       .possible_user;
@@ -165,7 +162,7 @@ const FriendsGroupList = (props) => {
       .finally(() => {});
 
     let preLikeArr = props.userData.group_like;
-    console.log(preLikeArr);
+   
     if (preLikeArr == null) {
       preLikeArr = [group_id];
     } else {
@@ -237,7 +234,7 @@ const FriendsGroupList = (props) => {
               data={props.dbFriendsGroupData}
               actions={[
                 (rowData) => ({
-                  icon: () => <NavLink to={`friendsGroupDetail/${rowData.group_id}`}  style={{color:'black'}}><ImportContactsIcon /></NavLink>,
+                  icon: () => <NavLink to={`friendsGroupDetail/${rowData.group_id}`} key={rowData.group_id} style={{color:'black'}}><ImportContactsIcon /></NavLink>,
                   tooltip: "查看內容",
                   // onClick: (event, rowData) => {
                   //   <Link to={`friendsGroupDetail/${rowData.group_id}`}></Link>

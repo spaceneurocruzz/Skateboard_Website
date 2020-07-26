@@ -174,8 +174,7 @@ const Guidemap = (props) => {
 
   const addtoFavorite = (e, locationName) => {
     e.preventDefault();
-    console.log("add to favorite");
-
+  
     let preLikeMapArr = props.userData.map_like;
 
     if (preLikeMapArr == null) {
