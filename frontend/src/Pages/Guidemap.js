@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { patchUserApi } from "../axiosApi";
+import { patchUserApi, getUserApi } from "../axiosApi";
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import { AuthContext } from "../App";
 
@@ -109,6 +109,35 @@ const Guidemap = (props) => {
     { key: 1, label: "店家" },
   ]);
 
+  const getMapDBByLocationId = (locationId) => {
+    if (props.dbGuideMapData != undefined) {
+      return props.dbGuideMapData.find(
+        (data) => data.location_id === locationId
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const updateMapDBByLocationId = (locationId, newData, type) => {
+    let index = props.dbGuideMapData.findIndex(
+      (data) => data.location_id === locationId
+    );
+
+    switch (type) {
+      case "RATING":
+        props.dbFriendsGroupData[index].rating = newData;
+        break;
+      case "LIKE":
+        props.dbGuideMapData[index].like_user = newData;
+        break;
+      default:
+        console.log("none");
+    }
+
+    props.updateGuideMapDB([...props.dbGuideMapData]);
+  };
+
   const handleDelete = (chipToDelete) => () => {
     setChipData((chips) =>
       chips.filter((chip) => chip.key !== chipToDelete.key)
@@ -174,7 +203,7 @@ const Guidemap = (props) => {
 
   const addtoFavorite = (e, locationName) => {
     e.preventDefault();
-  
+
     let preLikeMapArr = props.userData.map_like;
 
     if (preLikeMapArr == null) {
@@ -348,6 +377,10 @@ const Guidemap = (props) => {
           <MapList
             formerDbData={props.dbGuideMapData}
             updateGuideMapDB={props.updateGuideMapDB}
+            userData={props.userData}
+            updateGroupUserDB={props.updateGroupUserDB}
+            getMapDBByLocationId={getMapDBByLocationId}
+            updateMapDBByLocationId={updateMapDBByLocationId}
           />
         </Grid>
       </Container>

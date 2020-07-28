@@ -13,10 +13,12 @@ import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
+import kick from "./imgs/kick.gif";
 import axiosInstance, {
   logoutApi,
   getFriendsGroupApi,
   getGuidemapApi,
+  getUserApi
 } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
@@ -119,6 +121,7 @@ const App = () => {
 
   const initUserDB = (newData) => {
     setUserdata(newData);
+    console.log(newData)
   };
 
   const updateUserDB = (eventTarget) => {
@@ -225,6 +228,17 @@ const App = () => {
           <Link to="/" className="link">
             <img src={logo} alt="logo" />
           </Link>
+          <span
+            style={{
+              marginLeft: 20,
+              fontFamily: "Galindo",
+              verticalAlign: "middle",
+              fontSize: 28,
+              fontWeight: 900,
+            }}
+          >
+            SkateboardGO
+          </span>
         </div>
         <div className="nav">
           <ul className="nav-link">
@@ -268,7 +282,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>技術交流</span>
               </NavLink>
             </li> */}
-            {state.isAuthenticated && (
+            {/* {state.isAuthenticated && ( */}
             <li className="nav-link-item">
               <NavLink
                 to="/user"
@@ -279,7 +293,7 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>會員中心</span>
               </NavLink>
             </li>
-            )}
+            {/* )} */}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
@@ -322,6 +336,7 @@ const App = () => {
               dbGuideMapData={dbGuideMapData}
               updateGuideMapDB={updateGuideMapDB}
               dbFriendsGroupData={dbFriendsGroupData}
+              updateGroupUserDB={updateGroupUserDB}
             />
           )}
         />
@@ -378,7 +393,11 @@ const App = () => {
           )}
         />
 
-        <Route exact path={"/login/"} component={Login} />
+        <Route
+          exact
+          path={"/login/"}
+          render={() => <Login userData={userData} initUserDB={initUserDB} />}
+        />
         <Route exact path={"/signup/"} component={Signup} />
       </Switch>
       <div className="footer">Copyright</div>

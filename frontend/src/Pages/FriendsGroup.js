@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { AuthContext } from "../App";
+
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -13,7 +15,7 @@ import FriendsGroupDetail from "../Pages/FriendsGroupDetail";
 import Fab from "@material-ui/core/Fab";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import FriendsGroupModalInput from "../Components/FriendsGroup/FriendsGroupModalInput";
-import { getFriendsGroupApi } from "../axiosApi";
+import { getFriendsGroupApi, getUserApi } from "../axiosApi";
 //import { Switch } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FriendsGroup = (props) => {
+  const { state } = React.useContext(AuthContext);
   const getFriendsGroupDBById = (group_id) => {
     if (props.dbFriendsGroupData != undefined) {
       return props.dbFriendsGroupData.find(

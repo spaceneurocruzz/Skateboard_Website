@@ -17,6 +17,7 @@ class GuideMapSerializer(serializers.ModelSerializer):
     modified_user = serializers.CharField(max_length=120)
     create_dt = serializers.DateTimeField()
     update_dt = serializers.DateTimeField()
+    like_user = serializers.ListField(child=serializers.CharField())
 
     class Meta:
         model = GuideMap
@@ -34,6 +35,7 @@ class GuideMapSerializer(serializers.ModelSerializer):
                   'create_dt',
                   'update_dt',
                   'modified_user',
+                  'like_user'
                   )
 
     # def create(self, validated_data):

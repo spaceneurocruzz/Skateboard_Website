@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
 from .enums import LocationType
 import datetime
@@ -21,6 +21,8 @@ class GuideMap(models.Model):
     create_dt = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     update_dt = models.DateTimeField(auto_now=True, blank=True, null=True)
     modified_user = models.CharField(blank=True, max_length=120)
+    like_user = ArrayField(models.CharField(
+        blank=True, max_length=20), null=True)
 
     def __unicode__(self):
         return self.location_name

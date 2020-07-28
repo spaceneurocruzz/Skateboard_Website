@@ -9,7 +9,7 @@ const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 
 module.exports = {
   entry: {
-    index: ['babel-polyfill',"./src/index.js"],
+    index: ["babel-polyfill", "./src/index.js"],
     // app: ['babel-polyfill',"./src/index.js"],
     // index: "./src/index.js",
   },
@@ -18,7 +18,7 @@ module.exports = {
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist/static"),
-    publicPath:"/static/"
+    publicPath: "/static/",
   },
   module: {
     rules: [
@@ -35,6 +35,10 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: ["url-loader?limit=10000", "img-loader"],
       },
+      {
+        test: /\.mp4$/,
+        use: "file-loader?name=videos/[name].[ext]",
+      },
     ],
   },
   resolve: {
@@ -45,7 +49,7 @@ module.exports = {
     contentBase: path.resolve(__dirname, "dist"),
     publicPath: "/static/",
     //hot: true,
-    watchContentBase: true
+    watchContentBase: true,
   },
   plugins: [HTMLWebpackPluginConfig],
   mode: "development",

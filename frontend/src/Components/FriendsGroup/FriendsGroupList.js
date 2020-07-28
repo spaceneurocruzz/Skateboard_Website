@@ -83,6 +83,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FriendsGroupList = (props) => {
+  console.log(props);
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const [commentData, setCommentData] = useState([]);
@@ -102,7 +103,11 @@ const FriendsGroupList = (props) => {
     e.preventDefault();
 
     let preJoinUserArr = props.getFriendsGroupDBById(group_id).join_user;
-    preJoinUserArr.push(state.username);
+    if (preJoinUserArr == null || preJoinUserArr == undefined) {
+      preJoinUserArr = [state.username];
+    } else {
+      preJoinUserArr.push(state.username);
+    }
 
     let updateJoinUser = {
       join_user: preJoinUserArr,
@@ -146,7 +151,12 @@ const FriendsGroupList = (props) => {
 
     let prePossibleUserArr = props.getFriendsGroupDBById(group_id)
       .possible_user;
-    prePossibleUserArr.push("ss");
+
+    if (prePossibleUserArr == null || prePossibleUserArr == undefined) {
+      prePossibleUserArr = [state.username];
+    } else {
+      prePossibleUserArr.push(state.username);
+    }
 
     let updatePossibleUser = {
       possible_user: prePossibleUserArr,
@@ -162,7 +172,7 @@ const FriendsGroupList = (props) => {
       .finally(() => {});
 
     let preLikeArr = props.userData.group_like;
-   
+
     if (preLikeArr == null) {
       preLikeArr = [group_id];
     } else {
@@ -170,7 +180,7 @@ const FriendsGroupList = (props) => {
     }
 
     let groupLike = {
-      group_join: preLikeArr,
+      group_like: preLikeArr,
     };
 
     patchUserApi(state.username, groupLike)
@@ -188,8 +198,6 @@ const FriendsGroupList = (props) => {
   const updateComment = (newComment) => {
     setCommentData([...commentData, newComment]);
   };
-
-  //props.dbFriendsGroupData["group_startdt"] =
 
   return (
     <>
@@ -234,13 +242,16 @@ const FriendsGroupList = (props) => {
               data={props.dbFriendsGroupData}
               actions={[
                 (rowData) => ({
-                  icon: () => <NavLink to={`friendsGroupDetail/${rowData.group_id}`} key={rowData.group_id} style={{color:'black'}}><ImportContactsIcon /></NavLink>,
+                  icon: () => (
+                    <NavLink
+                      to={`friendsGroupDetail/${rowData.group_id}`}
+                      key={rowData.group_id}
+                      style={{ color: "black" }}
+                    >
+                      <ImportContactsIcon />
+                    </NavLink>
+                  ),
                   tooltip: "查看內容",
-                  // onClick: (event, rowData) => {
-                  //   <Link to={`friendsGroupDetail/${rowData.group_id}`}></Link>
-                  //   //handleShowContentOpen(event, rowData.group_id);
-                  // },
-                  // disabled: !state.isAuthenticated,
                 }),
                 (rowData) => ({
                   icon: () => <AddCircleIcon />,
@@ -248,7 +259,11 @@ const FriendsGroupList = (props) => {
                   onClick: (event, rowData) => {
                     joinGroup(event, rowData.group_id);
                   },
-                  disabled: !state.isAuthenticated || rowData.join_user.includes(state.username),
+                  disabled:
+                    !state.isAuthenticated ||
+                    (rowData.join_user != undefined
+                      ? rowData.join_user.includes(state.username)
+                      : true),
                 }),
                 (rowData) => ({
                   icon: () => <FavoriteBorderIcon />,
@@ -256,7 +271,11 @@ const FriendsGroupList = (props) => {
                   onClick: (event, rowData) => {
                     likeGroup(event, rowData.group_id);
                   },
-                  disabled: !state.isAuthenticated || rowData.possible_user.includes(state.username),
+                  disabled:
+                    !state.isAuthenticated ||
+                    (rowData.possible_user != undefined
+                      ? rowData.possible_user.includes(state.username)
+                      : true),
                 }),
               ]}
               options={{
@@ -267,7 +286,7 @@ const FriendsGroupList = (props) => {
                   fontSize: 16,
                 },
                 actionsColumnIndex: -1,
-                pageSize:10
+                pageSize: 10,
               }}
               localization={{
                 header: {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import {
   getGuideMapCommentsApi,
   postGuideMapCommentsApi,
+  patchUserApi,
+  patchGuidemapApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
 import Grid from "@material-ui/core/Grid";
@@ -154,7 +156,7 @@ const CommentList = (props) => {
                           <Rating
                             key={data.comment_id + "rate"}
                             name="half-rating-read"
-                            defaultValue={3}
+                            value={data.rating}
                             precision={0.5}
                             readOnly
                           />
@@ -193,18 +195,6 @@ const ShowCommentsDialog = (props) => {
 
   const handleListItemClick = (value) => {
     onClose(value);
-  };
-
-  const countCommentRating = (mapId) => {
-    let ratingTotal = 0;
-    let dataByMapId = props.commentData.filter(
-      (group) => group.map_id == mapId
-    );
-    for (let x in dataByMapId) {
-      ratingTotal += Number(dataByMapId[x].rating);
-    }
- 
-    return ratingTotal / dataByMapId.length;
   };
 
   return (
@@ -300,11 +290,24 @@ const WriteComment = (props) => {
       .then((res) => {
         alert("更新成功！");
         props.updateComments(dbPost);
-        handleClose();
+        props.onClose();
       })
       .then(() => {
         //updatemaprating
         //props.updateGuideMapDB();
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    let updateRating = {
+      rating: props.countCommentRating(dbPost.map_id),
+    };
+
+    patchGuidemapApi(dbPost.map_id, updateRating)
+      .then((res) => {
+        props.updateMapDBByLocationId(dbPost.map_id, updateRating, "RATING");
       })
       .catch((error) => {
         console.error(error.response);
@@ -363,30 +366,13 @@ const WriteCommentsDialog = (props) => {
   const classes = useStyles();
   const { onClose, open } = props;
 
-  // const [open, setOpen] = useState(false);
-  // const handleOpen = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
-  const handleClose = (value) => {
-    onClose(value);
-  };
-
-  // const handleListItemClick = (value) => {
-  //   onClose(value);
-  // };
-
   return (
     <Dialog
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
       //className={classes.modal}
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       fullWidth
       maxWidth="md"
     >
@@ -396,12 +382,15 @@ const WriteCommentsDialog = (props) => {
         username={props.username}
         commentData={props.commentData}
         updateComments={props.updateComments}
+        onClose={onClose}
+        countCommentRating={props.countCommentRating}
       />
     </Dialog>
   );
 };
 
 const MapList = (props) => {
+  console.log(props);
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const [city, setCity] = useState("臺北市");
@@ -477,20 +466,17 @@ const MapList = (props) => {
       .finally(() => {});
   }, []);
 
-  let dbData = props.formerDbData;
+  const countCommentRating = (mapId) => {
+    let ratingTotal = 0;
+    let dataByMapId = commentData.filter((group) => group.map_id == mapId);
+    for (let x in dataByMapId) {
+      ratingTotal += Number(dataByMapId[x].rating);
+      console.log(dataByMapId[x].rating);
+    }
+    return ratingTotal / dataByMapId.length;
+  };
 
-  // useEffect(() => {
-  //   axios
-  //     .get(`api/map/guideMap/`)
-  //     .then((res) => {
-  //       console.log(res.data);
-  //       setDbdata(...dbData, res.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     })
-  //     .finally(() => {});
-  // }, [reload]);
+  let dbData = props.formerDbData;
 
   const handleDelete = (chipToDelete) => () => {
     setChipData((chips) =>
@@ -511,18 +497,53 @@ const MapList = (props) => {
     setCommentData([...commentData, newValue]);
   };
 
-  const getTaiwanCityList = () => {
-    let cityJson = {};
-    TaiwanMapJson.map((data, index) => {
-      {
-        cityJson[data.CityName] = data.CityName;
-      }
-    });
-    // console.log(cityJson)
-    return cityJson;
-  };
+  const likeMap = (e, location_id) => {
+    e.preventDefault();
+    console.log(location_id);
 
-  // console.log(getTaiwanCityList())
+    let preLikeUserArr = props.getMapDBByLocationId(location_id).like_user;
+    if (preLikeUserArr == null || preLikeUserArr == undefined) {
+      preLikeUserArr = [state.username];
+    } else {
+      preLikeUserArr.push(state.username);
+    }
+
+    let updateLikeUser = {
+      like_user: preLikeUserArr,
+    };
+
+    patchGuidemapApi(location_id, updateLikeUser)
+      .then((res) => {
+        props.updateMapDBByLocationId(location_id, preLikeUserArr, "LIKE");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    let preLikeArr = props.userData.map_like;
+    console.log(preLikeArr);
+    if (preLikeArr == null) {
+      preLikeArr = [location_id];
+    } else {
+      preLikeArr.push(location_id);
+    }
+
+    let mapLike = {
+      map_like: preLikeArr,
+    };
+
+    patchUserApi(state.username, mapLike)
+      .then((res) => {
+        console.table(res.data);
+        props.updateGroupUserDB(mapLike);
+        alert("已加到最愛！");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
 
   return (
     <>
@@ -539,6 +560,7 @@ const MapList = (props) => {
         username={state.username}
         commentData={commentData}
         updateComments={updateComments}
+        countCommentRating={countCommentRating}
       />
 
       <Container component="main" maxWidth="lg">
@@ -582,16 +604,22 @@ const MapList = (props) => {
                 (rowData) => ({
                   icon: () => <RateReviewIcon />,
                   tooltip: "發表評論",
-                  onClick: (event, rowData) =>
-                    handleWriteCommentsOpen(event, rowData.location_id),
+                  onClick: (event, rowData) => {
+                    handleWriteCommentsOpen(event, rowData.location_id);
+                  },
                   disabled: !state.isAuthenticated,
                 }),
                 (rowData) => ({
                   icon: () => <FavoriteBorderIcon />,
                   tooltip: "加入最愛",
-                  onClick: (event, rowData) =>
-                    handleWriteCommentsOpen(event, rowData.location_id),
-                  disabled: !state.isAuthenticated,
+                  onClick: (event, rowData) => {
+                    likeMap(event, rowData.location_id);
+                  },
+                  disabled:
+                    !state.isAuthenticated ||
+                    (rowData.like_user != undefined
+                      ? rowData.like_user.includes(state.username)
+                      : false),
                 }),
               ]}
               options={{

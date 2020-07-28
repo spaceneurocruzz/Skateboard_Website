@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+
+import { NavLink } from "react-router-dom";
 import { getUserApi, patchUserApi } from "../axiosApi";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -29,7 +31,12 @@ import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import { eachDayOfInterval } from "date-fns";
 import profile from "../imgs/profile.png";
-
+import EditLocationIcon from "@material-ui/icons/EditLocation";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import EventAvailableIcon from "@material-ui/icons/EventAvailable";
+import "../css/app.css";
+import TrackChangesIcon from "@material-ui/icons/TrackChanges";
+import EmojiEventsIcon from "@material-ui/icons/EmojiEvents";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
@@ -53,6 +60,15 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       color: red[800],
     },
+  },
+  tabs: {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
+  tabroot: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.paper,
+    display: "flex",
+    height: 500,
   },
 }));
 
@@ -84,23 +100,11 @@ const User = (props) => {
     setOpenArticle(!openArticle);
   };
 
-  // const initialState = {
-  //   nickname: "",
-  //   email: "",
-  //   location: "",
-  //   intro: "",
-  //   avatar: "",
-  // };
-
-  // const [dbData, setDbdata] = useState(initialState);
   const [password, setPassword] = useState("");
 
   const handleInputChange = (event) => {
     props.updateUserDB(event.target);
-    // setDbdata({
-    //   ...dbData,
-    //   [event.target.name]: event.target.value,
-    // });
+
     if (event.target.name == "password") {
       setPassword(event.target.value);
     }
@@ -160,12 +164,11 @@ const User = (props) => {
       selectedFile: file,
       imageUploaded: 1,
     });
-
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     patchUserApi(state.username, props.userData)
       .then((res) => {
         console.table(userData);
@@ -185,7 +188,7 @@ const User = (props) => {
   };
 
   const TabPanel = (props) => {
-    const { children, value, index, ...other } = props;
+    const { children, value, index, classes, ...other } = props;
 
     return (
       <div
@@ -196,9 +199,11 @@ const User = (props) => {
         {...other}
       >
         {value === index && (
-          <Box p={3}>
-            <Typography>{children}</Typography>
-          </Box>
+          <Container>
+            <Box p={3}>
+              <Typography>{children}</Typography>
+            </Box>
+          </Container>
         )}
       </div>
     );
@@ -211,111 +216,209 @@ const User = (props) => {
     };
   }
 
+  let holdEvent = props.dbFriendsGroupData.filter(
+    (group) => group.create_user == state.username
+  );
+  console.log(holdEvent);
+
   const TabInfo = () => {
     return (
-      <Grid container style={{ width: "80%"  }}>
-        <AppBar position="static">
+      <Grid container style={{ width: "80%" }}>
+        <div className={classes.tabroot}>
+          {/* <AppBar position="static"> */}
           <Tabs
+            orientation="vertical"
+            variant="scrollable"
             value={value}
             onChange={handleChange}
-            aria-label="simple tabs example"
-            style={{ backgroundColor: "#2c8efd" }}
+            aria-label="Vertical tabs example"
+            className={classes.tabs}
           >
             <Tab label="地圖" {...a11yProps(0)} />
             <Tab label="揪團" {...a11yProps(1)} />
             <Tab label="修改個人資料" {...a11yProps(2)} />
           </Tabs>
-        </AppBar>
-        <TabPanel value={value} index={0}>
-          <div>
-            新增地點 :
-            <ul>
-              {props.userData.map_add != undefined ||
-              props.userData.map_add != null ? (
-                props.userData.map_add.map((addId, index) => {
-                  let data = props.dbGuideMapData.find(
-                    (map) => map.location_id == addId
-                  );
-                  return (
-                    <li>
-                      {data.location_type} {data.location_name}: {data.address}
-                    </li>
-                  );
-                })
-              ) : (
-                <div></div>
-              )}
-            </ul>
-          </div>
-          <div>
-            最愛地點:
-            <ul>
-              {props.userData.map_like != undefined ||
-              props.userData.map_like != null ? (
-                props.userData.map_like.map((likeId, index) => {
-                  let data = props.dbGuideMapData.find(
-                    (group) => group.group_id == likeId
-                  );
-                  return (
-                    <li>
-                      {data.location_name} {data.address}
-                    </li>
-                  );
-                })
-              ) : (
-                <div></div>
-              )}
-            </ul>
-          </div>
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          <div>
-            參加中:
-            <ul>
-              {props.userData.group_join != undefined ||
-              props.userData.group_join != null ? (
-                props.userData.group_join.map((joinId, index) => {
-                  let data = props.dbFriendsGroupData.find(
-                    (group) => group.group_id == joinId
-                  );
-                  return (
-                    <li>
-                      {data.group_startdt.slice(0, 10)}{" "}
-                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
-                    </li>
-                  );
-                })
-              ) : (
-                <div></div>
-              )}
-            </ul>
-          </div>
-          <div>
-            追蹤中:
-            <ul>
-              {props.userData.group_like != undefined ||
-              props.userData.group_like != null ? (
-                props.userData.group_like.map((likeId, index) => {
-                  let data = props.dbFriendsGroupData.find(
-                    (group) => group.group_id == likeId
-                  );
-                  return (
-                    <li>
-                      {data.group_startdt.slice(0, 10)}{" "}
-                      {data.group_startdt.slice(11, 20)} 在 {data.location_name}
-                    </li>
-                  );
-                })
-              ) : (
-                <div></div>
-              )}
-            </ul>
-          </div>
-        </TabPanel>
-        <TabPanel value={value} index={2}><EditProfile /></TabPanel>
+          {/* </AppBar> */}
+          <TabPanel value={value} index={0}>
+            <Grid container>
+              <EditLocationIcon />
+              <div style={{ marginBottom: 10 }}>新增地點 :</div>
+              <ul>
+                {props.userData.map_add != undefined ||
+                props.userData.map_add != null ? (
+                  props.userData.map_add.map((addId, index) => {
+                    let data = props.dbGuideMapData.find(
+                      (map) => map.location_id == addId
+                    );
+                    return (
+                      <li style={{ listStyleType: "decimal" }}>
+                        {data.location_type} {data.location_name}:{" "}
+                        {data.address}
+                      </li>
+                    );
+                  })
+                ) : (
+                  <span>還沒有</span>
+                )}
+              </ul>
+            </Grid>
+            <Grid container>
+              <FavoriteIcon />
+              <span>最愛地點 :</span>
+              <ul>
+                {props.userData.map_like != undefined ||
+                props.userData.map_like != null ? (
+                  props.userData.map_like.map((likeId, index) => {
+                    let data = props.dbGuideMapData.find(
+                      (map) => map.location_id == likeId
+                    );
+                    return (
+                      <li style={{ listStyleType: "decimal" }}>
+                        {data.location_type} {data.location_name}:{" "}
+                        {data.address}
+                      </li>
+                    );
+                  })
+                ) : (
+                  <span>還沒有</span>
+                )}
+              </ul>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <Grid container>
+              <EmojiEventsIcon />
+              舉辦中 :
+              <ul>
+                {holdEvent != undefined || holdEvent != null ? (
+                  holdEvent.map((data, index) => {
+                    return (
+                      <li style={{ listStyleType: "decimal" }}>
+                        {data.group_startdt.slice(0, 10)}{" "}
+                        {data.group_startdt.slice(11, 20)} 在{" "}
+                        {data.location_name}
+                        (ID:{" "}
+                        <NavLink
+                          to={"/friendsGroupDetail/" + data.group_id}
+                          className="link"
+                        >
+                          {data.group_id}
+                        </NavLink>
+                        )
+                      </li>
+                    );
+                  })
+                ) : (
+                  <span>還沒有</span>
+                )}
+              </ul>
+            </Grid>
+            <Grid container>
+              <EventAvailableIcon />
+              參加中 :
+              <ul>
+                {props.userData.group_join != undefined ||
+                props.userData.group_join != null ? (
+                  props.userData.group_join.map((joinId, index) => {
+                    let data = props.dbFriendsGroupData.find(
+                      (group) => group.group_id == joinId
+                    );
+                    return (
+                      <li style={{ listStyleType: "decimal" }}>
+                        {data.group_startdt.slice(0, 10)}{" "}
+                        {data.group_startdt.slice(11, 20)} 在{" "}
+                        {data.location_name}
+                        (ID:{" "}
+                        <NavLink
+                          to={"/friendsGroupDetail/" + data.group_id}
+                          className="link"
+                        >
+                          {data.group_id}
+                        </NavLink>
+                        )
+                      </li>
+                    );
+                  })
+                ) : (
+                  <span>還沒有</span>
+                )}
+              </ul>
+            </Grid>
+            <Grid container>
+              <TrackChangesIcon />
+              追蹤中 :
+              <ul>
+                {props.userData.group_like != undefined ||
+                props.userData.group_like != null ? (
+                  props.userData.group_like.map((likeId, index) => {
+                    let data = props.dbFriendsGroupData.find(
+                      (group) => group.group_id == likeId
+                    );
+                    return (
+                      <li style={{ listStyleType: "decimal" }}>
+                        {data.group_startdt.slice(0, 10)}{" "}
+                        {data.group_startdt.slice(11, 20)} 在{" "}
+                        {data.location_name}
+                        (ID:{" "}
+                        <NavLink
+                          to={"/friendsGroupDetail/" + data.group_id}
+                          className="link"
+                        >
+                          {data.group_id}
+                        </NavLink>
+                        )
+                      </li>
+                    );
+                  })
+                ) : (
+                  <span>還沒有</span>
+                )}
+              </ul>
+            </Grid>
+          </TabPanel>
+          <TabPanel value={value} index={2}>
+            <EditProfile />
+          </TabPanel>
+        </div>
       </Grid>
     );
   };
+
+  // const EditProfile = () => {
+  //   return (
+  //     <form novalidate>
+  //       <div className="form-group">
+  //         <label id="usernameLabel">Username</label>
+  //         <input
+  //           className="form-control"
+  //           type="email"
+  //           name="username"
+  //           value={props.userData.username}
+  //           onChange={handleInputChange}
+  //           required
+  //         />
+  //         <div className="error" id="usernameError" />
+  //       </div>
+  //       <div className="form-group">
+  //         <label id="passwordLabel">Password</label>
+  //         <input
+  //           className="form-control"
+  //           type="password"
+  //           name="password"
+  //           value={props.userData.password}
+  //           onChange={handleInputChange}
+  //           pattern=".{5,}"
+  //           required
+  //         />
+  //         <div className="error" id="passwordError" />
+  //       </div>
+
+  //       <button className="btn btn-primary" onClick={handleSubmit}>
+  //         submit
+  //       </button>
+  //     </form>
+  //   );
+  // };
 
   const EditProfile = () => {
     return (
@@ -375,19 +478,20 @@ const User = (props) => {
             label="自我介紹"
             name="intro"
             multiline
-            style={{ width: 800 }}
+            style={{ width: 400 }}
             rows={5}
             value={props.userData.intro}
             variant="filled"
           />
         </Grid>
-        {/* </div> */}
+
         <Button
           onClick={handleSubmit}
           type="submit"
           variant="contained"
           color="primary"
           className={classes.submit}
+          style={{ marginLeft: 5 }}
         >
           確認修改
         </Button>

@@ -110,6 +110,10 @@ export const postGuidemapApi = (data) => {
   return mapAxiosInstance.post(`guideMap/`, data);
 };
 
+export const patchGuidemapApi = (location_id, data) => {
+  return mapAxiosInstance.patch(`guideMap/${location_id}/`, data);
+};
+
 export const getGuideMapCommentsApi = () => {
   return mapAxiosInstance.get(`guideMapComments/`);
 };

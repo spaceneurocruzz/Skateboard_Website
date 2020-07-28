@@ -1,6 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Switch, Route, useHistory } from "react-router";
-import axiosInstance, {loginApi} from "../axiosApi";
+import axiosInstance, {
+  loginApi,
+  getUserApi,
+  getUserLoginApi,
+} from "../axiosApi";
 import Signup from "./Signup";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../App";
@@ -77,7 +81,7 @@ const theme = createMuiTheme({
   },
 });
 
-export const Login = () => {
+export const Login = (props) => {
   const classes = useStyles();
   const history = useHistory();
   const { dispatch } = useContext(AuthContext);
@@ -107,9 +111,9 @@ export const Login = () => {
     });
 
     loginApi({
-        username: authData.username,
-        password: authData.password,
-      })
+      username: authData.username,
+      password: authData.password,
+    })
       .then((response) => {
         axiosInstance.defaults.headers["Authorization"] =
           "JWT " + response.data.access;
@@ -124,6 +128,12 @@ export const Login = () => {
         });
       })
       .then(() => {
+        if(authData.username != ""){
+          getUserApi(authData.username).then((res) => {
+            console.table(res.data);
+            props.initUserDB(res.data);
+          });
+        }
         history.push("/");
       })
       .catch(function (error) {
@@ -134,6 +144,25 @@ export const Login = () => {
         });
       });
   };
+
+  if (localStorage.getItem != null) {
+    useEffect(() => {
+      getUserApi(authData.username)
+        .then((res) => {
+          console.table(res.data);
+          props.initUserDB(res.data);
+          //setDbdata(res.data);
+          //console.table(dbData);
+        })
+        .then(() => {
+          history.push("/");
+        })
+        .catch((error) => {
+          console.error(error.response);
+        })
+        .finally(() => {});
+    }, []);
+  }
 
   return (
     <Container component="main" maxWidth="xs">

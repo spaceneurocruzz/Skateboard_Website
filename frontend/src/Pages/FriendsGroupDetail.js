@@ -17,8 +17,8 @@ import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import "../css/app.css";
-import PersonPinIcon from '@material-ui/icons/PersonPin';
-import FaceIcon from '@material-ui/icons/Face';
+import PersonPinIcon from "@material-ui/icons/PersonPin";
+import FaceIcon from "@material-ui/icons/Face";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -93,7 +93,8 @@ const CommentList = (props) => {
                     key={data.group_id}
                     primary={
                       <React.Fragment key={data.group_id + "group"}>
-                        <PersonPinIcon />{`${data.comment_user}`}
+                        <PersonPinIcon />
+                        {`${data.comment_user}`}
                         <div>{data.comment}</div>
                       </React.Fragment>
                     }
@@ -204,7 +205,7 @@ const FriendsGroupDetail = (props) => {
           }
           return (
             <Container component="main" maxWidth="md" style={{ marginTop: 70 }}>
-              <div style={{ marginTop: 70, marginBottom:50 }}>
+              <div style={{ marginTop: 70, marginBottom: 50 }}>
                 <span style={{ fontSize: 24, fontWeight: "bold" }}>
                   {`${data.group_startdt.slice(0, 10)}    `}{" "}
                 </span>
@@ -220,7 +221,18 @@ const FriendsGroupDetail = (props) => {
                 </span>
               </div>
               <ListItem>
-                <ListItemText>{`地址：${data.address}`}</ListItemText>
+                <ListItemText>
+                  {/* {`地址：${data.address}`} */}
+                  地址：
+                  <a
+                    href={
+                      "https://www.google.com/maps/dir/?api=1&destination=" +
+                      data.address
+                    }
+                  >
+                    {`${data.address}`}
+                  </a>
+                </ListItemText>
               </ListItem>
               <ListItem>
                 <ListItemText>
@@ -245,7 +257,7 @@ const FriendsGroupDetail = (props) => {
                     fontSize: 12,
                     color: "#9a9898",
                     alignItems: "left",
-                    marginRight:10
+                    marginRight: 10,
                   }}
                 >{`新增日期：${data.create_dt.slice(
                   0,
@@ -272,7 +284,7 @@ const FriendsGroupDetail = (props) => {
                   name="comment"
                   label="我有問題"
                   variant="filled"
-                  style={{ width: 300, marginRight:20 }}
+                  style={{ width: 300, marginRight: 20 }}
                 />
                 <Button
                   style={{ height: 40 }}
