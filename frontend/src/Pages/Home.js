@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+
+import Container from "@material-ui/core/Container";
 import banner from "../imgs/index.jpg";
 import "../css/app.css";
 import indexman from "../imgs/indexman.jpg";
@@ -9,28 +11,70 @@ import indexsb from "../imgs/indexsb.jpg";
 import { Player } from "video-react";
 import { Link, NavLink } from "react-router-dom";
 
+const Welcome = ({ stickyRef }) => (
+  <main>
+    <section className="welcome">
+      <div ref={stickyRef}>
+        <img
+          src="../imgs/skateboardLogo.png"
+          alt="logo"
+          className="welcome--logo"
+        />
+        <p>Even if you scroll, i will stick with you</p>
+        <button className="welcome__cta-primary">Contact us</button>
+      </div>
+    </section>
+    <NavLink to="/guidemap">
+      <div
+        className="circle"
+        style={{
+          alignItems: "center",
+          zIndex: 2,
+          fontSize: 30,
+          alignItems: "left",
+          marginLeft: 100,
+          marginTop: 200,
+        }}
+      >
+        滑板地圖
+      </div>
+    </NavLink>
+    <About />
+    <About />
+  </main>
+);
+
 const Home = () => {
   const [state, setState] = useState("spin");
   const toRight = () => {
     setState("lefttoright");
   };
+  const [sbGo, setSbGo] = useState("");
 
-  // const toRight = () => {
-  //   setState("lefttoright");
-  // };
+  setTimeout(()=>{
+    setSbGo("SkateboardGO");
+  }, 1500)
+
+  const [slogan, setSlogan]= useState("");
+
+  setTimeout(()=>{
+    setSlogan("來揪團吧！");
+  }, 1500)
+
+  // const [img, setImg]= useState("");
+
+  // setTimeout(()=>{
+  //   setImg(`${indexmanstand}`);
+  // }, 1500)
 
   return (
     // <div
     //   className="banner_conatainer"
     //   style={{ marginTop: 30, height: "100%" }}
     // >
-    <>
-      {/* <video id="background-video" loop autoPlay muted style={{position:'fixed',bottom:100 }}>
-        <source src={bg} type="video/mp4" />
-      </video> */}
-      {/* <div id="background"></div> */}
-      <div style={{ marginLeft: 20, display: "flex" }}>
-        <NavLink to="/guidemap">
+    <div className="user_conatainer">
+      <div style={{ display: "flex" }}>
+        {/* <NavLink to="/guidemap">
           <div
             className="circle"
             style={{
@@ -39,12 +83,12 @@ const Home = () => {
               fontSize: 30,
               alignItems: "left",
               marginLeft: 100,
-              marginTop:200
+              marginTop: 200,
             }}
           >
             滑板地圖
           </div>
-        </NavLink>
+        </NavLink> */}
         {/* <div
           className="circle2"
           style={{ textAlign: "center", zIndex: 2, fontSize: 30,position:'fixed',bottom:100 }}
@@ -53,21 +97,66 @@ const Home = () => {
         </div>
       </div>
     </> */}
+        {/* <span
+          id="slogan"
+          style={{
+            fontFamily: "Galindo",
+            // marginTop: "auto",
+            // marginBottom: "auto",
+            fontSize: 50,
+            fontWeight: 900,
+          }}
+        >
+          {slogan}
+        </span> */}
+        {/* <img
+          // className="lefttoright"
+          //className={state}
+          src={img}
+          style={{
+            height: 500,
+            width: "auto",
+            marginTop: 50,
+            marginBottom: 70,
+            marginRight: 20,
+            // marginRight: "auto",
+            // marginLeft: "auto",
+            zIndex: 2,
+          }}
+          alt="banner"
+        /> */}
+        <div>
         <img
-          className={state}
+          className="lefttoright"
+          //className={state}
           src={indexman}
           style={{
             height: 500,
             width: "auto",
-            marginTop:50,
+            marginTop: 50,
             marginBottom: 70,
-            marginRight: "auto",
-            marginLeft: "auto",
-            zIndex: 2,
+            marginLeft: 20,
+            // marginRight: "auto",
+            // marginLeft: "auto",
+            //zIndex: 2,
           }}
           alt="banner"
         />
-        <NavLink to="/friendsgroup">
+        </div>
+        <div
+          id="sbgo"
+          style={{
+            fontFamily: "Galindo",
+            marginTop: "auto",
+            marginBottom: "auto",
+            fontSize: 80,
+            fontWeight: 900,
+            marginLeft:300
+          }}
+        >
+          {sbGo}
+        </div>
+        {/* <NavLink to="/friendsgroup">
           <div
             className="circle2"
             onClick={toRight}
@@ -76,12 +165,12 @@ const Home = () => {
               zIndex: 2,
               fontSize: 30,
               marginRight: 100,
-              marginTop:200
+              marginTop: 200,
             }}
           >
             揪團
           </div>
-        </NavLink>
+        </NavLink> */}
         {/* <img className="spin"
            src={indexsb}
            style={{
@@ -103,7 +192,7 @@ const Home = () => {
           alt="banner"
         /> */}
       </div>
-    </>
+    </div>
     /* <img src={banner} alt="banner" />  
      {/* </div> */
   );

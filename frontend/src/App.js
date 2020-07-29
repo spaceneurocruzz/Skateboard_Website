@@ -18,7 +18,7 @@ import axiosInstance, {
   logoutApi,
   getFriendsGroupApi,
   getGuidemapApi,
-  getUserApi
+  getUserApi,
 } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
@@ -43,13 +43,27 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
-      return {
-        ...state,
-        isAuthenticated: true,
-        access: action.payload.data.access,
-        refresh: action.payload.data.refresh,
-        username: JSON.parse(action.payload.config.data).username,
-      };
+      if (action.payload.data == undefined) {
+        console.log(state);
+
+        return {
+          ...state,
+          isAuthenticated: true,
+          access: localStorage.getItem("access_token"),
+          refresh: localStorage.getItem("refresh_token"),
+          username: localStorage.getItem("username"),
+          // username: JSON.parse(action.payload.config.data).username,
+        };
+      } else {
+        console.log(action);
+        return {
+          ...state,
+          isAuthenticated: true,
+          access: action.payload.data.access,
+          refresh: action.payload.data.refresh,
+          username: JSON.parse(action.payload.config.data).username,
+        };
+      }
     case "LOGOUT":
       return {
         ...state,
@@ -121,7 +135,7 @@ const App = () => {
 
   const initUserDB = (newData) => {
     setUserdata(newData);
-    console.log(newData)
+    console.log(newData);
   };
 
   const updateUserDB = (eventTarget) => {
@@ -175,6 +189,7 @@ const App = () => {
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token") || null;
     const refreshToken = localStorage.getItem("refresh_token") || null;
+    const localUsername = localStorage.getItem("username") || null;
 
     if (accessToken && refreshToken) {
       dispatch({
@@ -182,6 +197,7 @@ const App = () => {
         payload: {
           access: accessToken,
           refresh: refreshToken,
+          username: localUsername,
         },
       });
     }
@@ -228,17 +244,20 @@ const App = () => {
           <Link to="/" className="link">
             <img src={logo} alt="logo" />
           </Link>
-          <span
-            style={{
-              marginLeft: 20,
-              fontFamily: "Galindo",
-              verticalAlign: "middle",
-              fontSize: 28,
-              fontWeight: 900,
-            }}
-          >
-            SkateboardGO
-          </span>
+          <Link to="/" className="link">
+            {/* <span
+              style={{
+                marginLeft: 20,
+                fontFamily: "Galindo",
+                marginTop: "auto",
+                marginBottom: "auto",
+                fontSize: 28,
+                fontWeight: 900,
+              }}
+            >
+              SkateboardGO
+            </span> */}
+          </Link>
         </div>
         <div className="nav">
           <ul className="nav-link">
@@ -297,14 +316,21 @@ const App = () => {
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">
-                  <Button variant="contained" color="secondary">
+                  <Button
+                    variant="contained"
+                    style={{ backgroundColor: "#188af2", color: "white" }}
+                  >
                     登入
                   </Button>
                 </Link>
               </li>
             ) : (
               <li className="nav-link-btn">
-                <Button onClick={handleLogout} variant="contained">
+                <Button
+                  onClick={handleLogout}
+                  variant="contained"
+                  style={{ backgroundColor: "#f95173" }}
+                >
                   登出
                 </Button>
               </li>
@@ -400,7 +426,11 @@ const App = () => {
         />
         <Route exact path={"/signup/"} component={Signup} />
       </Switch>
-      <div className="footer">Copyright</div>
+      <div className="footer">
+        <div>Frontend: ReactJS, Material-UI</div>
+        <div>Backend: Django(Python), PosgreSQL</div>
+        <div>Designed by Sandy Lin, 2020</div>
+      </div>
     </AuthContext.Provider>
   );
 };

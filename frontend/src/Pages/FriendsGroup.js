@@ -44,6 +44,16 @@ const useStyles = makeStyles((theme) => ({
 
 const FriendsGroup = (props) => {
   const { state } = React.useContext(AuthContext);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token") || null;
+    const refreshToken = localStorage.getItem("refresh_token") || null;
+
+    if (accessToken && refreshToken) {
+
+    }
+  }, []);
+
   const getFriendsGroupDBById = (group_id) => {
     if (props.dbFriendsGroupData != undefined) {
       return props.dbFriendsGroupData.find(
@@ -155,7 +165,7 @@ const FriendsGroup = (props) => {
 
   return (
     <>
-      <Container component="main" maxWidth="lg" style={{textAlign: "center" }}>
+      <Container component="main" maxWidth="lg" style={{textAlign: "center" }} className="user_conatainer">
         <Grid container id="back-to-top-anchor">
           <FriendsGroupModalInput
             dbFriendsGroupData={props.dbFriendsGroupData}

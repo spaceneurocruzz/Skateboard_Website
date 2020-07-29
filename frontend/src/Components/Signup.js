@@ -256,12 +256,14 @@ const Signup = () => {
           >
             註冊
           </Button>
+          <Grid container style={{marginBottom:50}}>
         <div className="sign_up">
           已經有帳號嗎？
           <NavLink to="/login/" className="link">
             按我登入
           </NavLink>
         </div>
+        </Grid>
         </form>
         {/* </div> */}
       </div>

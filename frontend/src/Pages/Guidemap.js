@@ -109,6 +109,21 @@ const Guidemap = (props) => {
     { key: 1, label: "店家" },
   ]);
 
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token") || null;
+    const refreshToken = localStorage.getItem("refresh_token") || null;
+
+    // if (accessToken && refreshToken) {
+    //   state={
+    //     isAuthenticated: true,
+    //     access: accessToken,
+    //     refresh: refreshToken,
+    //     username: null,
+    //   }
+    //   console.log(state)
+    // }
+  }, []);
+
   const getMapDBByLocationId = (locationId) => {
     if (props.dbGuideMapData != undefined) {
       return props.dbGuideMapData.find(
@@ -123,10 +138,11 @@ const Guidemap = (props) => {
     let index = props.dbGuideMapData.findIndex(
       (data) => data.location_id === locationId
     );
-
+      console.log(newData)
+      console.log(locationId)
     switch (type) {
       case "RATING":
-        props.dbFriendsGroupData[index].rating = newData;
+        props.dbGuideMapData[index].rating = newData;
         break;
       case "LIKE":
         props.dbGuideMapData[index].like_user = newData;
@@ -135,7 +151,7 @@ const Guidemap = (props) => {
         console.log("none");
     }
 
-    props.updateGuideMapDB([...props.dbGuideMapData]);
+    props.updateGuideMapDB(...props.dbGuideMapData);
   };
 
   const handleDelete = (chipToDelete) => () => {
@@ -239,13 +255,13 @@ const Guidemap = (props) => {
               userData={props.userData}
             />
             {/* <LocationFilter /> */}
-            <h3 style={{ marginLeft: 20, marginBottom: 20, marginTop: 50 }}>
+            <h3 style={{ marginLeft: 30, marginBottom: 20, marginTop: 50 }}>
               <span style={{ verticalAlign: "middle" }}>場地</span>
               <img
                 src={skateboardMarker}
                 style={{ height: 32, verticalAlign: "middle" }}
               />
-              <span style={{ verticalAlign: "middle" }}>店家</span>
+              <span style={{ marginLeft: 20,verticalAlign: "middle" }}>店家</span>
               <img
                 src={shopMarker}
                 style={{ height: 32, verticalAlign: "middle" }}
@@ -344,18 +360,18 @@ const Guidemap = (props) => {
                     {/* <IconButton aria-label="add to favorites" onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}>
                       <FavoriteIcon />
                     </IconButton> */}
-                    <img
+                    {/* <img
                       src={share}
                       alt="share"
                       style={{ height: 32 }}
                       onClick={() =>
                         addtoFavorite(mapMarker.selectedLocation.name)
                       }
-                    />
+                    /> */}
 
-                    {/* <IconButton aria-label="share">
+                    <IconButton aria-label="share">
                       <ShareIcon />
-                    </IconButton> */}
+                    </IconButton>
                     <Typography
                       variant="body2"
                       color="textSecondary"
@@ -369,13 +385,12 @@ const Guidemap = (props) => {
               )}
             </InfoWindow>
           </Map>
-        </div>
+        </div>  
       </Grid>
-      {/* {!isLoading && <CircularProgressWithLabel value={progress} />} */}
       <Container component="main" maxWidth="lg">
         <Grid container>
           <MapList
-            formerDbData={props.dbGuideMapData}
+            dbGuideMapData={props.dbGuideMapData}
             updateGuideMapDB={props.updateGuideMapDB}
             userData={props.userData}
             updateGroupUserDB={props.updateGroupUserDB}

@@ -60,6 +60,8 @@ import shopMarker from "../../imgs/shopping-bag.png";
 import skateboardMarker from "../../imgs/skateboardMarker.png";
 
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import indexmanstand from "../../imgs/indexmanstand.jpg";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -68,6 +70,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0.5),
     margin: 0,
     width: "100%",
+    marginLeft: 40,
   },
   chip: {
     margin: theme.spacing(0.5),
@@ -134,53 +137,71 @@ const CommentList = (props) => {
   const classes = useStyles();
 
   if (!props.commentData.some((t) => t.map_id === props.locationId)) {
-    return <h4>目前還沒有評論哦！</h4>;
-  } else {
     return (
       <List className={classes.root}>
-        {props.commentData.map((data, index) => {
-          if (data.map_id == props.locationId) {
-            return (
-              <>
-                <ListItem alignItems="flex-start" key={index}>
-                  {/* <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                </ListItemAvatar> */}
-
-                  <ListItemText
-                    key={data.comment_id}
-                    primary={data.comment_title}
-                    secondary={
-                      <React.Fragment key={data.comment_id + "frag"}>
-                        <Grid container>
-                          <Rating
-                            key={data.comment_id + "rate"}
-                            name="half-rating-read"
-                            value={data.rating}
-                            precision={0.5}
-                            readOnly
-                          />
-                        </Grid>
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          className={classes.inline}
-                          color="textPrimary"
-                        >
-                          {`${data.username} - `}
-                        </Typography>
-                        {/* {data.username} */}
-                        {data.comment}
-                      </React.Fragment>
-                    }
-                  />
-                </ListItem>
-                <Divider variant="inset" component="li" />
-              </>
-            );
-          }
-        })}
+        <h4>目前還沒有評論哦！</h4>
       </List>
+    );
+  } else {
+    return (
+      <div style={{ display: "flex" }}>
+        <List className={classes.root}>
+          {props.commentData.map((data, index) => {
+            if (data.map_id == props.locationId) {
+              return (
+                <>
+                  <ListItem alignItems="flex-start" key={index}>
+                    <ListItemAvatar>
+                      <Avatar
+                        alt="avatar"
+                        src={`https://ui-avatars.com/api/?name=${data.username}&size=128&rounded=true&background=040404&color=fff`}
+                      />
+                    </ListItemAvatar>
+
+                    <ListItemText
+                      key={data.comment_id}
+                      primary={data.comment_title}
+                      secondary={
+                        <React.Fragment key={data.comment_id + "frag"}>
+                          <Grid container>
+                            <Rating
+                              key={data.comment_id + "rate"}
+                              name="half-rating-read"
+                              value={data.rating}
+                              precision={0.5}
+                              readOnly
+                            />
+                          </Grid>
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            className={classes.inline}
+                            color="textPrimary"
+                          >
+                            {`${data.username} - `}
+                          </Typography>
+                          {/* {data.username} */}
+                          {data.comment}
+                        </React.Fragment>
+                      }
+                    />
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: "#9a9898",
+                        alignItems: "left",
+                      }}
+                    >
+                      {data.create_dt.toString()}
+                    </span>
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                </>
+              );
+            }
+          })}
+        </List>
+      </div>
     );
   }
 };
@@ -205,9 +226,15 @@ const ShowCommentsDialog = (props) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth="md"
+      maxWidth="sm"
+      style={{ backgroundImage: `${indexmanstand}` }}
     >
-      <DialogTitle id="simple-dialog-title">關於這個場地的評論</DialogTitle>
+      <DialogTitle
+        id="simple-dialog-title"
+        style={{ backgroundColor: "#b7dcf9" }}
+      >
+        關於這個場地的評論
+      </DialogTitle>
       <CommentList
         locationId={props.locationId}
         commentData={props.commentData}
@@ -252,6 +279,7 @@ const HoverRating = (props) => {
 };
 
 const WriteComment = (props) => {
+  console.log(props);
   const classes = useStyles();
   const [ratingVal, setRatingVal] = useState(0);
   const [input, setInput] = useState({
@@ -467,16 +495,16 @@ const MapList = (props) => {
   }, []);
 
   const countCommentRating = (mapId) => {
+    console.log(commentData);
     let ratingTotal = 0;
     let dataByMapId = commentData.filter((group) => group.map_id == mapId);
     for (let x in dataByMapId) {
       ratingTotal += Number(dataByMapId[x].rating);
       console.log(dataByMapId[x].rating);
     }
-    return ratingTotal / dataByMapId.length;
+    console.log(Math.round((ratingTotal / dataByMapId.length) * 10) / 10);
+    return Math.round((ratingTotal / dataByMapId.length) * 10) / 10;
   };
-
-  let dbData = props.formerDbData;
 
   const handleDelete = (chipToDelete) => () => {
     setChipData((chips) =>
@@ -592,7 +620,7 @@ const MapList = (props) => {
                   },
                 },
               ]}
-              data={dbData}
+              data={props.dbGuideMapData}
               actions={[
                 (rowData) => ({
                   icon: () => <CommentIcon />,

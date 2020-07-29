@@ -48,7 +48,7 @@ module.exports = {
     port: 3000,
     contentBase: path.resolve(__dirname, "dist"),
     publicPath: "/static/",
-    //hot: true,
+    historyApiFallback: true,
     watchContentBase: true,
   },
   plugins: [HTMLWebpackPluginConfig],

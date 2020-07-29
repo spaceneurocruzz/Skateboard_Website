@@ -119,6 +119,7 @@ export const Login = (props) => {
           "JWT " + response.data.access;
         localStorage.setItem("access_token", response.data.access);
         localStorage.setItem("refresh_token", response.data.refresh);
+        localStorage.setItem("username", authData.username);
         return response;
       })
       .then((json) => {
@@ -222,15 +223,15 @@ export const Login = (props) => {
               helperText="密碼錯誤，請再試一次．"
             />
           )}
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
-          />
+          /> */}
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            color="primary"
+            style={{ backgroundColor :"#188af2", color: 'white'}}
             className={classes.submit}
           >
             登入

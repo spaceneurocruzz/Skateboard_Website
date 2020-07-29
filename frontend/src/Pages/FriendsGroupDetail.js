@@ -82,6 +82,11 @@ const CommentList = (props) => {
       <List className={classes.root}>
         {props.commentData.map((data, index) => {
           if (data.group_id == props.groupId) {
+            if (data.create_dt == undefined) {
+              console.log(data.create_dt)
+              data.create_dt = new Date().toISOString();
+              console.log(data.create_dt)
+            }
             return (
               <>
                 <ListItem alignItems="flex-start" key={index}>
@@ -93,8 +98,8 @@ const CommentList = (props) => {
                     key={data.group_id}
                     primary={
                       <React.Fragment key={data.group_id + "group"}>
-                        <PersonPinIcon />
-                        {`${data.comment_user}`}
+                        <div style={{color: '#0198e3'}}><PersonPinIcon />
+                        {`${data.comment_user}`}</div>
                         <div>{data.comment}</div>
                       </React.Fragment>
                     }
@@ -105,10 +110,13 @@ const CommentList = (props) => {
                       color: "#9a9898",
                       alignItems: "left",
                     }}
-                  >{`${data.create_dt.slice(0, 10)}  ${data.create_dt.slice(
+                  >
+                  {data.create_dt.toString()}
+                  {/* {`${data.create_dt.slice(0, 10)}  ${data.create_dt.slice(
                     11,
                     19
-                  )}`}</span>
+                  )}`} */}
+                  </span>
                 </ListItem>
                 {/* <Divider variant="inset" component="li" /> */}
               </>
@@ -172,7 +180,7 @@ const FriendsGroupDetail = (props) => {
     dbPost = input;
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
-
+    console.log(dbPost);
     //insert user
     //post should return commentid and post to user table
     postFriendsGroupCommentsApi(dbPost)
@@ -180,6 +188,7 @@ const FriendsGroupDetail = (props) => {
         alert("更新成功！");
 
         setCommentData([...commentData, dbPost]);
+        console.log(commentData);
         //props.updateComment(dbPost);
       })
       .catch((error) => {
@@ -205,75 +214,76 @@ const FriendsGroupDetail = (props) => {
           }
           return (
             <Container component="main" maxWidth="md" style={{ marginTop: 70 }}>
-              <div style={{ marginTop: 70, marginBottom: 50 }}>
-                <span style={{ fontSize: 24, fontWeight: "bold" }}>
-                  {`${data.group_startdt.slice(0, 10)}    `}{" "}
-                </span>
-                <span
-                  style={{ fontSize: 20, fontWeight: "bold" }}
-                >{`${data.group_startdt.slice(11, 19)}    `}</span>
-                <span style={{ fontSize: 22, fontWeight: "bold" }}>
-                  {data.location_name}
-                </span>
-                <span style={{ textAlign: "left" }}>
-                  {" "}
-                  (ID：{data.group_id})
-                </span>
-              </div>
-              <ListItem>
-                <ListItemText>
-                  {/* {`地址：${data.address}`} */}
-                  地址：
-                  <a
-                    href={
-                      "https://www.google.com/maps/dir/?api=1&destination=" +
-                      data.address
-                    }
-                  >
-                    {`${data.address}`}
-                  </a>
-                </ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>
-                  <span>{`     人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}</span>
-                </ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>{`內容：${data.group_content}`}</ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
-              </ListItem>
-              <ListItem>
-                <ListItemText>{`建立者：${data.create_user}`}</ListItemText>
-              </ListItem>
-              <ListItem>
-                <span
-                  style={{
-                    fontSize: 12,
-                    color: "#9a9898",
-                    alignItems: "left",
-                    marginRight: 10,
-                  }}
-                >{`新增日期：${data.create_dt.slice(
-                  0,
-                  10
-                )}  ${data.create_dt.slice(11, 19)}`}</span>
-                <span
-                  style={{
-                    fontSize: 12,
-                    color: "#9a9898",
-                    alignItems: "left",
-                  }}
-                >{`更新日期：${data.update_dt.slice(
-                  0,
-                  10
-                )}  ${data.update_dt.slice(11, 19)}`}</span>
-              </ListItem>
+              <Grid Container>
+                <div style={{ marginTop: 70, marginBottom: 30 }}>
+                  <span style={{ fontSize: 24, fontWeight: "bold" }}>
+                    {`${data.group_startdt.slice(0, 10)}    `}{" "}
+                  </span>
+                  <span
+                    style={{ fontSize: 20, fontWeight: "bold" }}
+                  >{`${data.group_startdt.slice(11, 19)}    `}</span>
+                  <span style={{ fontSize: 22, fontWeight: "bold" }}>
+                    {data.location_name}
+                  </span>
+                  <span style={{ textAlign: "left" }}>
+                    {" "}
+                    (ID：{data.group_id})
+                  </span>
+                  <span style={{ marginLeft: 100 }}>{`建立者：${data.create_user}`}</span>
+               
+                </div>
+                <ListItem>
+                  <ListItemText>
+                    {/* {`地址：${data.address}`} */}
+                    地址：
+                    <a
+                      href={
+                        "https://www.google.com/maps/dir/?api=1&destination=" +
+                        data.address
+                      }
+                    >
+                      {`${data.address}`}
+                    </a>
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>
+                    <span>{`     人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}</span>
+                  </ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`內容：${data.group_content}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
+                </ListItem>
+                <ListItem>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#9a9898",
+                      alignItems: "left",
+                      marginRight: 10,
+                    }}
+                  >{`新增日期：${data.create_dt.slice(
+                    0,
+                    10
+                  )}  ${data.create_dt.slice(11, 19)}`}</span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#9a9898",
+                      alignItems: "left",
+                    }}
+                  >{`更新日期：${data.update_dt.slice(
+                    0,
+                    10
+                  )}  ${data.update_dt.slice(11, 19)}`}</span>
+                </ListItem>
+              </Grid>
               <div
                 style={{ display: "flex", alignItems: "center", marginTop: 70 }}
               >
@@ -297,7 +307,16 @@ const FriendsGroupDetail = (props) => {
                   送出留言
                 </Button>
               </div>
-              <CommentList groupId={id} commentData={commentData} />
+              <Grid
+                Container
+                style={{
+                  backgroundColor: "#fff",
+                  marginBottom: 50,
+                  marginTop: 40,
+                }}
+              >
+                <CommentList groupId={id} commentData={commentData} />
+              </Grid>
             </Container>
           );
         }

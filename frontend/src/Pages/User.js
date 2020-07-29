@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 
 import { NavLink } from "react-router-dom";
-import { getUserApi, patchUserApi } from "../axiosApi";
+import {
+  getUserApi,
+  patchUserApi,
+  getGuidemapApi,
+  getFriendsGroupApi,
+} from "../axiosApi";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { AuthContext } from "../App";
@@ -37,6 +42,9 @@ import EventAvailableIcon from "@material-ui/icons/EventAvailable";
 import "../css/app.css";
 import TrackChangesIcon from "@material-ui/icons/TrackChanges";
 import EmojiEventsIcon from "@material-ui/icons/EmojiEvents";
+
+import indexmanstand from "../imgs/indexmanstand.jpg";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
@@ -73,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const User = (props) => {
+  console.log(props);
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const { dispatch } = React.useContext(AuthContext);
@@ -81,6 +90,76 @@ const User = (props) => {
     selectedFile: null,
     imageUploaded: 0,
   });
+  const [dbGuideMapData, setDbGuideMapData] = useState([]);
+  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
+
+  const accessToken = localStorage.getItem("access_token");
+  const refreshToken = localStorage.getItem("refresh_token");
+  const localUsername = localStorage.getItem("username");
+
+  // if (accessToken && refreshToken) {
+  //   dispatch({
+  //     type: "LOGIN",
+  //     payload: {
+  //       access: accessToken,
+  //       refresh: refreshToken,
+  //       username: localUsername,
+  //     },
+  //   });
+  // }
+
+  // useEffect(() => {
+  //   getUserApi(localUsername)
+  //     .then((res) => {
+  //       console.table(res.data);
+  //       props.initUserDB(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error.response);
+  //     })
+  //     .finally(() => {});
+  // }, []);
+
+  // useEffect(() => {
+  //   getGuidemapApi()
+  //     .then((res) => {
+  //       setDbGuideMapData(...dbGuideMapData, res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     })
+  //     .finally(() => {});
+  // }, []);
+
+  // useEffect(() => {
+  //   getFriendsGroupApi()
+  //     .then((res) => {
+  //       for (let ix in res.data) {
+  //         res.data[ix]["group_startdt"] = `${res.data[ix].group_startdt.slice(
+  //           0,
+  //           10
+  //         )}  ${res.data[ix].group_startdt.slice(11, 19)}`;
+  //       }
+
+  //       setDbFriendsGroupData(...dbFriendsGroupData, res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error.response);
+  //     })
+  //     .finally(() => {});
+  // }, []);
+
+  let holdEvent = [];
+  if (props.dbFriendsGroupData != undefined) {
+    holdEvent = props.dbFriendsGroupData.filter(
+      (group) => group.create_user == state.username
+    );
+  } else if (dbFriendsGroupData != undefined) {
+    holdEvent = dbFriendsGroupData.filter(
+      (group) => group.create_user == state.username
+    );
+    console.log(state.username);
+  }
 
   const [openMap, setOpenMap] = React.useState(false);
   const [openActivity, setOpenActivity] = React.useState(false);
@@ -216,15 +295,10 @@ const User = (props) => {
     };
   }
 
-  let holdEvent = props.dbFriendsGroupData.filter(
-    (group) => group.create_user == state.username
-  );
-  console.log(holdEvent);
-
   const TabInfo = () => {
     return (
-      <Grid container style={{ width: "80%" }}>
-        <div className={classes.tabroot}>
+      <Grid container style={{ width: "90%", marginBottom: 50, marginLeft: "auto", marginRight: "auto"  }}>
+        <div className={classes.tabroot} style={{ display: "flex" }}>
           {/* <AppBar position="static"> */}
           <Tabs
             orientation="vertical"
@@ -247,9 +321,19 @@ const User = (props) => {
                 {props.userData.map_add != undefined ||
                 props.userData.map_add != null ? (
                   props.userData.map_add.map((addId, index) => {
-                    let data = props.dbGuideMapData.find(
-                      (map) => map.location_id == addId
-                    );
+                    let data = null;
+                    if (
+                      props.dbGuideMapData != undefined ||
+                      props.dbGuideMapData != null
+                    ) {
+                      data = props.dbGuideMapData.find(
+                        (map) => map.location_id == addId
+                      );
+                    } else if (dbGuideMapData != undefined) {
+                      data = dbGuideMapData.find(
+                        (map) => map.location_id == addId
+                      );
+                    }
                     return (
                       <li style={{ listStyleType: "decimal" }}>
                         {data.location_type} {data.location_name}:{" "}
@@ -269,9 +353,19 @@ const User = (props) => {
                 {props.userData.map_like != undefined ||
                 props.userData.map_like != null ? (
                   props.userData.map_like.map((likeId, index) => {
-                    let data = props.dbGuideMapData.find(
-                      (map) => map.location_id == likeId
-                    );
+                    let data = [];
+                    if (
+                      props.dbGuideMapData != undefined ||
+                      props.dbGuideMapData != null
+                    ) {
+                      data = props.dbGuideMapData.find(
+                        (map) => map.location_id == likeId
+                      );
+                    } else if (dbGuideMapData != undefined) {
+                      data = dbGuideMapData.find(
+                        (map) => map.location_id == likeId
+                      );
+                    }
                     return (
                       <li style={{ listStyleType: "decimal" }}>
                         {data.location_type} {data.location_name}:{" "}
@@ -380,6 +474,17 @@ const User = (props) => {
             <EditProfile />
           </TabPanel>
         </div>
+        {/* <div style={{marginLeft:40}}>
+          <img
+            src={indexmanstand}
+            style={{
+              height: 500,
+              width: "auto",
+              marginBottom: 70,
+            }}
+            alt="banner"
+          />
+        </div> */}
       </Grid>
     );
   };
@@ -440,6 +545,8 @@ const User = (props) => {
             autoComplete="current-password"
             variant="filled"
           />
+        </Grid>
+        <Grid container>
           <TextField
             onChange={handleInputChange}
             required
@@ -501,9 +608,10 @@ const User = (props) => {
 
   return (
     <Container
+      className="user_conatainer"
       component="main"
       maxWidth="lg"
-      style={{ marginRight: 20, marginLeft: 20 }}
+      style={{ marginLeft: "auto", marginRight: "auto" }}
     >
       <Grid
         container
