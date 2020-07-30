@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const BrotliPlugin = require('brotli-webpack-plugin');
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
   template: `${__dirname}/dist/index.html`,
@@ -51,12 +50,7 @@ module.exports = {
     historyApiFallback: true,
     watchContentBase: true,
   },
-  plugins: [HTMLWebpackPluginConfig,new BrotliPlugin({
-    asset: '[path].br[query]',
-    test: /\.(js|css|html|svg)$/,
-    threshold: 10240,
-    minRatio: 0.8
-})],
+  plugins: [HTMLWebpackPluginConfig,],
   mode: "production",
   optimization: {
 		splitChunks: {
