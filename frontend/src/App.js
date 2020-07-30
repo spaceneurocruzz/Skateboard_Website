@@ -13,7 +13,6 @@ import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
-import kick from "./imgs/kick.gif";
 import axiosInstance, {
   logoutApi,
   getFriendsGroupApi,
