@@ -6,7 +6,7 @@ body {
   /* background-color: black; */
   background-color: #fcf3ea;
   color: #2e2d2d;
-  font-size: 16px;
+  /* font-size: 20px; */
 }
 
 
@@ -166,6 +166,18 @@ body {
 
 .link:visited{
   color: black
+}
+
+.userLink {
+  color:#F76C6C;
+  font-weight: 600;
+  font-size: 20px;
+  text-decoration: none;
+  align-items: center;
+}
+
+.userLink:visited{
+  color: #F76C6C
 }
 
 

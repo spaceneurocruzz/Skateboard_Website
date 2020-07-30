@@ -6,6 +6,9 @@ import {
   patchUserApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
+import ShowAlertMessages from "../ShowAlertMessages"
+import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
+
 import { Link, NavLink } from "react-router-dom";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
@@ -99,6 +102,26 @@ const FriendsGroupList = (props) => {
       .finally(() => {});
   }, []);
 
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
+
+  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
+
+  const handleShowErrorAlertOpen = () => {
+    setOpenShowErrorAlert(true);
+  };
+
+  const handleShowErrorAlertClose = () => {
+    setOpenShowErrorAlert(false);
+  };
+
   const joinGroup = (e, group_id) => {
     e.preventDefault();
 
@@ -138,7 +161,8 @@ const FriendsGroupList = (props) => {
       .then((res) => {
         console.table(res.data);
         props.updateGroupUserDB(groupJoin);
-        alert("已參加！");
+        handleShowAlertOpen();
+        //alert("已參加！");
       })
       .catch((error) => {
         console.error(error.response);
@@ -187,7 +211,8 @@ const FriendsGroupList = (props) => {
       .then((res) => {
         console.table(res.data);
         props.updateGroupUserDB(groupLike);
-        alert("已追蹤！");
+        handleShowAlertOpen();
+        //alert("已追蹤！");
       })
       .catch((error) => {
         console.error(error.response);
@@ -201,6 +226,9 @@ const FriendsGroupList = (props) => {
 
   return (
     <>
+     <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+     <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
+      
       <Container component="main" maxWidth="lg">
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>

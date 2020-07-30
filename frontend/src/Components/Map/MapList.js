@@ -6,6 +6,9 @@ import {
   patchGuidemapApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
+import ShowAlertMessages from "../ShowAlertMessages";
+import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
+
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -61,6 +64,10 @@ import skateboardMarker from "../../imgs/skateboardMarker.png";
 
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import indexmanstand from "../../imgs/indexmanstand.jpg";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,7 +77,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0.5),
     margin: 0,
     width: "100%",
-    marginLeft: 40,
   },
   chip: {
     margin: theme.spacing(0.5),
@@ -214,10 +220,6 @@ const ShowCommentsDialog = (props) => {
     onClose(value);
   };
 
-  const handleListItemClick = (value) => {
-    onClose(value);
-  };
-
   return (
     <Dialog
       aria-labelledby="transition-modal-title"
@@ -227,7 +229,6 @@ const ShowCommentsDialog = (props) => {
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
-      style={{ backgroundImage: `${indexmanstand}` }}
     >
       <DialogTitle
         id="simple-dialog-title"
@@ -272,14 +273,15 @@ const HoverRating = (props) => {
         }}
       />
       {props.ratingVal !== null && (
-        <Box ml={2}>{labels[hover !== -1 ? hover : props.ratingVal]}</Box>
+        <Box ml={2} style={{ fontSize: 16 }}>
+          {labels[hover !== -1 ? hover : props.ratingVal]}
+        </Box>
       )}
     </div>
   );
 };
 
 const WriteComment = (props) => {
-  console.log(props);
   const classes = useStyles();
   const [ratingVal, setRatingVal] = useState(0);
   const [input, setInput] = useState({
@@ -316,7 +318,8 @@ const WriteComment = (props) => {
     //post should return commentid and post to user table
     postGuideMapCommentsApi(dbPost)
       .then((res) => {
-        alert("更新成功！");
+        // alert("更新成功！");
+        props.handleShowAlertOpen();
         props.updateComments(dbPost);
         props.onClose();
       })
@@ -350,6 +353,7 @@ const WriteComment = (props) => {
         noValidate
         autoComplete="off"
         margin="normal"
+        style={{ width: "80%", marginRight: "auto", marginLeft: "auto" }}
       >
         <TextField
           onChange={handleInputChange}
@@ -359,7 +363,6 @@ const WriteComment = (props) => {
           name="comment_title"
           label="標題"
           variant="filled"
-          style={{ width: 300, marginRight: 20, marginLeft: 20 }}
         />
         <TextField
           onChange={handleInputChange}
@@ -369,10 +372,11 @@ const WriteComment = (props) => {
           name="comment"
           label="寫下你的心得吧..."
           variant="filled"
-          style={{ width: 300, marginRight: 20, marginLeft: 20 }}
           multiline
           rows={10}
         />
+        {/* <div style={{display:'flex', alignItems:'center', marginTop:10}}> */}
+        {/* <div style={{fontSize:16}}>評分</div> */}
         <HoverRating ratingVal={ratingVal} updateRatingVal={updateRatingVal} />
 
         <Button
@@ -380,11 +384,12 @@ const WriteComment = (props) => {
           type="submit"
           variant="contained"
           color="primary"
-          style={{ width: 60, marginRight: 20, marginLeft: 20 }}
+          style={{ width: 60, marginLeft: 200, alignSelf: "flex-end" }}
           className={classes.submit}
         >
           送出
         </Button>
+        {/* </div> */}
       </form>
     </Grid>
   );
@@ -402,9 +407,14 @@ const WriteCommentsDialog = (props) => {
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="md"
+      maxWidth="sm"
     >
-      <DialogTitle id="simple-dialog-title">我要寫評論</DialogTitle>
+      <DialogTitle
+        id="simple-dialog-title"
+        style={{ backgroundColor: "#b7dcf9" }}
+      >
+        我要寫評論
+      </DialogTitle>
       <WriteComment
         locationId={props.locationId}
         username={props.username}
@@ -412,13 +422,13 @@ const WriteCommentsDialog = (props) => {
         updateComments={props.updateComments}
         onClose={onClose}
         countCommentRating={props.countCommentRating}
+        handleShowAlertOpen={props.handleShowAlertOpen}
       />
     </Dialog>
   );
 };
 
 const MapList = (props) => {
-  console.log(props);
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const [city, setCity] = useState("臺北市");
@@ -456,6 +466,26 @@ const MapList = (props) => {
     { key: 1, label: "店家" },
     { key: 2, label: "全部" },
   ];
+
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
+
+  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
+
+  const handleShowErrorAlertOpen = () => {
+    setOpenShowErrorAlert(true);
+  };
+
+  const handleShowErrorAlertClose = () => {
+    setOpenShowErrorAlert(false);
+  };
 
   const [openShowComments, setOpenShowComments] = React.useState(false);
   const [openShowCommentsMapId, setOpenShowCommentsMapId] = React.useState(0);
@@ -565,7 +595,8 @@ const MapList = (props) => {
       .then((res) => {
         console.table(res.data);
         props.updateGroupUserDB(mapLike);
-        alert("已加到最愛！");
+        handleShowAlertOpen();
+        // alert("已加到最愛！");
       })
       .catch((error) => {
         console.error(error.response);
@@ -573,8 +604,38 @@ const MapList = (props) => {
       .finally(() => {});
   };
 
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  };
+
+  // const ShowMessages = (props) => {
+  //   const classes = useStyles();
+  //   const { onClose, open } = props;
+
+  //   const handleClose = (value) => {
+  //     onClose(value);
+  //   };
+
+  //   return (
+  //     <div className={classes.root}>
+  //       <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
+  //         <Alert onClose={handleClose} severity="success">
+  //           更新成功！
+  //         </Alert>
+  //       </Snackbar>
+  //       {/* <Alert severity={msgType}請確認資料！</Alert> */}
+  //     </div>
+  //   );
+  // };
+
   return (
     <>
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+
       <ShowCommentsDialog
         open={openShowComments}
         onClose={handleShowCommentsClose}
@@ -589,6 +650,7 @@ const MapList = (props) => {
         commentData={commentData}
         updateComments={updateComments}
         countCommentRating={countCommentRating}
+        handleShowAlertOpen={handleShowAlertOpen}
       />
 
       <Container component="main" maxWidth="lg">
@@ -635,7 +697,7 @@ const MapList = (props) => {
                   onClick: (event, rowData) => {
                     handleWriteCommentsOpen(event, rowData.location_id);
                   },
-                  disabled: !state.isAuthenticated,
+                  //disabled: !state.isAuthenticated,
                 }),
                 (rowData) => ({
                   icon: () => <FavoriteBorderIcon />,

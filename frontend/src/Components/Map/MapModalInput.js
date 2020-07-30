@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { postGuidemapApi } from "../../axiosApi";
 import { AuthContext } from "../../App";
+import ShowAlertMessages from "../ShowAlertMessages";
+import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -88,7 +90,7 @@ const MapModalInput = (props) => {
     intro: "",
     create_dt: new Date().toISOString(),
     update_dt: new Date().toISOString(),
-    modified_user:  state.username,
+    modified_user: state.username,
   });
 
   const [phone, setPhone] = useState();
@@ -141,6 +143,26 @@ const MapModalInput = (props) => {
     setOpen(false);
   };
 
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
+
+  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
+
+  const handleShowErrorAlertOpen = () => {
+    setOpenShowErrorAlert(true);
+  };
+
+  const handleShowErrorAlertClose = () => {
+    setOpenShowErrorAlert(false);
+  };
+
   const [userData, setUserdata] = useState([]);
 
   //insert user
@@ -149,8 +171,7 @@ const MapModalInput = (props) => {
     let dbPost;
 
     dbPost = input;
-    dbPost["modified_user"] = state.username,
-    dbPost["phone"] = phone;
+    (dbPost["modified_user"] = state.username), (dbPost["phone"] = phone);
     dbPost["openhours"] = {
       weekdayTimeStart: weekdayTimeStart.toLocaleTimeString(),
       weekdayTimeEnd: weekdayTimeEnd.toLocaleTimeString(),
@@ -168,8 +189,8 @@ const MapModalInput = (props) => {
     }
 
     let mapAdd = {
-      map_add: preAddMapArr
-    }
+      map_add: preAddMapArr,
+    };
 
     Geocode.enableDebug();
     Geocode.fromAddress(input.address)
@@ -188,7 +209,7 @@ const MapModalInput = (props) => {
         postGuidemapApi(dbPost)
           .then((res) => {
             props.updateDB(dbPost);
-            alert("更新成功！");
+            handleShowAlertOpen();
             handleClose();
           })
           .then(() => {
@@ -198,11 +219,13 @@ const MapModalInput = (props) => {
                 props.updateGroupUserDB(mapAdd);
               })
               .catch((error) => {
+                handleShowErrorAlertOpen();
                 console.error(error.response);
               })
               .finally(() => {});
           })
           .catch((error) => {
+            handleShowErrorAlertOpen();
             console.error(error.response);
           })
           .finally(() => {});
@@ -295,17 +318,18 @@ const MapModalInput = (props) => {
 
   return (
     <>
-      {state.isAuthenticated ? (
-        <Button
-          variant="contained"
-          color="secondary"
-          className={classes.buttonAdd}
-          onClick={handleOpen}
-          startIcon={<AddLocationIcon />}
-        >
-          新增地點
-        </Button>
-      ) : (
+      {/* {state.isAuthenticated ? ( */}
+      <Button
+        variant="contained"
+        color="secondary"
+        className={classes.buttonAdd}
+        onClick={handleOpen}
+        startIcon={<AddLocationIcon />}
+      >
+        新增地點
+      </Button>
+      
+      {/* ) : (
         <Button
           variant="contained"
           color="default"
@@ -315,7 +339,8 @@ const MapModalInput = (props) => {
         >
           請登入即可新增地點及發表評論
         </Button>
-      )}
+      )
+      }*/}
       <Dialog
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -328,6 +353,9 @@ const MapModalInput = (props) => {
           timeout: 500,
         }}
       >
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
+     
         <Fade in={open}>
           <Grid
             container

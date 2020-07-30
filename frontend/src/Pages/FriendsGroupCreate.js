@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Redirect } from "react-router-dom";
 import { getGuidemapApi, postFriendsGroupApi } from "../axiosApi";
 import { AuthContext } from "../App";
+import ShowAlertMessages from "../Components/ShowAlertMessages"
+import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
+
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import MUIRichTextEditor from "mui-rte";
@@ -26,6 +29,8 @@ import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 
 import Dialog from "@material-ui/core/Dialog";
+
+import indexmanstand from "../imgs/indexmanstand.jpg";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -207,6 +212,26 @@ const FriendsGroupCreate = (props) => {
     }
   };
 
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
+
+  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
+
+  const handleShowErrorAlertOpen = () => {
+    setOpenShowErrorAlert(true);
+  };
+
+  const handleShowErrorAlertClose = () => {
+    setOpenShowErrorAlert(false);
+  };
+
   const handleContentChange = (event, value) => {
     setInput({
       ...input,
@@ -254,9 +279,7 @@ const FriendsGroupCreate = (props) => {
       postFriendsGroupApi(dbPost)
         .then((res) => {
           setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
-          // updateFriendsGroupDB(dbPost);
-          alert("更新成功！");
-          //redirect
+          handleShowAlertOpen();
         })
         .catch((error) => {
           console.error(error.response);
@@ -275,6 +298,10 @@ const FriendsGroupCreate = (props) => {
   const [inputValue, setInputValue] = React.useState("");
 
   return (
+    <>
+    <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+    <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
+      
     <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
       <Dialog
         aria-labelledby="transition-modal-title"
@@ -298,8 +325,7 @@ const FriendsGroupCreate = (props) => {
           </Alert>
         </Fade>
       </Dialog>
-      ;
-      <Container component="main" maxWidth="md">
+      <Grid item xs={6} style={{marginLeft:100}}>
         <form className={classes.formControl} noValidate autoComplete="off">
           <h2>填寫開團資訊</h2>
           <div className={classes.paper}>
@@ -339,9 +365,9 @@ const FriendsGroupCreate = (props) => {
               <FormControl>
                 <div
                   className={classes.flexContainer}
-                  style={{ marginBottom: 20 }}
+                  style={{ marginBottom: 20}}
                 >
-                  <h3>開團時間</h3>
+                  <span style={{fontSize:16, display:'block'}}>開團時間</span>
                   {/* <form className={classes.datetime} noValidate> */}
                   <TextField
                     required
@@ -500,15 +526,30 @@ const FriendsGroupCreate = (props) => {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
-                style={{ marginTop: 20, width: 150 }}
+                style={{ marginTop: 20, width: 150, marginBottom: 70 }}
               >
                 確認修改
               </Button>
             </FormControl>
           </div>
         </form>
-      </Container>
+      </Grid>
+      <Grid item xs>
+      <div>
+       <img
+          src={indexmanstand}
+          style={{
+            height: 700,
+            width: "auto",
+            marginTop: 150,
+            marginBottom: 70,
+          }}
+          alt="banner"
+        />
+        </div>
+      </Grid>
     </Grid>
+    </>
   );
 };
 

@@ -7,9 +7,14 @@ import {
   getGuidemapApi,
   getFriendsGroupApi,
 } from "../axiosApi";
+import { AuthContext } from "../App";
+import ShowAlertMessages from "../Components/ShowAlertMessages"
+import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
+
+import "../css/app.css";
+
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import { AuthContext } from "../App";
 import Avatar from "@material-ui/core/Avatar";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
@@ -18,28 +23,14 @@ import Fab from "@material-ui/core/Fab";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import red from "@material-ui/core/colors/red";
 import Button from "@material-ui/core/Button";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Collapse from "@material-ui/core/Collapse";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
-import DraftsIcon from "@material-ui/icons/Drafts";
-import SendIcon from "@material-ui/icons/Send";
-import ExpandLess from "@material-ui/icons/ExpandLess";
-import ExpandMore from "@material-ui/icons/ExpandMore";
-import StarBorder from "@material-ui/icons/StarBorder";
-import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import { eachDayOfInterval } from "date-fns";
-import profile from "../imgs/profile.png";
 import EditLocationIcon from "@material-ui/icons/EditLocation";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import EventAvailableIcon from "@material-ui/icons/EventAvailable";
-import "../css/app.css";
+
 import TrackChangesIcon from "@material-ui/icons/TrackChanges";
 import EmojiEventsIcon from "@material-ui/icons/EmojiEvents";
 
@@ -49,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
+      fontSize: "20px",
       // width: "25ch",
     },
   },
@@ -69,10 +61,16 @@ const useStyles = makeStyles((theme) => ({
       color: red[800],
     },
   },
+  tab: {
+    fontSize: "16px",
+    marginTop: "10px",
+    marginBottom: "10px",
+  },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
   },
   tabroot: {
+    fontSize: "16px",
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     display: "flex",
@@ -81,7 +79,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const User = (props) => {
-  console.log(props);
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const { dispatch } = React.useContext(AuthContext);
@@ -179,6 +176,26 @@ const User = (props) => {
     setOpenArticle(!openArticle);
   };
 
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
+
+  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
+
+  const handleShowErrorAlertOpen = () => {
+    setOpenShowErrorAlert(true);
+  };
+
+  const handleShowErrorAlertClose = () => {
+    setOpenShowErrorAlert(false);
+  };
+
   const [password, setPassword] = useState("");
 
   const handleInputChange = (event) => {
@@ -247,12 +264,10 @@ const User = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    console.table("submit");
     patchUserApi(state.username, props.userData)
       .then((res) => {
-        console.table(userData);
-        console.table(res.data);
-        alert("更新成功！");
+        handleShowAlertOpen();
       })
       .catch((error) => {
         console.error(error.response);
@@ -297,7 +312,15 @@ const User = (props) => {
 
   const TabInfo = () => {
     return (
-      <Grid container style={{ width: "90%", marginBottom: 50, marginLeft: "auto", marginRight: "auto"  }}>
+      <Grid
+        container
+        style={{
+          width: "90%",
+          marginBottom: 50,
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
         <div className={classes.tabroot} style={{ display: "flex" }}>
           {/* <AppBar position="static"> */}
           <Tabs
@@ -308,9 +331,13 @@ const User = (props) => {
             aria-label="Vertical tabs example"
             className={classes.tabs}
           >
-            <Tab label="地圖" {...a11yProps(0)} />
-            <Tab label="揪團" {...a11yProps(1)} />
-            <Tab label="修改個人資料" {...a11yProps(2)} />
+            <Tab label="地圖" {...a11yProps(0)} className={classes.tab} />
+            <Tab label="揪團" {...a11yProps(1)} className={classes.tab} />
+            <Tab
+              label="修改個人資料"
+              {...a11yProps(2)}
+              className={classes.tab}
+            />
           </Tabs>
           {/* </AppBar> */}
           <TabPanel value={value} index={0}>
@@ -394,7 +421,7 @@ const User = (props) => {
                         (ID:{" "}
                         <NavLink
                           to={"/friendsGroupDetail/" + data.group_id}
-                          className="link"
+                          className="userLink"
                         >
                           {data.group_id}
                         </NavLink>
@@ -425,7 +452,7 @@ const User = (props) => {
                         (ID:{" "}
                         <NavLink
                           to={"/friendsGroupDetail/" + data.group_id}
-                          className="link"
+                          className="userLink"
                         >
                           {data.group_id}
                         </NavLink>
@@ -456,7 +483,7 @@ const User = (props) => {
                         (ID:{" "}
                         <NavLink
                           to={"/friendsGroupDetail/" + data.group_id}
-                          className="link"
+                          className="userLink"
                         >
                           {data.group_id}
                         </NavLink>
@@ -488,42 +515,6 @@ const User = (props) => {
       </Grid>
     );
   };
-
-  // const EditProfile = () => {
-  //   return (
-  //     <form novalidate>
-  //       <div className="form-group">
-  //         <label id="usernameLabel">Username</label>
-  //         <input
-  //           className="form-control"
-  //           type="email"
-  //           name="username"
-  //           value={props.userData.username}
-  //           onChange={handleInputChange}
-  //           required
-  //         />
-  //         <div className="error" id="usernameError" />
-  //       </div>
-  //       <div className="form-group">
-  //         <label id="passwordLabel">Password</label>
-  //         <input
-  //           className="form-control"
-  //           type="password"
-  //           name="password"
-  //           value={props.userData.password}
-  //           onChange={handleInputChange}
-  //           pattern=".{5,}"
-  //           required
-  //         />
-  //         <div className="error" id="passwordError" />
-  //       </div>
-
-  //       <button className="btn btn-primary" onClick={handleSubmit}>
-  //         submit
-  //       </button>
-  //     </form>
-  //   );
-  // };
 
   const EditProfile = () => {
     return (
@@ -607,20 +598,24 @@ const User = (props) => {
   };
 
   return (
-    <Container
-      className="user_conatainer"
-      component="main"
-      maxWidth="lg"
-      style={{ marginLeft: "auto", marginRight: "auto" }}
-    >
-      <Grid
-        container
-        style={{ marginTop: 70, marginBottom: 20, display: "flex" }}
+    <>
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
+      
+      <Container
+        className="user_conatainer"
+        component="main"
+        maxWidth="lg"
+        style={{ marginLeft: "auto", marginRight: "auto" }}
       >
-        <img
-          src={`https://ui-avatars.com/api/?name=${state.username}&size=128&rounded=true&background=040404&color=fff`}
-        />
-        {/* <input
+        <Grid
+          container
+          style={{ marginTop: 70, marginBottom: 20, display: "flex" }}
+        >
+          <img
+            src={`https://ui-avatars.com/api/?name=${state.username}&size=128&rounded=true&background=040404&color=fff`}
+          />
+          {/* <input
               accept="image/*"
               className={classes.input}
               id="contained-button-file"
@@ -634,17 +629,17 @@ const User = (props) => {
                 <AddPhotoAlternateIcon />
               </Fab>
             </label> */}
-        {/* <img
+          {/* <img
               width="200px"
               className={classes.media}
               src={img.selectedFile}
             /> */}
-        {/* <img
+          {/* <img
               width="200px"
               className={classes.media}
               src={`../..${props.userData.avatar}`}
             /> */}
-        {/* <Button
+          {/* <Button
               onClick={handleAvatarSubmit}
               type="submit"
               variant="contained"
@@ -653,20 +648,21 @@ const User = (props) => {
             >
               確認
             </Button> */}
-        {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
+          {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
           <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
-        <div style={{ marginLeft: 50 }}>
-          <h2>暱稱：{props.userData.nickname}</h2>
-          <div style={{ display: "flex" }}>
-            <span>@{state.username}</span>
-            <span></span>
+          <div style={{ marginLeft: 50 }}>
+            <h2>暱稱：{props.userData.nickname}</h2>
+            <div style={{ display: "flex" }}>
+              <span>@{state.username}</span>
+              <span></span>
+            </div>
           </div>
-        </div>
-        {/* <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span> */}
-      </Grid>
+          {/* <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span> */}
+        </Grid>
 
-      <TabInfo />
-    </Container>
+        <TabInfo />
+      </Container>
+    </>
   );
 };
 

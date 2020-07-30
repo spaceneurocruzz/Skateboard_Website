@@ -135,7 +135,7 @@ const Home = () => {
             width: "auto",
             marginTop: 50,
             marginBottom: 70,
-            marginLeft: 20,
+            //marginLeft: 20,
             // marginRight: "auto",
             // marginLeft: "auto",
             //zIndex: 2,
@@ -151,7 +151,7 @@ const Home = () => {
             marginBottom: "auto",
             fontSize: 80,
             fontWeight: 900,
-            marginLeft:300
+            marginLeft:200
           }}
         >
           {sbGo}

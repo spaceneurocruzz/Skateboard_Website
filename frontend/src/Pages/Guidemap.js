@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { patchUserApi, getUserApi } from "../axiosApi";
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import { AuthContext } from "../App";
+import ShowAlertMessages from "../Components/ShowAlertMessages"
 
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
@@ -138,8 +139,8 @@ const Guidemap = (props) => {
     let index = props.dbGuideMapData.findIndex(
       (data) => data.location_id === locationId
     );
-      console.log(newData)
-      console.log(locationId)
+    console.log(newData);
+    console.log(locationId);
     switch (type) {
       case "RATING":
         props.dbGuideMapData[index].rating = newData;
@@ -219,7 +220,7 @@ const Guidemap = (props) => {
 
   const addtoFavorite = (e, locationName) => {
     e.preventDefault();
-
+    console.log("like")
     let preLikeMapArr = props.userData.map_like;
 
     if (preLikeMapArr == null) {
@@ -261,7 +262,9 @@ const Guidemap = (props) => {
                 src={skateboardMarker}
                 style={{ height: 32, verticalAlign: "middle" }}
               />
-              <span style={{ marginLeft: 20,verticalAlign: "middle" }}>店家</span>
+              <span style={{ marginLeft: 20, verticalAlign: "middle" }}>
+                店家
+              </span>
               <img
                 src={shopMarker}
                 style={{ height: 32, verticalAlign: "middle" }}
@@ -345,33 +348,26 @@ const Guidemap = (props) => {
                     </Typography>
                   </CardContent>
                   <CardActions disableSpacing className={classes.cardAction}>
-                    <a
-                      href="#"
+                      {/* <img
+                        src={placeunlike}
+                        alt="placeunlike"
+                        style={{ height: 32, zIndex: 500 }}
+                        onClick={() =>
+                        addtoFavorite(mapMarker.selectedLocation.name)
+                      }
+                      />
+   
+                    <IconButton
+                      aria-label="add to favorites"
                       onClick={() =>
                         addtoFavorite(mapMarker.selectedLocation.name)
                       }
                     >
-                      <img
-                        src={placeunlike}
-                        alt="placeunlike"
-                        style={{ height: 32, zIndex: 500 }}
-                      />
-                    </a>
-                    {/* <IconButton aria-label="add to favorites" onClick={()=>addtoFavorite(mapMarker.selectedLocation.name)}>
                       <FavoriteIcon />
-                    </IconButton> */}
-                    {/* <img
-                      src={share}
-                      alt="share"
-                      style={{ height: 32 }}
-                      onClick={() =>
-                        addtoFavorite(mapMarker.selectedLocation.name)
-                      }
-                    /> */}
-
+                    </IconButton>
                     <IconButton aria-label="share">
                       <ShareIcon />
-                    </IconButton>
+                    </IconButton> */}
                     <Typography
                       variant="body2"
                       color="textSecondary"
@@ -385,7 +381,7 @@ const Guidemap = (props) => {
               )}
             </InfoWindow>
           </Map>
-        </div>  
+        </div>
       </Grid>
       <Container component="main" maxWidth="lg">
         <Grid container>
