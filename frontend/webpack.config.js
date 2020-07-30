@@ -14,7 +14,6 @@ module.exports = {
     // index: "./src/index.js",
   },
   watch: true,
-  devtool: "source-map",
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist/static"),
@@ -52,5 +51,5 @@ module.exports = {
     watchContentBase: true,
   },
   plugins: [HTMLWebpackPluginConfig],
-  mode: "development",
+  mode: "production",
 };
