@@ -17,8 +17,7 @@ class GuideMapSerializer(serializers.ModelSerializer):
     modified_user = serializers.CharField(max_length=120)
     create_dt = serializers.DateTimeField()
     update_dt = serializers.DateTimeField()
-    like_user = serializers.ListField(child=serializers.CharField())
-
+ 
     class Meta:
         model = GuideMap
         fields = ('location_id',

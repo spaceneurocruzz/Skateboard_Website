@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import FriendsGroup, FriendsGroupComments, GuideMap
 
 class FriendsGroupSerializer(serializers.ModelSerializer):
-    group_id = serializers.CharField(max_length=50)
     map_id = serializers.PrimaryKeyRelatedField(
         queryset=GuideMap.objects.all())
     group_startdt = serializers.DateTimeField()

@@ -165,6 +165,7 @@ const FriendsGroupList = (props) => {
         //alert("已參加！");
       })
       .catch((error) => {
+        handleShowErrorAlertOpen();
         console.error(error.response);
       })
       .finally(() => {});
@@ -215,6 +216,7 @@ const FriendsGroupList = (props) => {
         //alert("已追蹤！");
       })
       .catch((error) => {
+        handleShowErrorAlertOpen();
         console.error(error.response);
       })
       .finally(() => {});
