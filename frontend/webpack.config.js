@@ -52,15 +52,4 @@ module.exports = {
   },
   plugins: [HTMLWebpackPluginConfig,],
   mode: "production",
-  optimization: {
-		splitChunks: {
-			cacheGroups: {
-				commons: {
-					test: /[\\/]node_modules[\\/]/,
-					name: 'vendors',
-					chunks: 'all'
-				}
-			}
-		}
-	}
 };
