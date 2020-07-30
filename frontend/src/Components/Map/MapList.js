@@ -689,7 +689,6 @@ const MapList = (props) => {
                   tooltip: "查看評論",
                   onClick: (event, rowData) =>
                     handleShowCommentsOpen(event, rowData.location_id),
-                  //disabled: state.isAuthenticated,
                 }),
                 (rowData) => ({
                   icon: () => <RateReviewIcon />,
@@ -697,7 +696,7 @@ const MapList = (props) => {
                   onClick: (event, rowData) => {
                     handleWriteCommentsOpen(event, rowData.location_id);
                   },
-                  //disabled: !state.isAuthenticated,
+                  disabled: !state.isAuthenticated,
                 }),
                 (rowData) => ({
                   icon: () => <FavoriteBorderIcon />,

@@ -170,9 +170,9 @@ const FriendsGroup = (props) => {
           <FriendsGroupModalInput
             dbFriendsGroupData={props.dbFriendsGroupData}
           />
-          <FriendsGroupModalInput
+          {/* <FriendsGroupModalInput
             dbFriendsGroupData={props.dbFriendsGroupData}
-          />
+          /> */}
         </Grid>
         <Grid container>
           <FriendsGroupList

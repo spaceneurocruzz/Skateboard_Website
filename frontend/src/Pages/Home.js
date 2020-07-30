@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-
 import Container from "@material-ui/core/Container";
-import banner from "../imgs/index.jpg";
 import "../css/app.css";
 import indexman from "../imgs/indexman.jpg";
-import indexmanstand from "../imgs/indexmanstand.jpg";
-// import young from "../imgs/30419.jpg";
-import indexsb from "../imgs/indexsb.jpg";
 
 import { Player } from "video-react";
 import { Link, NavLink } from "react-router-dom";
@@ -52,7 +47,7 @@ const Home = () => {
   const [sbGo, setSbGo] = useState("");
 
   setTimeout(()=>{
-    setSbGo("SkateboardGO");
+    setSbGo("Let's Go Skateboarding Together!");
   }, 1500)
 
   const [slogan, setSlogan]= useState("");
@@ -149,7 +144,7 @@ const Home = () => {
             fontFamily: "Galindo",
             marginTop: "auto",
             marginBottom: "auto",
-            fontSize: 80,
+            fontSize: 60,
             fontWeight: 900,
             marginLeft:200
           }}

@@ -95,7 +95,7 @@ const useStyles = makeStyles((theme) => ({
       paddingLeft: 10,
       borderRadius: 10,
     },
-    color: "#e9710f",
+    color: "#CA3900",
     fontWeight: 600,
     fontSize: 24,
     textDecoration: "none",
@@ -244,20 +244,20 @@ const App = () => {
           <Link to="/" className="link">
             <img src={logo} alt="logo" />
           </Link>
-          <Link to="/" className="link">
-            {/* <span
-              style={{
-                marginLeft: 20,
-                fontFamily: "Galindo",
-                marginTop: "auto",
-                marginBottom: "auto",
-                fontSize: 28,
-                fontWeight: 900,
-              }}
-            >
-              SkateboardGO
-            </span> */}
-          </Link>
+            <Link to="/" className="link">
+              <span
+                style={{
+                  marginLeft: 20,
+                  fontFamily: "Galindo",
+                  marginTop: "auto",
+                  marginBottom: "auto",
+                  fontSize: 28,
+                  fontWeight: 900,
+                }}
+              >
+                SkateboardGO
+              </span>
+            </Link>
         </div>
         <div className="nav">
           <ul className="nav-link">
@@ -301,18 +301,18 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>技術交流</span>
               </NavLink>
             </li> */}
-            {/* {state.isAuthenticated && ( */}
-            <li className="nav-link-item">
-              <NavLink
-                to="/user"
-                activeClassName={classes.activelink}
-                className={classes.link}
-              >
-                <MapIcon style={{ verticalAlign: "middle" }} />
-                <span style={{ verticalAlign: "middle" }}>會員中心</span>
-              </NavLink>
-            </li>
-            {/* )} */}
+            {state.isAuthenticated && (
+              <li className="nav-link-item">
+                <NavLink
+                  to="/user"
+                  activeClassName={classes.activelink}
+                  className={classes.link}
+                >
+                  <MapIcon style={{ verticalAlign: "middle" }} />
+                  <span style={{ verticalAlign: "middle" }}>會員中心</span>
+                </NavLink>
+              </li>
+            )}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">
                 <Link to="/login/" className="link">

@@ -259,7 +259,7 @@ const Signup = () => {
           <Grid container style={{marginBottom:50}}>
         <div className="sign_up">
           已經有帳號嗎？
-          <NavLink to="/login/" className="link">
+          <NavLink to="/login/" className="userLink">
             按我登入
           </NavLink>
         </div>

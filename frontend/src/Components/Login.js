@@ -245,7 +245,7 @@ export const Login = (props) => {
             <Grid item>
               {/* <NavLink to="/signup/" variant="body2"> */}
               還沒有帳號嗎？
-              <NavLink to="/signup/" className="link">
+              <NavLink to="/signup/" className="userLink">
                 按我註冊
                 {/* {"還沒有帳號嗎？ 按我註冊"} */}
               </NavLink>
