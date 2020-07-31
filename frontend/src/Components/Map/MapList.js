@@ -580,7 +580,7 @@ const MapList = (props) => {
       .finally(() => {});
 
     let preLikeArr = props.userData.map_like;
-    console.log(preLikeArr);
+
     if (preLikeArr == null) {
       preLikeArr = [location_id];
     } else {

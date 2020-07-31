@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { AuthContext } from "../App";
+import { Link, NavLink } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -34,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonAdd: {
     margin: theme.spacing(1),
+    marginBottom: 20,
+    marginTop: 50,
+    marginLeft: 50,
   },
   scrolltop: {
     position: "fixed",
@@ -44,13 +48,13 @@ const useStyles = makeStyles((theme) => ({
 
 const FriendsGroup = (props) => {
   const { state } = React.useContext(AuthContext);
+  const classes = useStyles();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token") || null;
     const refreshToken = localStorage.getItem("refresh_token") || null;
 
     if (accessToken && refreshToken) {
-
     }
   }, []);
 
@@ -128,7 +132,7 @@ const FriendsGroup = (props) => {
         data["upper_limit"] != null
       ) {
         data["join_count"] = data["join_user"].length;
-       
+
         if (data["upper_limit"] === 0) {
           data["remain_count"] = 999;
         } else {
@@ -165,14 +169,22 @@ const FriendsGroup = (props) => {
 
   return (
     <>
-      <Container component="main" maxWidth="lg" style={{textAlign: "center" }} className="user_conatainer">
+      <Container
+        component="main"
+        maxWidth="lg"
+        style={{ textAlign: "center" }}
+        className="user_conatainer"
+      >
+        
         <Grid container id="back-to-top-anchor">
           <FriendsGroupModalInput
             dbFriendsGroupData={props.dbFriendsGroupData}
           />
-          {/* <FriendsGroupModalInput
-            dbFriendsGroupData={props.dbFriendsGroupData}
-          /> */}
+        <Link to="/FriendsGroupHistory/" className="link">
+          <Button variant="contained" color="text.primary" className={classes.buttonAdd}>
+            歷史揪團
+          </Button>
+        </Link>
         </Grid>
         <Grid container>
           <FriendsGroupList

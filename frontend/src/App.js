@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from "react";
+import {
+  patchUserApi,
+  patchGuidemapApi,
+  patchFriendsGroupApi
+} from "./axiosApi";
 import { Link, NavLink } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
 import User from "./Pages/User";
@@ -10,6 +15,7 @@ import Calendar from "./Pages/Calendar";
 import FriendsGroup from "./Pages/FriendsGroup";
 import FriendsGroupDetail from "./Pages/FriendsGroupDetail";
 import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
+import FriendsGroupHistory from "./Components/FriendsGroup/FriendsGroupHistory";
 import Discussion from "./Pages/Discussion";
 import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
@@ -26,6 +32,8 @@ import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import MapIcon from "@material-ui/icons/Map";
+import GroupAddIcon from "@material-ui/icons/GroupAdd";
+import FaceIcon from "@material-ui/icons/Face";
 import EventIcon from "@material-ui/icons/Event";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import ForumIcon from "@material-ui/icons/Forum";
@@ -144,6 +152,166 @@ const App = () => {
     });
   };
 
+  const getMapDBByLocationId = (locationId) => {
+    if (dbGuideMapData != undefined) {
+      return dbGuideMapData.find(
+        (data) => data.location_id === locationId
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const updateMapDBByLocationId = (locationId, newData, type) => {
+    let index = dbGuideMapData.findIndex(
+      (data) => data.location_id === locationId
+    );
+
+    switch (type) {
+      case "RATING":
+        dbGuideMapData[index].rating = newData;
+        break;
+      case "LIKE":
+        dbGuideMapData[index].like_user = newData;
+        break;
+      default:
+        console.log("none");
+    }
+
+    updateGuideMapDB(...props.dbGuideMapData);
+  };
+
+  const removeUserMapDB = (removeValue, column) => {
+    let updateMapArr = [];
+    let patchMapData = [];
+    let patchUserData = [];
+
+    switch (column) {
+      case "MAP_LIKE":
+        updateMapArr = getMapDBByLocationId(removeValue)
+          .like_user.filter((user) => user !== state.username);
+
+        patchMapData = {
+          like_user: updateMapArr,
+        };
+
+        patchUserData = {
+          map_like: userData.map_like.filter((id) => id !== removeValue),
+        };
+        break;
+    }
+
+    patchGuidemapApi(removeValue, patchMapData)
+      .then((res) => {
+        updateMapDBByLocationId(removeValue, updateMapArr, "LIKE");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    patchUserApi(state.username, patchUserData)
+      .then((res) => {
+        setUserdata(patchUserData);
+        handleShowAlertOpen();
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
+
+  const getFriendsGroupDBById = (groupId) => {
+    console.log(groupId)
+    if (dbFriendsGroupData != undefined) {
+      return dbFriendsGroupData.find(
+        (data) => data.group_id === groupId
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const updateFriendsGroupDBById = (group_id, newData, type) => {
+    let index = dbFriendsGroupData.findIndex(
+      (data) => data.group_id === group_id
+    );
+
+    switch (type) {
+      case "JOIN":
+        dbFriendsGroupData[index].join_user = newData;
+        break;
+      case "LIKE":
+        dbFriendsGroupData[index].possible_user = newData;
+        break;
+      default:
+        console.log("none");
+    }
+    updateFriendsGroupDB([...dbFriendsGroupData]);
+  };
+
+  const removeUserGroupDB = (removeValue, column) => {
+    let updateGroupArr = [];
+    let patchGroupData = [];
+    let patchUserData = [];
+    let type = "";
+
+    switch (column) {
+      case "GROUP_JOIN":
+        updateGroupArr = getFriendsGroupDBById(removeValue)
+          .join_user.filter((user) => user !== state.username);
+
+        patchGroupData = {
+          join_user: updateGroupArr,
+        };
+
+        patchUserData = {
+          group_join: userData.group_join.filter((id) => id !== removeValue),
+        };
+
+        type = "JOIN";
+
+        break;
+
+      case "GROUP_LIKE":
+        console.log(getFriendsGroupDBById(removeValue))
+        updateGroupArr = getFriendsGroupDBById(removeValue)
+          .possible_user.filter((user) => user !== state.username);
+
+        patchGroupData = {
+          possible_user: updateGroupArr,
+        };
+
+        patchUserData = {
+          group_like: userData.group_like.filter((id) => id !== removeValue),
+        };
+        console.log(updateGroupArr)
+        console.log(patchUserData)
+        type = "LIKE";
+
+        break;
+    }
+
+    patchFriendsGroupApi(removeValue, patchGroupData)
+      .then((res) => {
+        updateFriendsGroupDBById(removeValue, updateGroupArr, type);
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    patchUserApi(state.username, patchUserData)
+      .then((res) => {
+        setUserdata(patchUserData);
+        handleShowAlertOpen();
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
+
   const updateGroupUserDB = (newValue) => {
     setUserdata({
       ...userData,
@@ -243,20 +411,20 @@ const App = () => {
           <Link to="/" className="link">
             <img src={logo} alt="logo" />
           </Link>
-            <Link to="/" className="link">
-              <span
-                style={{
-                  marginLeft: 20,
-                  fontFamily: "Galindo",
-                  marginTop: "auto",
-                  marginBottom: "auto",
-                  fontSize: 28,
-                  fontWeight: 900,
-                }}
-              >
-                SkateboardGO
-              </span>
-            </Link>
+          <Link to="/" className="link">
+            <span
+              style={{
+                marginLeft: 20,
+                fontFamily: "Galindo",
+                marginTop: "auto",
+                marginBottom: "auto",
+                fontSize: 28,
+                fontWeight: 900,
+              }}
+            >
+              SkateboardGO
+            </span>
+          </Link>
         </div>
         <div className="nav">
           <ul className="nav-link">
@@ -307,7 +475,7 @@ const App = () => {
                   activeClassName={classes.activelink}
                   className={classes.link}
                 >
-                  <MapIcon style={{ verticalAlign: "middle" }} />
+                  <FaceIcon style={{ verticalAlign: "middle" }} />
                   <span style={{ verticalAlign: "middle" }}>會員中心</span>
                 </NavLink>
               </li>
@@ -328,7 +496,7 @@ const App = () => {
                 <Button
                   onClick={handleLogout}
                   variant="contained"
-                  style={{ backgroundColor: "#f95173" }}
+                  style={{ backgroundColor: "#616263", color: "white" }}
                 >
                   登出
                 </Button>
@@ -362,6 +530,7 @@ const App = () => {
               updateGuideMapDB={updateGuideMapDB}
               dbFriendsGroupData={dbFriendsGroupData}
               updateGroupUserDB={updateGroupUserDB}
+              //removeUserDB={removeUserDB}
             />
           )}
         />
@@ -371,6 +540,21 @@ const App = () => {
           key={"route-friendsgroup"}
           render={() => (
             <FriendsGroup
+              userData={userData}
+              updateUserDB={updateUserDB}
+              updateGroupUserDB={updateGroupUserDB}
+              dbFriendsGroupData={dbFriendsGroupData}
+              updateFriendsGroupDB={updateFriendsGroupDB}
+              //removeUserDB={removeUserDB}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={"/friendsgrouphistory"}
+          key={"route-friendsgrouphistory"}
+          render={() => (
+            <FriendsGroupHistory
               userData={userData}
               updateUserDB={updateUserDB}
               updateGroupUserDB={updateGroupUserDB}
@@ -390,6 +574,8 @@ const App = () => {
               initUserDB={initUserDB}
               dbFriendsGroupData={dbFriendsGroupData}
               dbGuideMapData={dbGuideMapData}
+              removeUserMapDB={removeUserMapDB}
+              removeUserGroupDB={removeUserGroupDB}
             />
           )}
         />

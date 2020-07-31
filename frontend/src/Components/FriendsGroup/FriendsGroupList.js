@@ -235,7 +235,7 @@ const FriendsGroupList = (props) => {
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
             <MaterialTable
-              title="開團列表"
+              title="開團列表（進行中）"
               columns={[
                 { title: "ID", field: "group_id", width: 25 },
                 {
@@ -247,7 +247,7 @@ const FriendsGroupList = (props) => {
                 //   { title: "地區", field: "city", width:100 },
                 { title: "地點", field: "location_name", width: 120 },
                 { title: "時間", field: "group_startdt", width: 70 },
-                { title: "主題", field: "group_title", width: 270 },
+                { title: "主題", field: "group_title", width: 260 },
                 {
                   title: "剩餘名額",
                   field: "remain_count",
@@ -269,7 +269,7 @@ const FriendsGroupList = (props) => {
                 //     width:100
                 //   },
               ]}
-              data={props.dbFriendsGroupData}
+              data={props.dbFriendsGroupData.filter((data)=>new Date(data.group_startdt) >= new Date())}
               actions={[
                 (rowData) => ({
                   icon: () => (
@@ -309,7 +309,6 @@ const FriendsGroupList = (props) => {
                 }),
               ]}
               options={{
-                filtering: true,
                 headerStyle: {
                   backgroundColor: "#015da5",
                   color: "#FFF",

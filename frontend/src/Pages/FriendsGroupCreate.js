@@ -298,6 +298,7 @@ const FriendsGroupCreate = (props) => {
           })
           .finally(() => {
             window.location.href = "/#/friendsgroup";
+            //window.location.reload(false);
           });
       });
   };

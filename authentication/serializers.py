@@ -24,6 +24,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
     )
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, write_only=True)
+    map_create = serializers.ListField(required=False)
+    map_like = serializers.ListField(required=False)
+    group_create = serializers.ListField(required=False)
+    group_like = serializers.ListField(required=False)
+    group_join = serializers.ListField(required=False)
 
     class Meta:
         model = CustomUser
@@ -39,6 +44,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
                   "group_create",
                   "group_join",
                   "group_like",
+                  "map_create",
                   "map_like",
                   "map_add",
                   "map_comment",

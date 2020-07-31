@@ -139,8 +139,7 @@ const Guidemap = (props) => {
     let index = props.dbGuideMapData.findIndex(
       (data) => data.location_id === locationId
     );
-    console.log(newData);
-    console.log(locationId);
+
     switch (type) {
       case "RATING":
         props.dbGuideMapData[index].rating = newData;

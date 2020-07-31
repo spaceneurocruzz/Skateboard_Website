@@ -8,7 +8,7 @@ import {
   getFriendsGroupApi,
 } from "../axiosApi";
 import { AuthContext } from "../App";
-import ShowAlertMessages from "../Components/ShowAlertMessages"
+import ShowAlertMessages from "../Components/ShowAlertMessages";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 
 import "../css/app.css";
@@ -30,7 +30,7 @@ import Box from "@material-ui/core/Box";
 import EditLocationIcon from "@material-ui/icons/EditLocation";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import EventAvailableIcon from "@material-ui/icons/EventAvailable";
-
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import TrackChangesIcon from "@material-ui/icons/TrackChanges";
 import EmojiEventsIcon from "@material-ui/icons/EmojiEvents";
 
@@ -65,6 +65,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     marginTop: "10px",
     marginBottom: "10px",
+    fontWeight: "bold",
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
@@ -343,7 +344,9 @@ const User = (props) => {
           <TabPanel value={value} index={0}>
             <Grid container>
               <EditLocationIcon />
-              <div style={{ marginBottom: 10 }}>新增地點 :</div>
+              <b>
+                <div style={{ marginBottom: 10 }}>新增地點 :</div>
+              </b>
               <ul>
                 {props.userData.map_add != undefined ||
                 props.userData.map_add != null ? (
@@ -374,8 +377,10 @@ const User = (props) => {
               </ul>
             </Grid>
             <Grid container>
-              <FavoriteIcon />
-              <span>最愛地點 :</span>
+              <b>
+                <FavoriteIcon />
+                <span>最愛地點 :</span>
+              </b>
               <ul>
                 {props.userData.map_like != undefined ||
                 props.userData.map_like != null ? (
@@ -396,7 +401,21 @@ const User = (props) => {
                     return (
                       <li style={{ listStyleType: "decimal" }}>
                         {data.location_type} {data.location_name}:{" "}
-                        {data.address}
+                        <a
+                          href={
+                            "https://www.google.com/maps/dir/?api=1&destination=" +
+                            data.address
+                          }
+                          className="addressLink"
+                        >
+                          {data.address}
+                        </a>
+                        <DeleteForeverIcon
+                          style={{ verticalAlign: "middle" }}
+                          onClick={() =>
+                            props.removeUserMapDB(data.location_id, "MAP_LIKE")
+                          }
+                        />
                       </li>
                     );
                   })
@@ -408,8 +427,10 @@ const User = (props) => {
           </TabPanel>
           <TabPanel value={value} index={1}>
             <Grid container>
-              <EmojiEventsIcon />
-              舉辦中 :
+              <b>
+                <EmojiEventsIcon />
+                舉辦中 :
+              </b>
               <ul>
                 {holdEvent != undefined || holdEvent != null ? (
                   holdEvent.map((data, index) => {
@@ -435,8 +456,10 @@ const User = (props) => {
               </ul>
             </Grid>
             <Grid container>
-              <EventAvailableIcon />
-              參加中 :
+              <b>
+                <EventAvailableIcon />
+                參加中 :
+              </b>
               <ul>
                 {props.userData.group_join != undefined ||
                 props.userData.group_join != null ? (
@@ -457,6 +480,15 @@ const User = (props) => {
                           {data.group_id}
                         </NavLink>
                         )
+                        <DeleteForeverIcon
+                          style={{ verticalAlign: "middle" }}
+                          onClick={() =>
+                            props.removeUserGroupDB(
+                              data.group_id,
+                              "GROUP_JOIN"
+                            )
+                          }
+                        />
                       </li>
                     );
                   })
@@ -466,8 +498,10 @@ const User = (props) => {
               </ul>
             </Grid>
             <Grid container>
-              <TrackChangesIcon />
-              追蹤中 :
+              <b>
+                <TrackChangesIcon />
+                追蹤中 :
+              </b>
               <ul>
                 {props.userData.group_like != undefined ||
                 props.userData.group_like != null ? (
@@ -488,6 +522,15 @@ const User = (props) => {
                           {data.group_id}
                         </NavLink>
                         )
+                        <DeleteForeverIcon
+                          style={{ verticalAlign: "middle" }}
+                          onClick={() =>
+                            props.removeUserGroupDB(
+                              data.group_id,
+                              "GROUP_LIKE"
+                            )
+                          }
+                        />
                       </li>
                     );
                   })
@@ -600,8 +643,11 @@ const User = (props) => {
   return (
     <>
       <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
-      
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+
       <Container
         className="user_conatainer"
         component="main"

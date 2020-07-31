@@ -43,7 +43,7 @@ const FriendsGroupModalInput = (props) => {
 
   return (
     <>
-      {/* {state.isAuthenticated ? ( */}
+      {state.isAuthenticated ? (
         <Link
           to={{
             pathname: "/friendsGroup/create",
@@ -62,17 +62,18 @@ const FriendsGroupModalInput = (props) => {
             我要揪團
           </Button>
         </Link>
-      {/* ) : (
+      ) : (
         <Button
           variant="contained"
           color="default"
           className={classes.buttonAdd}
           startIcon={<PostAddIcon />}
+          disabled
         >
           請登入即可新增揪團
         </Button>
       ) 
-      }*/}
+      }
     </>
   );
 };

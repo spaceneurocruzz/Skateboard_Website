@@ -169,7 +169,7 @@ body {
 }
 
 .userLink {
-  color:#F76C6C;
+  color:#ea6a00;
   font-weight: 600;
   font-size: 20px;
   text-decoration: none;
@@ -177,7 +177,19 @@ body {
 }
 
 .userLink:visited{
-  color: #F76C6C
+  color: #ea6a00
+}
+
+.addressLink{
+  color:#ea6a00;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  align-items: center;
+}
+
+.addressLink:visited{
+  color: #ea6a00
 }
 
 .loginform {

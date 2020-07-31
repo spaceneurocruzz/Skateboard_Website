@@ -6,7 +6,7 @@ import {
   getFriendsGroupApi,
   postFriendsGroupCommentsApi,
 } from "../axiosApi";
-import ShowAlertMessages from "../Components/ShowAlertMessages"
+import ShowAlertMessages from "../Components/ShowAlertMessages";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 
 import List from "@material-ui/core/List";
@@ -115,11 +115,12 @@ const CommentList = (props) => {
                       alignItems: "left",
                     }}
                   >
-                    {data.create_dt.toString()}
-                    {/* {`${data.create_dt.slice(0, 10)}  ${data.create_dt.slice(
-                    11,
-                    19
-                  )}`} */}
+                     {data.create_dt.toString()}
+                    {/*{`${data.create_dt
+                      .toString()
+                      .slice(0, 10)}  ${data.create_dt
+                      .toString()
+                      .slice(11, 20)}`}*/}
                   </span>
                 </ListItem>
                 {/* <Divider variant="inset" component="li" /> */}
@@ -224,8 +225,11 @@ const FriendsGroupDetail = (props) => {
   return (
     <>
       <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
-      
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+
       <div>
         {dbFriendsGroupData.map((data, index) => {
           if (data.group_id == id) {
@@ -281,7 +285,18 @@ const FriendsGroupDetail = (props) => {
                   </ListItem>
                   <ListItem>
                     <ListItemText>
-                      <span>{`     人數上下限：${data.lower_limit}人 - ${data.upper_limit}人`}</span>
+                      {data.lower_limit == 0 && data.upper_limit == 0 && (
+                        <span>{`     人數上下限：- 人 至  -人`}</span>
+                      )}
+                      {data.lower_limit == 0 && data.upper_limit != 0 && (
+                        <span>{`     人數上下限：- 人 至  ${data.upper_limit}人`}</span>
+                      )}
+                      {data.lower_limit != 0 && data.upper_limit == 0 && (
+                        <span>{`     人數上下限：${data.lower_limit}人 至  -人`}</span>
+                      )}
+                      {data.lower_limit != 0 && data.upper_limit != 0 && (
+                        <span>{`     人數上下限：${data.lower_limit}人 至 ${data.upper_limit}人`}</span>
+                      )}
                     </ListItemText>
                   </ListItem>
                   <ListItem>
