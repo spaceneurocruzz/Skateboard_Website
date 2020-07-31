@@ -587,6 +587,8 @@ const App = () => {
             <FriendsGroupCreate
               userData={userData}
               updateUserDB={updateUserDB}
+              dbFriendsGroupData={dbFriendsGroupData}
+              updateFriendsGroupDB={updateFriendsGroupDB}
             />
           )}
         />

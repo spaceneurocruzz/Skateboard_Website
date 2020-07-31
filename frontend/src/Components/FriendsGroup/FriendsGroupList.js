@@ -4,6 +4,7 @@ import {
   postFriendsGroupCommentsApi,
   patchFriendsGroupApi,
   patchUserApi,
+  getFriendsGroupApi
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
 import ShowAlertMessages from "../ShowAlertMessages"
@@ -90,6 +91,18 @@ const FriendsGroupList = (props) => {
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const [commentData, setCommentData] = useState([]);
+  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
+
+  useEffect(() => {
+    getFriendsGroupApi()
+      .then((res) => {
+        setDbFriendsGroupData(res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
 
   useEffect(() => {
     getFriendsGroupCommentsApi()
@@ -101,6 +114,47 @@ const FriendsGroupList = (props) => {
       })
       .finally(() => {});
   }, []);
+
+  if (
+    dbFriendsGroupData != undefined ||
+    dbFriendsGroupData != null
+  ) {
+    dbFriendsGroupData.map((data, index) => {
+      if (
+        data["join_user"] != undefined ||
+        data["join_user"] != null ||
+        data["possible_user"] != undefined ||
+        data["possible_user"] != null ||
+        data["upper_limit"] != undefined ||
+        data["upper_limit"] != null
+      ) {
+        data["join_count"] = data["join_user"].length;
+
+        if (data["upper_limit"] === 0) {
+          data["remain_count"] = 999;
+        } else {
+          data["remain_count"] = data["upper_limit"] - data["join_user"].length;
+        }
+      }
+    });}
+
+    const updateFriendsGroupDBById = (group_id, newData, type) => {
+      let index = dbFriendsGroupData.findIndex(
+        (data) => data.group_id === group_id
+      );
+  
+      switch (type) {
+        case "JOIN":
+          dbFriendsGroupData[index].join_user = newData;
+          break;
+        case "LIKE":
+          dbFriendsGroupData[index].possible_user = newData;
+          break;
+        default:
+          console.log("none");
+      }
+      props.updateFriendsGroupDB([...dbFriendsGroupData]);
+    };
 
   const [openShowAlert, setOpenShowAlert] = React.useState(false);
 
@@ -138,7 +192,7 @@ const FriendsGroupList = (props) => {
 
     patchFriendsGroupApi(group_id, updateJoinUser)
       .then((res) => {
-        props.updateFriendsGroupDBById(group_id, preJoinUserArr, "JOIN");
+        updateFriendsGroupDBById(group_id, preJoinUserArr, "JOIN");
       })
       .catch((error) => {
         console.error(error.response);
@@ -189,7 +243,7 @@ const FriendsGroupList = (props) => {
 
     patchFriendsGroupApi(group_id, updatePossibleUser)
       .then((res) => {
-        props.updateFriendsGroupDBById(group_id, prePossibleUserArr, "LIKE");
+        updateFriendsGroupDBById(group_id, prePossibleUserArr, "LIKE");
       })
       .catch((error) => {
         console.error(error.response);
@@ -269,7 +323,7 @@ const FriendsGroupList = (props) => {
                 //     width:100
                 //   },
               ]}
-              data={props.dbFriendsGroupData.filter((data)=>new Date(data.group_startdt) >= new Date())}
+              data={dbFriendsGroupData.filter((data)=>new Date(data.group_startdt) >= new Date())}
               actions={[
                 (rowData) => ({
                   icon: () => (

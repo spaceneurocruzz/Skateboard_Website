@@ -205,13 +205,15 @@ const User = (props) => {
     if (event.target.name == "password") {
       setPassword(event.target.value);
     }
-  };
+  }; 
+  const [userData, setUserdata] = useState([]);
+
 
   useEffect(() => {
     getUserApi(state.username)
       .then((res) => {
         console.table(res.data);
-        props.initUserDB(res.data);
+        setUserdata(res.data);
         //setDbdata(res.data);
         //console.table(dbData);
       })
@@ -266,7 +268,7 @@ const User = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.table("submit");
-    patchUserApi(state.username, props.userData)
+    patchUserApi(state.username, userData)
       .then((res) => {
         handleShowAlertOpen();
       })
@@ -348,9 +350,9 @@ const User = (props) => {
                 <div style={{ marginBottom: 10 }}>新增地點 :</div>
               </b>
               <ul>
-                {props.userData.map_add != undefined ||
-                props.userData.map_add != null ? (
-                  props.userData.map_add.map((addId, index) => {
+                {userData.map_add != undefined ||
+                userData.map_add != null ? (
+                  userData.map_add.map((addId, index) => {
                     let data = null;
                     if (
                       props.dbGuideMapData != undefined ||
@@ -382,9 +384,9 @@ const User = (props) => {
                 <span>最愛地點 :</span>
               </b>
               <ul>
-                {props.userData.map_like != undefined ||
-                props.userData.map_like != null ? (
-                  props.userData.map_like.map((likeId, index) => {
+                {userData.map_like != undefined ||
+                userData.map_like != null ? (
+                  userData.map_like.map((likeId, index) => {
                     let data = [];
                     if (
                       props.dbGuideMapData != undefined ||
@@ -461,9 +463,9 @@ const User = (props) => {
                 參加中 :
               </b>
               <ul>
-                {props.userData.group_join != undefined ||
-                props.userData.group_join != null ? (
-                  props.userData.group_join.map((joinId, index) => {
+                {userData.group_join != undefined ||
+                userData.group_join != null ? (
+                  userData.group_join.map((joinId, index) => {
                     let data = props.dbFriendsGroupData.find(
                       (group) => group.group_id == joinId
                     );
@@ -503,9 +505,9 @@ const User = (props) => {
                 追蹤中 :
               </b>
               <ul>
-                {props.userData.group_like != undefined ||
-                props.userData.group_like != null ? (
-                  props.userData.group_like.map((likeId, index) => {
+                {userData.group_like != undefined ||
+                userData.group_like != null ? (
+                  userData.group_like.map((likeId, index) => {
                     let data = props.dbFriendsGroupData.find(
                       (group) => group.group_id == likeId
                     );
@@ -587,7 +589,7 @@ const User = (props) => {
             id="filled-required-email"
             name="email"
             label="Email(必填)"
-            value={props.userData.email}
+            value={userData.email}
             variant="filled"
             style={{ width: 300 }}
           />
@@ -599,7 +601,7 @@ const User = (props) => {
             id="filled-required"
             name="nickname"
             label="暱稱"
-            value={props.userData.nickname}
+            value={userData.nickname}
             variant="filled"
           />
           <TextField
@@ -607,7 +609,7 @@ const User = (props) => {
             id="filled-search"
             label="所在城市"
             name="location"
-            value={props.userData.location}
+            value={userData.location}
             variant="filled"
           />
         </Grid>
@@ -621,7 +623,7 @@ const User = (props) => {
             multiline
             style={{ width: 400 }}
             rows={5}
-            value={props.userData.intro}
+            value={userData.intro}
             variant="filled"
           />
         </Grid>
@@ -697,7 +699,7 @@ const User = (props) => {
           {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
           <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
           <div style={{ marginLeft: 50 }}>
-            <h2>暱稱：{props.userData.nickname}</h2>
+            <h2>暱稱：{userData.nickname}</h2>
             <div style={{ display: "flex" }}>
               <span>@{state.username}</span>
               <span></span>

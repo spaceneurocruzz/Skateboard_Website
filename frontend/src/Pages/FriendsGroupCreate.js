@@ -133,8 +133,6 @@ const FriendsGroupCreate = (props) => {
 
   const [dbData, setDbData] = useState([]);
 
-  // const { updateFriendsGroupDB } = props.updateFriendsGroupDB;
-
   useEffect(() => {
     getGuidemapApi()
       .then((res) => {
@@ -256,13 +254,12 @@ const FriendsGroupCreate = (props) => {
     dbPost["update_dt"] = new Date();
 
     if (input.address == "") {
-      if (dbPost == undefined) {
+      let mapData = getMapDatabyLocationName(dbPost.location_name);
+      if (mapData == undefined || mapData == null) {
         handleShowErrorAlertOpen();
       } else {
-        let mapData = getMapDatabyLocationName(dbPost.location_name);
         input["address"] = mapData.address;
         input["map_id"] = mapData.location_id;
-        console.log(mapData);
       }
     }
 
@@ -284,20 +281,18 @@ const FriendsGroupCreate = (props) => {
         // dbPost["group_content"];
         postFriendsGroupApi(dbPost)
           .then((res) => {
-            setDbFriendsGroupData([...dbFriendsGroupData, dbPost]);
+            props.updateFriendsGroupDB([...props.dbFriendsGroupData, dbPost]);
             handleShowAlertOpen();
-            //window.location.href = "/#/friendsgroup";
+            window.location.href = "/#/friendsgroup";
           })
           .catch((error) => {
-            handleShowAlertOpen();
-            //handleShowErrorAlertOpen();
+            //handleShowAlertOpen();
+            handleShowErrorAlertOpen();
             console.error(error.response);
             //window.location.href = "/#/friendsgroup";
-              // <Link to="/friendsgroup" />
-   
+            // <Link to="/friendsgroup" />
           })
           .finally(() => {
-            window.location.href = "/#/friendsgroup";
             //window.location.reload(false);
           });
       });
@@ -465,6 +460,7 @@ const FriendsGroupCreate = (props) => {
                 {isAddressChecked && (
                   <>
                     <TextField
+                      required
                       onChange={handleInputChange}
                       size="small"
                       id="location_name"
@@ -475,6 +471,7 @@ const FriendsGroupCreate = (props) => {
                       style={{ marginTop: 20 }}
                     />
                     <TextField
+                      required
                       onChange={handleInputChange}
                       size="small"
                       id="address"
@@ -488,7 +485,6 @@ const FriendsGroupCreate = (props) => {
                 )}
                 <div className={classes.flexContainer}>
                   <TextField
-                    required
                     id="lower_limit"
                     label="人數下限"
                     type="number"
@@ -499,7 +495,6 @@ const FriendsGroupCreate = (props) => {
                     style={{ marginTop: 20, marginRight: 20 }}
                   />
                   <TextField
-                    required
                     id="uppper_limit"
                     label="人數上限"
                     type="number"

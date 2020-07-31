@@ -68,24 +68,6 @@ const FriendsGroup = (props) => {
     }
   };
 
-  const updateFriendsGroupDBById = (group_id, newData, type) => {
-    let index = props.dbFriendsGroupData.findIndex(
-      (data) => data.group_id === group_id
-    );
-
-    switch (type) {
-      case "JOIN":
-        props.dbFriendsGroupData[index].join_user = newData;
-        break;
-      case "LIKE":
-        props.dbFriendsGroupData[index].possible_user = newData;
-        break;
-      default:
-        console.log("none");
-    }
-    props.updateFriendsGroupDB([...props.dbFriendsGroupData]);
-  };
-
   useEffect(() => {
     getFriendsGroupApi()
       .then((res) => {
@@ -190,7 +172,7 @@ const FriendsGroup = (props) => {
           <FriendsGroupList
             dbFriendsGroupData={props.dbFriendsGroupData}
             updateFriendsGroupDB={props.updateFriendsGroupDB}
-            updateFriendsGroupDBById={updateFriendsGroupDBById}
+            //updateFriendsGroupDBById={updateFriendsGroupDBById}
             getFriendsGroupDBById={getFriendsGroupDBById}
             userData={props.userData}
             updateUserDB={props.updateUserDB}
