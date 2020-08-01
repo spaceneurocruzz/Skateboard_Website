@@ -25,7 +25,7 @@ const Home = () => {
             marginBottom: "auto",
             fontSize: 60,
             fontWeight: 900,
-            // marginLeft: 200,
+            marginLeft: 200,
           }}
         >
           {sbGo}
