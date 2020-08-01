@@ -151,7 +151,7 @@ const StyledMenu = withStyles({
 const StyledMenuItem = withStyles((theme) => ({
   root: {
     "&:focus": {
-      backgroundColor: theme.palette.primary.main,
+      backgroundColor: theme.palette.success.light,
       "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
         color: theme.palette.common.white,
       },
@@ -189,7 +189,7 @@ const SideMenu = () => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-       <NavLink to="/guidemap">
+       <NavLink to="/guidemap" className="hamLink">
         <StyledMenuItem>
           <ListItemIcon>
             <MapIcon fontSize="small" />
@@ -197,7 +197,7 @@ const SideMenu = () => {
           <ListItemText primary="地圖"/>
         </StyledMenuItem>
         </NavLink>
-        <NavLink to="/friendsgroup">
+        <NavLink to="/friendsgroup" className="hamLink">
           <StyledMenuItem>
             <ListItemIcon>
               <GroupAddIcon fontSize="small" />
@@ -205,7 +205,7 @@ const SideMenu = () => {
             <ListItemText primary="揪團" />
           </StyledMenuItem>
         </NavLink>
-        <NavLink to="/login">
+        <NavLink to="/login" className="hamLink">
         <StyledMenuItem>
           <ListItemIcon>
             <LockOpenIcon fontSize="small" />
@@ -213,7 +213,7 @@ const SideMenu = () => {
           <ListItemText primary="登入" />
         </StyledMenuItem>
         </NavLink>
-        <NavLink to="/signup">
+        <NavLink to="/signup" className="hamLink">
         <StyledMenuItem>
           <ListItemIcon>
             <AccountCircleIcon fontSize="small" />
