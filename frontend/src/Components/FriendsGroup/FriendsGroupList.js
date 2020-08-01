@@ -1,41 +1,24 @@
 import React, { useState, useEffect } from "react";
 import {
   getFriendsGroupCommentsApi,
-  postFriendsGroupCommentsApi,
   patchFriendsGroupApi,
   patchUserApi,
-  getFriendsGroupApi
+  getFriendsGroupApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
-import ShowAlertMessages from "../ShowAlertMessages"
+import ShowAlertMessages from "../ShowAlertMessages";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 
 import { Link, NavLink } from "react-router-dom";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
 import Container from "@material-ui/core/Container";
-import AddLocationIcon from "@material-ui/icons/AddLocation";
-import PlusOneIcon from "@material-ui/icons/PlusOne";
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+
+import TrackChangesIcon from "@material-ui/icons/TrackChanges";
 import MaterialTable from "material-table";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ImportContactsIcon from "@material-ui/icons/ImportContacts";
-import Icon from "@material-ui/core/Icon";
-import Typography from "@material-ui/core/Typography";
-import FriendsGroupDetail from "../../Pages/FriendsGroupDetail";
 
-import { Switch, Route, useHistory } from "react-router";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -115,11 +98,12 @@ const FriendsGroupList = (props) => {
       .finally(() => {});
   }, []);
 
-  if (
-    dbFriendsGroupData != undefined ||
-    dbFriendsGroupData != null
-  ) {
-    dbFriendsGroupData.map((data, index) => {
+  let filterFriendsGroupData = dbFriendsGroupData.filter(
+    (data) => new Date(data.group_startdt) >= new Date()
+  );
+
+  if (filterFriendsGroupData != undefined || filterFriendsGroupData != null) {
+    filterFriendsGroupData.map((data, index) => {
       if (
         data["join_user"] != undefined ||
         data["join_user"] != null ||
@@ -136,25 +120,31 @@ const FriendsGroupList = (props) => {
           data["remain_count"] = data["upper_limit"] - data["join_user"].length;
         }
       }
-    });}
 
-    const updateFriendsGroupDBById = (group_id, newData, type) => {
-      let index = dbFriendsGroupData.findIndex(
-        (data) => data.group_id === group_id
-      );
-  
-      switch (type) {
-        case "JOIN":
-          dbFriendsGroupData[index].join_user = newData;
-          break;
-        case "LIKE":
-          dbFriendsGroupData[index].possible_user = newData;
-          break;
-        default:
-          console.log("none");
-      }
-      props.updateFriendsGroupDB([...dbFriendsGroupData]);
-    };
+      data["group_startdt"] =
+        data["group_startdt"].slice(0, 10) +
+        " " +
+        data.group_startdt.slice(11, 19);
+    });
+  }
+
+  const updateFriendsGroupDBById = (group_id, newData, type) => {
+    let index = dbFriendsGroupData.findIndex(
+      (data) => data.group_id === group_id
+    );
+
+    switch (type) {
+      case "JOIN":
+        dbFriendsGroupData[index].join_user = newData;
+        break;
+      case "LIKE":
+        dbFriendsGroupData[index].possible_user = newData;
+        break;
+      default:
+        console.log("none");
+    }
+    props.updateFriendsGroupDB([...dbFriendsGroupData]);
+  };
 
   const [openShowAlert, setOpenShowAlert] = React.useState(false);
 
@@ -282,9 +272,12 @@ const FriendsGroupList = (props) => {
 
   return (
     <>
-     <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-     <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
-      
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+
       <Container component="main" maxWidth="lg">
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
@@ -296,12 +289,12 @@ const FriendsGroupList = (props) => {
                   title: "類型",
                   field: "group_type",
                   lookup: { 交流: "交流", 教學: "教學" },
-                  width: 90,
+                  width: 80,
                 },
                 //   { title: "地區", field: "city", width:100 },
                 { title: "地點", field: "location_name", width: 120 },
-                { title: "時間", field: "group_startdt", width: 70 },
-                { title: "主題", field: "group_title", width: 260 },
+                { title: "時間", field: "group_startdt", width: 90 },
+                { title: "主題", field: "group_title", width: 250 },
                 {
                   title: "剩餘名額",
                   field: "remain_count",
@@ -312,18 +305,8 @@ const FriendsGroupList = (props) => {
                   field: "join_count",
                   width: 100,
                 },
-                // {
-                //     title: "確定參加",
-                //     field: "join_user",
-                //     width:100
-                //   },
-                //   {
-                //     title: "可能參加",
-                //     field: "possible_user",
-                //     width:100
-                //   },
               ]}
-              data={dbFriendsGroupData.filter((data)=>new Date(data.group_startdt) >= new Date())}
+              data={filterFriendsGroupData}
               actions={[
                 (rowData) => ({
                   icon: () => (
@@ -350,7 +333,7 @@ const FriendsGroupList = (props) => {
                       : true),
                 }),
                 (rowData) => ({
-                  icon: () => <FavoriteBorderIcon />,
+                  icon: () => <TrackChangesIcon />,
                   tooltip: "追蹤",
                   onClick: (event, rowData) => {
                     likeGroup(event, rowData.group_id);

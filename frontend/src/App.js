@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   patchUserApi,
   patchGuidemapApi,
-  patchFriendsGroupApi
+  patchFriendsGroupApi,
 } from "./axiosApi";
 import { Link, NavLink } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
@@ -37,7 +37,16 @@ import FaceIcon from "@material-ui/icons/Face";
 import EventIcon from "@material-ui/icons/Event";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import ForumIcon from "@material-ui/icons/Forum";
-
+import LockOpenIcon from "@material-ui/icons/LockOpen";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import InboxIcon from "@material-ui/icons/MoveToInbox";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import DraftsIcon from "@material-ui/icons/Drafts";
+import SendIcon from "@material-ui/icons/Send";
+import MenuIcon from "@material-ui/icons/Menu";
 export const AuthContext = React.createContext();
 
 const initialState = {
@@ -119,6 +128,104 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const StyledMenu = withStyles({
+  paper: {
+    border: "1px solid #d3d4d5",
+  },
+})((props) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: "bottom",
+      horizontal: "center",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "center",
+    }}
+    {...props}
+  />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+  root: {
+    "&:focus": {
+      backgroundColor: theme.palette.primary.main,
+      "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
+        color: theme.palette.common.white,
+      },
+    },
+  },
+}))(MenuItem);
+
+const SideMenu = () => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div className="forsmallscreen">
+      <MenuIcon
+        style={{
+          width: 35,
+          height: 35,
+          marginTop: '6vw',
+          marginBottom: "auto",
+          marginRight: '2vw',
+        }}
+        onClick={handleClick}
+      />
+      <StyledMenu
+        id="customized-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+       <NavLink to="/guidemap">
+        <StyledMenuItem>
+          <ListItemIcon>
+            <MapIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="地圖"/>
+        </StyledMenuItem>
+        </NavLink>
+        <NavLink to="/friendsgroup">
+          <StyledMenuItem>
+            <ListItemIcon>
+              <GroupAddIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="揪團" />
+          </StyledMenuItem>
+        </NavLink>
+        <NavLink to="/login">
+        <StyledMenuItem>
+          <ListItemIcon>
+            <LockOpenIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="登入" />
+        </StyledMenuItem>
+        </NavLink>
+        <NavLink to="/signup">
+        <StyledMenuItem>
+          <ListItemIcon>
+            <AccountCircleIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="註冊" />
+        </StyledMenuItem>
+        </NavLink>
+      </StyledMenu>
+    </div>
+  );
+};
+
 const App = () => {
   const classes = useStyles();
   const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -154,9 +261,7 @@ const App = () => {
 
   const getMapDBByLocationId = (locationId) => {
     if (dbGuideMapData != undefined) {
-      return dbGuideMapData.find(
-        (data) => data.location_id === locationId
-      );
+      return dbGuideMapData.find((data) => data.location_id === locationId);
     } else {
       return null;
     }
@@ -188,8 +293,9 @@ const App = () => {
 
     switch (column) {
       case "MAP_LIKE":
-        updateMapArr = getMapDBByLocationId(removeValue)
-          .like_user.filter((user) => user !== state.username);
+        updateMapArr = getMapDBByLocationId(removeValue).like_user.filter(
+          (user) => user !== state.username
+        );
 
         patchMapData = {
           like_user: updateMapArr,
@@ -222,11 +328,8 @@ const App = () => {
   };
 
   const getFriendsGroupDBById = (groupId) => {
-    console.log(groupId)
     if (dbFriendsGroupData != undefined) {
-      return dbFriendsGroupData.find(
-        (data) => data.group_id === groupId
-      );
+      return dbFriendsGroupData.find((data) => data.group_id === groupId);
     } else {
       return null;
     }
@@ -258,8 +361,9 @@ const App = () => {
 
     switch (column) {
       case "GROUP_JOIN":
-        updateGroupArr = getFriendsGroupDBById(removeValue)
-          .join_user.filter((user) => user !== state.username);
+        updateGroupArr = getFriendsGroupDBById(removeValue).join_user.filter(
+          (user) => user !== state.username
+        );
 
         patchGroupData = {
           join_user: updateGroupArr,
@@ -274,9 +378,9 @@ const App = () => {
         break;
 
       case "GROUP_LIKE":
-        console.log(getFriendsGroupDBById(removeValue))
-        updateGroupArr = getFriendsGroupDBById(removeValue)
-          .possible_user.filter((user) => user !== state.username);
+        updateGroupArr = getFriendsGroupDBById(
+          removeValue
+        ).possible_user.filter((user) => user !== state.username);
 
         patchGroupData = {
           possible_user: updateGroupArr,
@@ -285,8 +389,6 @@ const App = () => {
         patchUserData = {
           group_like: userData.group_like.filter((id) => id !== removeValue),
         };
-        console.log(updateGroupArr)
-        console.log(patchUserData)
         type = "LIKE";
 
         break;
@@ -412,21 +514,11 @@ const App = () => {
             <img src={logo} alt="logo" />
           </Link>
           <Link to="/" className="link">
-            <span
-              style={{
-                marginLeft: 20,
-                fontFamily: "Galindo",
-                marginTop: "auto",
-                marginBottom: "auto",
-                fontSize: 28,
-                fontWeight: 900,
-              }}
-            >
-              SkateboardGO
-            </span>
+            <span className="logoText">SkateboardGO</span>
           </Link>
         </div>
-        <div className="nav">
+        <SideMenu />
+        <div className="nav forlargescreen">
           <ul className="nav-link">
             <li className="nav-link-item">
               <NavLink
@@ -576,6 +668,7 @@ const App = () => {
               dbGuideMapData={dbGuideMapData}
               removeUserMapDB={removeUserMapDB}
               removeUserGroupDB={removeUserGroupDB}
+              updateGroupUserDB={updateGroupUserDB}
             />
           )}
         />

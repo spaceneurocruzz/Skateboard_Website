@@ -2,40 +2,19 @@ import React, { useState, useEffect } from "react";
 import {
   getFriendsGroupCommentsApi,
   getFriendsGroupApi,
-  postFriendsGroupCommentsApi,
-  patchFriendsGroupApi,
-  patchUserApi,
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
 import ShowAlertMessages from "../ShowAlertMessages";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 
 import { Link, NavLink } from "react-router-dom";
-import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import Container from "@material-ui/core/Container";
-import AddLocationIcon from "@material-ui/icons/AddLocation";
-import PlusOneIcon from "@material-ui/icons/PlusOne";
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import MaterialTable from "material-table";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import ImportContactsIcon from "@material-ui/icons/ImportContacts";
-import Icon from "@material-ui/core/Icon";
-import Typography from "@material-ui/core/Typography";
-import FriendsGroupDetail from "../../Pages/FriendsGroupDetail";
 
-import { Switch, Route, useHistory } from "react-router";
+import Container from "@material-ui/core/Container";
+import MaterialTable from "material-table";
+import ImportContactsIcon from "@material-ui/icons/ImportContacts";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -119,6 +98,36 @@ const FriendsGroupHistory = (props) => {
       .finally(() => {});
   }, []);
 
+  let filterFriendsGroupData = dbFriendsGroupData.filter(
+    (data) => new Date(data.group_startdt) < new Date()
+  );
+
+  if (filterFriendsGroupData != undefined || filterFriendsGroupData != null) {
+    filterFriendsGroupData.map((data, index) => {
+      if (
+        data["join_user"] != undefined ||
+        data["join_user"] != null ||
+        data["possible_user"] != undefined ||
+        data["possible_user"] != null ||
+        data["upper_limit"] != undefined ||
+        data["upper_limit"] != null
+      ) {
+        data["join_count"] = data["join_user"].length;
+
+        if (data["upper_limit"] === 0) {
+          data["remain_count"] = 999;
+        } else {
+          data["remain_count"] = data["upper_limit"] - data["join_user"].length;
+        }
+      }
+
+      data["group_startdt"] =
+        data["group_startdt"].slice(0, 10) +
+        " " +
+        data.group_startdt.slice(11, 19);
+    });
+  }
+
   return (
     <Container component="main" maxWidth="lg" className="user_conatainer">
       <Link to="/FriendsGroup/" className="link">
@@ -158,9 +167,7 @@ const FriendsGroupHistory = (props) => {
                   width: 100,
                 },
               ]}
-              data={dbFriendsGroupData.filter(
-                (data) => new Date(data.group_startdt) < new Date()
-              )}
+              data={filterFriendsGroupData}
               actions={[
                 (rowData) => ({
                   icon: () => (

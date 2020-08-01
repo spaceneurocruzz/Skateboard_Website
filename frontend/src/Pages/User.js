@@ -6,6 +6,7 @@ import {
   patchUserApi,
   getGuidemapApi,
   getFriendsGroupApi,
+  patchFriendsGroupApi,
 } from "../axiosApi";
 import { AuthContext } from "../App";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
@@ -205,16 +206,15 @@ const User = (props) => {
     if (event.target.name == "password") {
       setPassword(event.target.value);
     }
-  }; 
+  };
   const [userData, setUserdata] = useState([]);
-
 
   useEffect(() => {
     getUserApi(state.username)
       .then((res) => {
         console.table(res.data);
-        setUserdata(res.data);
-        //setDbdata(res.data);
+        props.initUserDB(res.data);
+        //setUserdata(res.data);
         //console.table(dbData);
       })
       .catch((error) => {
@@ -222,6 +222,167 @@ const User = (props) => {
       })
       .finally(() => {});
   }, []);
+
+  const getMapDBByLocationId = (locationId) => {
+    if (props.dbGuideMapData != undefined) {
+      return props.dbGuideMapData.find(
+        (data) => data.location_id === locationId
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const updateMapDBByLocationId = (locationId, newData, type) => {
+    let index = props.dbGuideMapData.findIndex(
+      (data) => data.location_id === locationId
+    );
+
+    switch (type) {
+      case "RATING":
+        props.dbGuideMapData[index].rating = newData;
+        break;
+      case "LIKE":
+        props.dbGuideMapData[index].like_user = newData;
+        break;
+      default:
+        console.log("none");
+    }
+
+    updateGuideMapDB(...props.dbGuideMapData);
+  };
+
+  const removeUserMapDB = (removeValue, column) => {
+    let updateMapArr = [];
+    let patchMapData = [];
+    let patchUserData = [];
+
+    switch (column) {
+      case "MAP_LIKE":
+        updateMapArr = getMapDBByLocationId(removeValue).like_user.filter(
+          (user) => user !== state.username
+        );
+
+        patchMapData = {
+          like_user: updateMapArr,
+        };
+
+        patchUserData = {
+          map_like: props.userData.map_like.filter((id) => id !== removeValue),
+        };
+        break;
+    }
+
+    patchGuidemapApi(removeValue, patchMapData)
+      .then((res) => {
+        updateMapDBByLocationId(removeValue, updateMapArr, "LIKE");
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    patchUserApi(state.username, patchUserData)
+      .then((res) => {
+        props.updateGroupUserDB(patchUserData);
+        handleShowAlertOpen();
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
+
+  const getFriendsGroupDBById = (groupId) => {
+    if (props.dbFriendsGroupData != undefined) {
+      return props.dbFriendsGroupData.find((data) => data.group_id === groupId);
+    } else {
+      return null;
+    }
+  };
+
+  const updateFriendsGroupDBById = (group_id, newData, type) => {
+    let index = props.dbFriendsGroupData.findIndex(
+      (data) => data.group_id === group_id
+    );
+
+    switch (type) {
+      case "JOIN":
+        props.dbFriendsGroupData[index].join_user = newData;
+        break;
+      case "LIKE":
+        props.dbFriendsGroupData[index].possible_user = newData;
+        break;
+      default:
+        console.log("none");
+    }
+    updateFriendsGroupDB([...props.dbFriendsGroupData]);
+  };
+
+  const removeUserGroupDB = (removeValue, column) => {
+    let updateGroupArr = [];
+    let patchGroupData = [];
+    let patchUserData = [];
+    let type = "";
+
+    switch (column) {
+      case "GROUP_JOIN":
+        updateGroupArr = getFriendsGroupDBById(removeValue).join_user.filter(
+          (user) => user !== state.username
+        );
+
+        patchGroupData = {
+          join_user: updateGroupArr,
+        };
+
+        patchUserData = {
+          group_join: props.userData.group_join.filter(
+            (id) => id !== removeValue
+          ),
+        };
+
+        type = "JOIN";
+
+        break;
+
+      case "GROUP_LIKE":
+        updateGroupArr = getFriendsGroupDBById(
+          removeValue
+        ).possible_user.filter((user) => user !== state.username);
+
+        patchGroupData = {
+          possible_user: updateGroupArr,
+        };
+
+        patchUserData = {
+          group_like: props.userData.group_like.filter(
+            (id) => id !== removeValue
+          ),
+        };
+        type = "LIKE";
+
+        break;
+    }
+
+    patchFriendsGroupApi(removeValue, patchGroupData)
+      .then((res) => {
+        updateFriendsGroupDBById(removeValue, updateGroupArr, type);
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+
+    patchUserApi(state.username, patchUserData)
+      .then((res) => {
+        props.updateGroupUserDB(patchUserData);
+        handleShowAlertOpen();
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  };
 
   const handleAvatarSubmit = (e) => {
     e.preventDefault();
@@ -350,9 +511,9 @@ const User = (props) => {
                 <div style={{ marginBottom: 10 }}>新增地點 :</div>
               </b>
               <ul>
-                {userData.map_add != undefined ||
-                userData.map_add != null ? (
-                  userData.map_add.map((addId, index) => {
+                {props.userData.map_add != undefined ||
+                props.userData.map_add != null ? (
+                  props.userData.map_add.map((addId, index) => {
                     let data = null;
                     if (
                       props.dbGuideMapData != undefined ||
@@ -384,9 +545,9 @@ const User = (props) => {
                 <span>最愛地點 :</span>
               </b>
               <ul>
-                {userData.map_like != undefined ||
-                userData.map_like != null ? (
-                  userData.map_like.map((likeId, index) => {
+                {props.userData.map_like != undefined ||
+                props.userData.map_like != null ? (
+                  props.userData.map_like.map((likeId, index) => {
                     let data = [];
                     if (
                       props.dbGuideMapData != undefined ||
@@ -415,7 +576,7 @@ const User = (props) => {
                         <DeleteForeverIcon
                           style={{ verticalAlign: "middle" }}
                           onClick={() =>
-                            props.removeUserMapDB(data.location_id, "MAP_LIKE")
+                            removeUserMapDB(data.location_id, "MAP_LIKE")
                           }
                         />
                       </li>
@@ -463,9 +624,9 @@ const User = (props) => {
                 參加中 :
               </b>
               <ul>
-                {userData.group_join != undefined ||
-                userData.group_join != null ? (
-                  userData.group_join.map((joinId, index) => {
+                {props.userData.group_join != undefined ||
+                props.userData.group_join != null ? (
+                  props.userData.group_join.map((joinId, index) => {
                     let data = props.dbFriendsGroupData.find(
                       (group) => group.group_id == joinId
                     );
@@ -485,10 +646,7 @@ const User = (props) => {
                         <DeleteForeverIcon
                           style={{ verticalAlign: "middle" }}
                           onClick={() =>
-                            props.removeUserGroupDB(
-                              data.group_id,
-                              "GROUP_JOIN"
-                            )
+                            removeUserGroupDB(data.group_id, "GROUP_JOIN")
                           }
                         />
                       </li>
@@ -505,9 +663,9 @@ const User = (props) => {
                 追蹤中 :
               </b>
               <ul>
-                {userData.group_like != undefined ||
-                userData.group_like != null ? (
-                  userData.group_like.map((likeId, index) => {
+                {props.userData.group_like != undefined ||
+                props.userData.group_like != null ? (
+                  props.userData.group_like.map((likeId, index) => {
                     let data = props.dbFriendsGroupData.find(
                       (group) => group.group_id == likeId
                     );
@@ -527,10 +685,7 @@ const User = (props) => {
                         <DeleteForeverIcon
                           style={{ verticalAlign: "middle" }}
                           onClick={() =>
-                            props.removeUserGroupDB(
-                              data.group_id,
-                              "GROUP_LIKE"
-                            )
+                            removeUserGroupDB(data.group_id, "GROUP_LIKE")
                           }
                         />
                       </li>

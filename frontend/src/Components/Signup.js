@@ -146,6 +146,7 @@ const Signup = () => {
   };
 
   return (
+    <div className="user_conatainer">
     <Container component="main" maxWidth="xs">
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
@@ -271,6 +272,7 @@ const Signup = () => {
         <Route exact path={"/login/"} component={Login} />
       </Switch>
     </Container>
+    </div>
   );
 };
 
