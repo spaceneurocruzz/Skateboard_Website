@@ -144,18 +144,33 @@ const User = (props) => {
   };
   const [userData, setUserdata] = useState([]);
 
-  useEffect(() => {
-    getUserApi(state.username)
-      .then((res) => {
-        props.initUserDB(res.data);
-        //setUserdata(res.data);
-        //console.table(dbData);
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-  }, [props.userData]);
+  if (state.username == null) {
+    useEffect(() => {
+      getUserApi(localUsername)
+        .then((res) => {
+          props.initUserDB(res.data);
+          //setUserdata(res.data);
+          //console.table(dbData);
+        })
+        .catch((error) => {
+          console.error(error.response);
+        })
+        .finally(() => {});
+    }, [props.userData]);
+  } else {
+    useEffect(() => {
+      getUserApi(state.username)
+        .then((res) => {
+          props.initUserDB(res.data);
+          //setUserdata(res.data);
+          //console.table(dbData);
+        })
+        .catch((error) => {
+          console.error(error.response);
+        })
+        .finally(() => {});
+    }, [props.userData]);
+  }
 
   const [dbGuideMapData, setDbGuideMapData] = useState([]);
   const [isGuidemapLoaded, setIsGuidemapLoaded] = useState(false);
@@ -570,9 +585,11 @@ const User = (props) => {
                   {holdEvent != undefined || holdEvent != null ? (
                     holdEvent.map((data, index) => {
                       return (
-                        <li style={{ listStyleType: "decimal" }}>
+                        <li
+                          style={{ listStyleType: "decimal" }}
+                        >
                           {data.group_startdt.slice(0, 10)}{" "}
-                          {data.group_startdt.slice(11, 20)} 在{" "}
+                          {data.group_startdt.slice(11, 19)} 在{" "}
                           {data.location_name}
                           (ID:{" "}
                           <NavLink
@@ -581,7 +598,7 @@ const User = (props) => {
                           >
                             {data.group_id}
                           </NavLink>
-                          )
+                          )<span>[參加人數: {data.join_user.length}]</span>
                         </li>
                       );
                     })
@@ -605,7 +622,7 @@ const User = (props) => {
                       return (
                         <li style={{ listStyleType: "decimal" }}>
                           {data.group_startdt.slice(0, 10)}{" "}
-                          {data.group_startdt.slice(11, 20)} 在{" "}
+                          {data.group_startdt.slice(11, 19)} 在{" "}
                           {data.location_name}
                           (ID:{" "}
                           <NavLink
@@ -644,7 +661,7 @@ const User = (props) => {
                       return (
                         <li style={{ listStyleType: "decimal" }}>
                           {data.group_startdt.slice(0, 10)}{" "}
-                          {data.group_startdt.slice(11, 20)} 在{" "}
+                          {data.group_startdt.slice(11, 19)} 在{" "}
                           {data.location_name}
                           (ID:{" "}
                           <NavLink

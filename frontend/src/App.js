@@ -416,6 +416,7 @@ const App = () => {
       .then(() => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        localStorage.removeItem("username");
         axiosInstance.defaults.headers["Authorization"] = null;
       })
       .then(() => {

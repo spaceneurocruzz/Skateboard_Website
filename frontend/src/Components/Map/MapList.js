@@ -4,6 +4,7 @@ import {
   postGuideMapCommentsApi,
   patchUserApi,
   patchGuidemapApi,
+  getGuidemapApi
 } from "../../axiosApi";
 import { AuthContext } from "../../App";
 import ShowAlertMessages from "../ShowAlertMessages";
@@ -467,6 +468,23 @@ const MapList = (props) => {
     { key: 2, label: "全部" },
   ];
 
+  const [dbGuideMapData, setDbGuideMapData] = useState([]);
+  const [isGuidemapLoaded, setIsGuidemapLoaded] = useState(false);
+
+  useEffect(() => {
+    getGuidemapApi()
+      .then((res) => {
+        setDbGuideMapData(res.data);
+      })
+      .then((res) => {
+        setIsGuidemapLoaded(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, [props.dbGuideMapData]);
+
   const [openShowAlert, setOpenShowAlert] = React.useState(false);
 
   const handleShowAlertOpen = () => {
@@ -627,153 +645,159 @@ const MapList = (props) => {
   //     </div>
   //   );
   // };
+  if (!isGuidemapLoaded) {
+    return <div>Loading...</div>;
+  } else {
+    return (
+      <>
+        <ShowAlertMessages
+          open={openShowAlert}
+          onClose={handleShowAlertClose}
+        />
+        <ShowAlertErrorMessages
+          open={openShowErrorAlert}
+          onClose={handleShowErrorAlertClose}
+        />
 
-  return (
-    <>
-      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages
-        open={openShowErrorAlert}
-        onClose={handleShowErrorAlertClose}
-      />
+        <ShowCommentsDialog
+          open={openShowComments}
+          onClose={handleShowCommentsClose}
+          locationId={openShowCommentsMapId}
+          commentData={commentData}
+        />
+        <WriteCommentsDialog
+          open={openWriteComments}
+          onClose={handleWriteCommentsClose}
+          locationId={openWriteCommentsMapId}
+          username={state.username}
+          commentData={commentData}
+          updateComments={updateComments}
+          countCommentRating={countCommentRating}
+          handleShowAlertOpen={handleShowAlertOpen}
+        />
 
-      <ShowCommentsDialog
-        open={openShowComments}
-        onClose={handleShowCommentsClose}
-        locationId={openShowCommentsMapId}
-        commentData={commentData}
-      />
-      <WriteCommentsDialog
-        open={openWriteComments}
-        onClose={handleWriteCommentsClose}
-        locationId={openWriteCommentsMapId}
-        username={state.username}
-        commentData={commentData}
-        updateComments={updateComments}
-        countCommentRating={countCommentRating}
-        handleShowAlertOpen={handleShowAlertOpen}
-      />
-
-      <Container component="main" maxWidth="lg">
-        <div className={classes.root}>
-          <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
-            <MaterialTable
-              title={"場地或店家列表"}
-              columns={[
-                {
-                  title: "類型",
-                  field: "location_type",
-                  lookup: { 場地: "場地", 店家: "店家" },
-                  width: 100,
-                },
-                { title: "場地名稱", field: "location_name", width: 225 },
-                { title: "地址", field: "address" },
-                {
-                  title: "綜合評分",
-                  field: "rating",
-                  width: 220,
-                  render: (rowData) => {
-                    return (
-                      <Rating
-                        name="hover-feedback"
-                        value={rowData.rating}
-                        readOnly
-                      />
-                    );
+        <Container component="main" maxWidth="lg">
+          <div className={classes.root}>
+            <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
+              <MaterialTable
+                title={"場地或店家列表"}
+                columns={[
+                  {
+                    title: "類型",
+                    field: "location_type",
+                    lookup: { 場地: "場地", 店家: "店家" },
+                    width: 100,
                   },
-                },
-              ]}
-              data={props.dbGuideMapData}
-              actions={[
-                (rowData) => ({
-                  icon: () => <CommentIcon />,
-                  tooltip: "查看評論",
-                  onClick: (event, rowData) =>
-                    handleShowCommentsOpen(event, rowData.location_id),
-                }),
-                (rowData) => ({
-                  icon: () => <RateReviewIcon />,
-                  tooltip: "發表評論",
-                  onClick: (event, rowData) => {
-                    handleWriteCommentsOpen(event, rowData.location_id);
+                  { title: "場地名稱", field: "location_name", width: 225 },
+                  { title: "地址", field: "address" },
+                  {
+                    title: "綜合評分",
+                    field: "rating",
+                    width: 220,
+                    render: (rowData) => {
+                      return (
+                        <Rating
+                          name="hover-feedback"
+                          value={rowData.rating}
+                          readOnly
+                        />
+                      );
+                    },
                   },
-                  disabled: !state.isAuthenticated,
-                }),
-                (rowData) => ({
-                  icon: () => <FavoriteBorderIcon />,
-                  tooltip: "加入最愛",
-                  onClick: (event, rowData) => {
-                    likeMap(event, rowData.location_id);
+                ]}
+                data={props.dbGuideMapData}
+                actions={[
+                  (rowData) => ({
+                    icon: () => <CommentIcon />,
+                    tooltip: "查看評論",
+                    onClick: (event, rowData) =>
+                      handleShowCommentsOpen(event, rowData.location_id),
+                  }),
+                  (rowData) => ({
+                    icon: () => <RateReviewIcon />,
+                    tooltip: "發表評論",
+                    onClick: (event, rowData) => {
+                      handleWriteCommentsOpen(event, rowData.location_id);
+                    },
+                    disabled: !state.isAuthenticated,
+                  }),
+                  (rowData) => ({
+                    icon: () => <FavoriteBorderIcon />,
+                    tooltip: "加入最愛",
+                    onClick: (event, rowData) => {
+                      likeMap(event, rowData.location_id);
+                    },
+                    disabled:
+                      !state.isAuthenticated ||
+                      (rowData.like_user != undefined
+                        ? rowData.like_user.includes(state.username)
+                        : false),
+                  }),
+                ]}
+                options={{
+                  filtering: true,
+                  headerStyle: {
+                    backgroundColor: "#015da5",
+                    color: "#FFF",
+                    fontSize: 16,
                   },
-                  disabled:
-                    !state.isAuthenticated ||
-                    (rowData.like_user != undefined
-                      ? rowData.like_user.includes(state.username)
-                      : false),
-                }),
-              ]}
-              options={{
-                filtering: true,
-                headerStyle: {
-                  backgroundColor: "#015da5",
-                  color: "#FFF",
-                  fontSize: 16,
-                },
-                actionsColumnIndex: -1,
-              }}
-              localization={{
-                header: {
-                  actions: "評論/加入最愛",
-                },
-              }}
-              detailPanel={(rowData) => {
-                return (
-                  <Grid
-                    container
-                    // spacing={1}
-                    style={{ backgroundColor: "#e8f8fb" }}
-                  >
-                    <Grid item xs={12} sm={1}></Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Box p={1}>{<ScheduleIcon />}開放時間</Box>
-                      <Box p={1}>
-                        <ListItemText
-                          primary={`平日: ${rowData.openhours["weekdayTimeStart"]}- ${rowData.openhours["weekdayTimeEnd"]}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                        <ListItemText
-                          primary={`假日與例假日: ${rowData.openhours["weekendTimeStart"]}- ${rowData.openhours["weekendTimeEnd"]}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </Box>
+                  actionsColumnIndex: -1,
+                }}
+                localization={{
+                  header: {
+                    actions: "評論/加入最愛",
+                  },
+                }}
+                detailPanel={(rowData) => {
+                  return (
+                    <Grid
+                      container
+                      // spacing={1}
+                      style={{ backgroundColor: "#e8f8fb" }}
+                    >
+                      <Grid item xs={12} sm={1}></Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Box p={1}>{<ScheduleIcon />}開放時間</Box>
+                        <Box p={1}>
+                          <ListItemText
+                            primary={`平日: ${rowData.openhours["weekdayTimeStart"]}- ${rowData.openhours["weekdayTimeEnd"]}`}
+                            classes={{ primary: classes.listItemText }}
+                          />
+                          <ListItemText
+                            primary={`假日與例假日: ${rowData.openhours["weekendTimeStart"]}- ${rowData.openhours["weekendTimeEnd"]}`}
+                            classes={{ primary: classes.listItemText }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={3}>
+                        <Box p={1}>{<CommuteIcon />}建議交通方式</Box>
+                        <Box p={1}>
+                          <ListItemText
+                            primary={`${rowData.traffic}`}
+                            classes={{ primary: classes.listItemText }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Box p={1}>{<InfoIcon />}場地介紹</Box>
+                        <Box p={1}>
+                          <ListItemText
+                            primary={`${rowData.intro}`}
+                            classes={{ primary: classes.listItemText }}
+                          />
+                        </Box>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={3}>
-                      <Box p={1}>{<CommuteIcon />}建議交通方式</Box>
-                      <Box p={1}>
-                        <ListItemText
-                          primary={`${rowData.traffic}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Box p={1}>{<InfoIcon />}場地介紹</Box>
-                      <Box p={1}>
-                        <ListItemText
-                          primary={`${rowData.intro}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </Box>
-                    </Grid>
-                  </Grid>
-                );
-              }}
-              onRowClick={(event, rowData, togglePanel) => togglePanel()}
-            />
+                  );
+                }}
+                onRowClick={(event, rowData, togglePanel) => togglePanel()}
+              />
+            </div>
           </div>
-        </div>
-      </Container>
-    </>
-  );
+        </Container>
+      </>
+    );
+  }
 };
 
 export default MapList;
