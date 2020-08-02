@@ -27,9 +27,6 @@ import axiosInstance, {
 } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import MapIcon from "@material-ui/icons/Map";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
@@ -247,9 +244,21 @@ const App = () => {
 
   const [userData, setUserdata] = useState(initUserData);
 
+  useEffect(() => {
+    getUserApi(state.username)
+      .then((res) => {
+        initUserDB(res.data);
+        //setUserdata(res.data);
+        //console.table(dbData);
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  }, []);
+
   const initUserDB = (newData) => {
     setUserdata(newData);
-    console.log(newData);
   };
 
   const updateUserDB = (eventTarget) => {
@@ -257,33 +266,6 @@ const App = () => {
       ...userData,
       [eventTarget.name]: eventTarget.value,
     });
-  };
-
-  const getMapDBByLocationId = (locationId) => {
-    if (dbGuideMapData != undefined) {
-      return dbGuideMapData.find((data) => data.location_id === locationId);
-    } else {
-      return null;
-    }
-  };
-
-  const updateMapDBByLocationId = (locationId, newData, type) => {
-    let index = dbGuideMapData.findIndex(
-      (data) => data.location_id === locationId
-    );
-
-    switch (type) {
-      case "RATING":
-        dbGuideMapData[index].rating = newData;
-        break;
-      case "LIKE":
-        dbGuideMapData[index].like_user = newData;
-        break;
-      default:
-        console.log("none");
-    }
-
-    updateGuideMapDB(...props.dbGuideMapData);
   };
 
   const removeUserMapDB = (removeValue, column) => {
@@ -427,12 +409,6 @@ const App = () => {
     setDbFriendsGroupData([...dbFriendsGroupData, newData]);
   };
 
-  const [dbGuideMapData, setDbGuideMapData] = useState([]);
-
-  const updateGuideMapDB = (newData) => {
-    setDbGuideMapData([...dbGuideMapData, newData]);
-  };
-
   const handleLogout = () => {
     logoutApi({
       refresh_token: localStorage.getItem("refresh_token"),
@@ -470,17 +446,6 @@ const App = () => {
         },
       });
     }
-  }, []);
-
-  useEffect(() => {
-    getGuidemapApi()
-      .then((res) => {
-        setDbGuideMapData(...dbGuideMapData, res.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {});
   }, []);
 
   useEffect(() => {
@@ -618,8 +583,6 @@ const App = () => {
             <Guidemap
               userData={userData}
               updateUserDB={updateUserDB}
-              dbGuideMapData={dbGuideMapData}
-              updateGuideMapDB={updateGuideMapDB}
               dbFriendsGroupData={dbFriendsGroupData}
               updateGroupUserDB={updateGroupUserDB}
               //removeUserDB={removeUserDB}
@@ -665,7 +628,6 @@ const App = () => {
               updateUserDB={updateUserDB}
               initUserDB={initUserDB}
               dbFriendsGroupData={dbFriendsGroupData}
-              dbGuideMapData={dbGuideMapData}
               removeUserMapDB={removeUserMapDB}
               removeUserGroupDB={removeUserGroupDB}
               updateGroupUserDB={updateGroupUserDB}

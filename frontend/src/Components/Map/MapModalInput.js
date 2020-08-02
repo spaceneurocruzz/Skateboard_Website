@@ -208,7 +208,7 @@ const MapModalInput = (props) => {
       .then(() => {
         postGuidemapApi(dbPost)
           .then((res) => {
-            props.updateDB(dbPost);
+            props.updateGuideMapDB(dbPost);
             handleShowAlertOpen();
             handleClose();
           })

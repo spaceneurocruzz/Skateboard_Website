@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { patchUserApi, getUserApi } from "../axiosApi";
+import { patchUserApi, getGuidemapApi } from "../axiosApi";
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import { AuthContext } from "../App";
 import ShowAlertMessages from "../Components/ShowAlertMessages"
@@ -125,9 +125,26 @@ const Guidemap = (props) => {
     // }
   }, []);
 
+  const [dbGuideMapData, setDbGuideMapData] = useState([]);
+
+  useEffect(() => {
+    getGuidemapApi()
+      .then((res) => {
+        setDbGuideMapData(...dbGuideMapData, res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
+
+  const updateGuideMapDB = (newData) => {
+    setDbGuideMapData([...dbGuideMapData, newData]);
+  };
+
   const getMapDBByLocationId = (locationId) => {
-    if (props.dbGuideMapData != undefined) {
-      return props.dbGuideMapData.find(
+    if (dbGuideMapData != undefined) {
+      return dbGuideMapData.find(
         (data) => data.location_id === locationId
       );
     } else {
@@ -136,22 +153,22 @@ const Guidemap = (props) => {
   };
 
   const updateMapDBByLocationId = (locationId, newData, type) => {
-    let index = props.dbGuideMapData.findIndex(
+    let index = dbGuideMapData.findIndex(
       (data) => data.location_id === locationId
     );
 
     switch (type) {
       case "RATING":
-        props.dbGuideMapData[index].rating = newData;
+        dbGuideMapData[index].rating = newData;
         break;
       case "LIKE":
-        props.dbGuideMapData[index].like_user = newData;
+        dbGuideMapData[index].like_user = newData;
         break;
       default:
         console.log("none");
     }
 
-    props.updateGuideMapDB(...props.dbGuideMapData);
+    setDbGuideMapData(dbGuideMapData);
   };
 
   const handleDelete = (chipToDelete) => () => {
@@ -250,8 +267,7 @@ const Guidemap = (props) => {
         <Grid container id="back-to-top-anchor">
           <div className={classes.flexContainer}>
             <MapModalInput
-              updateDB={props.updateGuideMapDB}
-              formerDbData={props.dbGuideMapData}
+              updateGuideMapDB={updateGuideMapDB}
               userData={props.userData}
             />
             {/* <LocationFilter /> */}
@@ -288,7 +304,7 @@ const Guidemap = (props) => {
             onClick={onMapClicked}
             zoom={13}
           >
-            {props.dbGuideMapData.map((data, index) =>
+            {dbGuideMapData.map((data, index) =>
               data.location_type === "場地" ? (
                 <Marker
                   icon={{
@@ -385,8 +401,8 @@ const Guidemap = (props) => {
       <Container component="main" maxWidth="lg">
         <Grid container>
           <MapList
-            dbGuideMapData={props.dbGuideMapData}
-            updateGuideMapDB={props.updateGuideMapDB}
+            dbGuideMapData={dbGuideMapData}
+            updateGuideMapDB={updateGuideMapDB}
             userData={props.userData}
             updateGroupUserDB={props.updateGroupUserDB}
             getMapDBByLocationId={getMapDBByLocationId}

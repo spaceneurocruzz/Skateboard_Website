@@ -7,6 +7,7 @@ import {
   getGuidemapApi,
   getFriendsGroupApi,
   patchFriendsGroupApi,
+  patchGuidemapApi,
 } from "../axiosApi";
 import { AuthContext } from "../App";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
@@ -89,76 +90,10 @@ const User = (props) => {
     selectedFile: null,
     imageUploaded: 0,
   });
-  const [dbGuideMapData, setDbGuideMapData] = useState([]);
-  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
 
   const accessToken = localStorage.getItem("access_token");
   const refreshToken = localStorage.getItem("refresh_token");
   const localUsername = localStorage.getItem("username");
-
-  // if (accessToken && refreshToken) {
-  //   dispatch({
-  //     type: "LOGIN",
-  //     payload: {
-  //       access: accessToken,
-  //       refresh: refreshToken,
-  //       username: localUsername,
-  //     },
-  //   });
-  // }
-
-  // useEffect(() => {
-  //   getUserApi(localUsername)
-  //     .then((res) => {
-  //       console.table(res.data);
-  //       props.initUserDB(res.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error.response);
-  //     })
-  //     .finally(() => {});
-  // }, []);
-
-  // useEffect(() => {
-  //   getGuidemapApi()
-  //     .then((res) => {
-  //       setDbGuideMapData(...dbGuideMapData, res.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     })
-  //     .finally(() => {});
-  // }, []);
-
-  // useEffect(() => {
-  //   getFriendsGroupApi()
-  //     .then((res) => {
-  //       for (let ix in res.data) {
-  //         res.data[ix]["group_startdt"] = `${res.data[ix].group_startdt.slice(
-  //           0,
-  //           10
-  //         )}  ${res.data[ix].group_startdt.slice(11, 19)}`;
-  //       }
-
-  //       setDbFriendsGroupData(...dbFriendsGroupData, res.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error.response);
-  //     })
-  //     .finally(() => {});
-  // }, []);
-
-  let holdEvent = [];
-  if (props.dbFriendsGroupData != undefined) {
-    holdEvent = props.dbFriendsGroupData.filter(
-      (group) => group.create_user == state.username
-    );
-  } else if (dbFriendsGroupData != undefined) {
-    holdEvent = dbFriendsGroupData.filter(
-      (group) => group.create_user == state.username
-    );
-    console.log(state.username);
-  }
 
   const [openMap, setOpenMap] = React.useState(false);
   const [openActivity, setOpenActivity] = React.useState(false);
@@ -212,7 +147,6 @@ const User = (props) => {
   useEffect(() => {
     getUserApi(state.username)
       .then((res) => {
-        console.table(res.data);
         props.initUserDB(res.data);
         //setUserdata(res.data);
         //console.table(dbData);
@@ -221,35 +155,74 @@ const User = (props) => {
         console.error(error.response);
       })
       .finally(() => {});
-  }, []);
+  }, [props.userData]);
+
+  const [dbGuideMapData, setDbGuideMapData] = useState([]);
+  const [isGuidemapLoaded, setIsGuidemapLoaded] = useState(false);
+
+  useEffect(() => {
+    getGuidemapApi()
+      .then((res) => {
+        setDbGuideMapData(res.data);
+      })
+      .then((res) => {
+        setIsGuidemapLoaded(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, [props.userData]);
+
+  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
+  const [isFriendsLoaded, setIsFriendsLoaded] = useState(false);
+
+  useEffect(() => {
+    getFriendsGroupApi()
+      .then((res) => {
+        setDbFriendsGroupData(res.data);
+      })
+      .then((res) => {
+        setIsFriendsLoaded(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, [props.userData]);
+
+  let holdEvent = [];
+  if (dbFriendsGroupData != undefined) {
+    holdEvent = dbFriendsGroupData.filter(
+      (group) => group.create_user == state.username
+    );
+  }
 
   const getMapDBByLocationId = (locationId) => {
-    if (props.dbGuideMapData != undefined) {
-      return props.dbGuideMapData.find(
-        (data) => data.location_id === locationId
-      );
+    if (dbGuideMapData != undefined) {
+      return dbGuideMapData.find((data) => data.location_id === locationId);
     } else {
       return null;
     }
   };
 
   const updateMapDBByLocationId = (locationId, newData, type) => {
-    let index = props.dbGuideMapData.findIndex(
+    let index = dbGuideMapData.findIndex(
       (data) => data.location_id === locationId
     );
 
     switch (type) {
       case "RATING":
-        props.dbGuideMapData[index].rating = newData;
+        dbGuideMapData[index].rating = newData;
         break;
       case "LIKE":
-        props.dbGuideMapData[index].like_user = newData;
+        dbGuideMapData[index].like_user = newData;
         break;
       default:
         console.log("none");
     }
 
-    updateGuideMapDB(...props.dbGuideMapData);
+    setDbGuideMapData(dbGuideMapData);
   };
 
   const removeUserMapDB = (removeValue, column) => {
@@ -294,29 +267,29 @@ const User = (props) => {
   };
 
   const getFriendsGroupDBById = (groupId) => {
-    if (props.dbFriendsGroupData != undefined) {
-      return props.dbFriendsGroupData.find((data) => data.group_id === groupId);
+    if (dbFriendsGroupData != undefined) {
+      return dbFriendsGroupData.find((data) => data.group_id === groupId);
     } else {
       return null;
     }
   };
 
   const updateFriendsGroupDBById = (group_id, newData, type) => {
-    let index = props.dbFriendsGroupData.findIndex(
+    let index = dbFriendsGroupData.findIndex(
       (data) => data.group_id === group_id
     );
 
     switch (type) {
       case "JOIN":
-        props.dbFriendsGroupData[index].join_user = newData;
+        dbFriendsGroupData[index].join_user = newData;
         break;
       case "LIKE":
-        props.dbFriendsGroupData[index].possible_user = newData;
+        dbFriendsGroupData[index].possible_user = newData;
         break;
       default:
         console.log("none");
     }
-    updateFriendsGroupDB([...props.dbFriendsGroupData]);
+    setDbFriendsGroupData(dbFriendsGroupData);
   };
 
   const removeUserGroupDB = (removeValue, column) => {
@@ -475,233 +448,232 @@ const User = (props) => {
   }
 
   const TabInfo = () => {
-    return (
-      <Grid
-        container
-        style={{
-          width: "90%",
-          marginBottom: 50,
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <div className={classes.tabroot} style={{ display: "flex" }}>
-          {/* <AppBar position="static"> */}
-          <Tabs
-            orientation="vertical"
-            variant="scrollable"
-            value={value}
-            onChange={handleChange}
-            aria-label="Vertical tabs example"
-            className={classes.tabs}
-          >
-            <Tab label="地圖" {...a11yProps(0)} className={classes.tab} />
-            <Tab label="揪團" {...a11yProps(1)} className={classes.tab} />
-            <Tab
-              label="修改個人資料"
-              {...a11yProps(2)}
-              className={classes.tab}
-            />
-          </Tabs>
-          {/* </AppBar> */}
-          <TabPanel value={value} index={0}>
-            <Grid container>
-              <EditLocationIcon />
-              <b>
-                <div style={{ marginBottom: 10 }}>新增地點 :</div>
-              </b>
-              <ul>
-                {props.userData.map_add != undefined ||
-                props.userData.map_add != null ? (
-                  props.userData.map_add.map((addId, index) => {
-                    let data = null;
-                    if (
-                      props.dbGuideMapData != undefined ||
-                      props.dbGuideMapData != null
-                    ) {
-                      data = props.dbGuideMapData.find(
-                        (map) => map.location_id == addId
-                      );
-                    } else if (dbGuideMapData != undefined) {
-                      data = dbGuideMapData.find(
-                        (map) => map.location_id == addId
-                      );
-                    }
-                    return (
-                      <li style={{ listStyleType: "decimal" }}>
-                        {data.location_type} {data.location_name}:{" "}
-                        {data.address}
-                      </li>
-                    );
-                  })
-                ) : (
-                  <span>還沒有</span>
-                )}
-              </ul>
-            </Grid>
-            <Grid container>
-              <b>
-                <FavoriteIcon />
-                <span>最愛地點 :</span>
-              </b>
-              <ul>
-                {props.userData.map_like != undefined ||
-                props.userData.map_like != null ? (
-                  props.userData.map_like.map((likeId, index) => {
-                    let data = [];
-                    if (
-                      props.dbGuideMapData != undefined ||
-                      props.dbGuideMapData != null
-                    ) {
-                      data = props.dbGuideMapData.find(
-                        (map) => map.location_id == likeId
-                      );
-                    } else if (dbGuideMapData != undefined) {
-                      data = dbGuideMapData.find(
-                        (map) => map.location_id == likeId
-                      );
-                    }
-                    return (
-                      <li style={{ listStyleType: "decimal" }}>
-                        {data.location_type} {data.location_name}:{" "}
-                        <a
-                          href={
-                            "https://www.google.com/maps/dir/?api=1&destination=" +
-                            data.address
-                          }
-                          className="addressLink"
-                        >
+    if (!isGuidemapLoaded || !isFriendsLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return (
+        <Grid
+          container
+          style={{
+            width: "90%",
+            marginBottom: 50,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          <div className={classes.tabroot} style={{ display: "flex" }}>
+            {/* <AppBar position="static"> */}
+            <Tabs
+              orientation="vertical"
+              variant="scrollable"
+              value={value}
+              onChange={handleChange}
+              aria-label="Vertical tabs example"
+              className={classes.tabs}
+            >
+              <Tab label="地圖" {...a11yProps(0)} className={classes.tab} />
+              <Tab label="揪團" {...a11yProps(1)} className={classes.tab} />
+              <Tab
+                label="修改個人資料"
+                {...a11yProps(2)}
+                className={classes.tab}
+              />
+            </Tabs>
+            {/* </AppBar> */}
+            <TabPanel value={value} index={0}>
+              <Grid container>
+                <EditLocationIcon />
+                <b>
+                  <div style={{ marginBottom: 10 }}>新增地點 :</div>
+                </b>
+                <ul>
+                  {props.userData.map_add != undefined ||
+                  props.userData.map_add != null ? (
+                    props.userData.map_add.map((addId, index) => {
+                      let data = null;
+                      if (
+                        dbGuideMapData != undefined ||
+                        dbGuideMapData != null
+                      ) {
+                        data = dbGuideMapData.find(
+                          (map) => map.location_id == addId
+                        );
+                      } else if (dbGuideMapData != undefined) {
+                        data = dbGuideMapData.find(
+                          (map) => map.location_id == addId
+                        );
+                      }
+                      return (
+                        <li style={{ listStyleType: "decimal" }}>
+                          {data.location_type} {data.location_name}:{" "}
                           {data.address}
-                        </a>
-                        <DeleteForeverIcon
-                          style={{ verticalAlign: "middle" }}
-                          onClick={() =>
-                            removeUserMapDB(data.location_id, "MAP_LIKE")
-                          }
-                        />
-                      </li>
-                    );
-                  })
-                ) : (
-                  <span>還沒有</span>
-                )}
-              </ul>
-            </Grid>
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <Grid container>
-              <b>
-                <EmojiEventsIcon />
-                舉辦中 :
-              </b>
-              <ul>
-                {holdEvent != undefined || holdEvent != null ? (
-                  holdEvent.map((data, index) => {
-                    return (
-                      <li style={{ listStyleType: "decimal" }}>
-                        {data.group_startdt.slice(0, 10)}{" "}
-                        {data.group_startdt.slice(11, 20)} 在{" "}
-                        {data.location_name}
-                        (ID:{" "}
-                        <NavLink
-                          to={"/friendsGroupDetail/" + data.group_id}
-                          className="userLink"
-                        >
-                          {data.group_id}
-                        </NavLink>
-                        )
-                      </li>
-                    );
-                  })
-                ) : (
-                  <span>還沒有</span>
-                )}
-              </ul>
-            </Grid>
-            <Grid container>
-              <b>
-                <EventAvailableIcon />
-                參加中 :
-              </b>
-              <ul>
-                {props.userData.group_join != undefined ||
-                props.userData.group_join != null ? (
-                  props.userData.group_join.map((joinId, index) => {
-                    let data = props.dbFriendsGroupData.find(
-                      (group) => group.group_id == joinId
-                    );
-                    return (
-                      <li style={{ listStyleType: "decimal" }}>
-                        {data.group_startdt.slice(0, 10)}{" "}
-                        {data.group_startdt.slice(11, 20)} 在{" "}
-                        {data.location_name}
-                        (ID:{" "}
-                        <NavLink
-                          to={"/friendsGroupDetail/" + data.group_id}
-                          className="userLink"
-                        >
-                          {data.group_id}
-                        </NavLink>
-                        )
-                        <DeleteForeverIcon
-                          style={{ verticalAlign: "middle" }}
-                          onClick={() =>
-                            removeUserGroupDB(data.group_id, "GROUP_JOIN")
-                          }
-                        />
-                      </li>
-                    );
-                  })
-                ) : (
-                  <span>還沒有</span>
-                )}
-              </ul>
-            </Grid>
-            <Grid container>
-              <b>
-                <TrackChangesIcon />
-                追蹤中 :
-              </b>
-              <ul>
-                {props.userData.group_like != undefined ||
-                props.userData.group_like != null ? (
-                  props.userData.group_like.map((likeId, index) => {
-                    let data = props.dbFriendsGroupData.find(
-                      (group) => group.group_id == likeId
-                    );
-                    return (
-                      <li style={{ listStyleType: "decimal" }}>
-                        {data.group_startdt.slice(0, 10)}{" "}
-                        {data.group_startdt.slice(11, 20)} 在{" "}
-                        {data.location_name}
-                        (ID:{" "}
-                        <NavLink
-                          to={"/friendsGroupDetail/" + data.group_id}
-                          className="userLink"
-                        >
-                          {data.group_id}
-                        </NavLink>
-                        )
-                        <DeleteForeverIcon
-                          style={{ verticalAlign: "middle" }}
-                          onClick={() =>
-                            removeUserGroupDB(data.group_id, "GROUP_LIKE")
-                          }
-                        />
-                      </li>
-                    );
-                  })
-                ) : (
-                  <span>還沒有</span>
-                )}
-              </ul>
-            </Grid>
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            <EditProfile />
-          </TabPanel>
-        </div>
-        {/* <div style={{marginLeft:40}}>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <span>還沒有</span>
+                  )}
+                </ul>
+              </Grid>
+              <Grid container>
+                <b>
+                  <FavoriteIcon />
+                  <span>最愛地點 :</span>
+                </b>
+                <ul>
+                  {props.userData.map_like != undefined ||
+                  props.userData.map_like != null ? (
+                    props.userData.map_like.map((likeId, index) => {
+                      let data = [];
+                      if (
+                        dbGuideMapData != undefined ||
+                        dbGuideMapData != null
+                      ) {
+                        data = dbGuideMapData.find(
+                          (map) => map.location_id == likeId
+                        );
+                      }
+                      return (
+                        <li style={{ listStyleType: "decimal" }}>
+                          {data.location_type} {data.location_name}:{" "}
+                          <a
+                            href={
+                              "https://www.google.com/maps/dir/?api=1&destination=" +
+                              data.address
+                            }
+                            className="addressLink"
+                          >
+                            {data.address}
+                          </a>
+                          <DeleteForeverIcon
+                            style={{ verticalAlign: "middle" }}
+                            onClick={() =>
+                              removeUserMapDB(data.location_id, "MAP_LIKE")
+                            }
+                          />
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <span>還沒有</span>
+                  )}
+                </ul>
+              </Grid>
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+              <Grid container>
+                <b>
+                  <EmojiEventsIcon />
+                  舉辦中 :
+                </b>
+                <ul>
+                  {holdEvent != undefined || holdEvent != null ? (
+                    holdEvent.map((data, index) => {
+                      return (
+                        <li style={{ listStyleType: "decimal" }}>
+                          {data.group_startdt.slice(0, 10)}{" "}
+                          {data.group_startdt.slice(11, 20)} 在{" "}
+                          {data.location_name}
+                          (ID:{" "}
+                          <NavLink
+                            to={"/friendsGroupDetail/" + data.group_id}
+                            className="userLink"
+                          >
+                            {data.group_id}
+                          </NavLink>
+                          )
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <span>還沒有</span>
+                  )}
+                </ul>
+              </Grid>
+              <Grid container>
+                <b>
+                  <EventAvailableIcon />
+                  參加中 :
+                </b>
+                <ul>
+                  {props.userData.group_join != undefined ||
+                  props.userData.group_join != null ? (
+                    props.userData.group_join.map((joinId, index) => {
+                      let data = dbFriendsGroupData.find(
+                        (group) => group.group_id == joinId
+                      );
+                      return (
+                        <li style={{ listStyleType: "decimal" }}>
+                          {data.group_startdt.slice(0, 10)}{" "}
+                          {data.group_startdt.slice(11, 20)} 在{" "}
+                          {data.location_name}
+                          (ID:{" "}
+                          <NavLink
+                            to={"/friendsGroupDetail/" + data.group_id}
+                            className="userLink"
+                          >
+                            {data.group_id}
+                          </NavLink>
+                          )
+                          <DeleteForeverIcon
+                            style={{ verticalAlign: "middle" }}
+                            onClick={() =>
+                              removeUserGroupDB(data.group_id, "GROUP_JOIN")
+                            }
+                          />
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <span>還沒有</span>
+                  )}
+                </ul>
+              </Grid>
+              <Grid container>
+                <b>
+                  <TrackChangesIcon />
+                  追蹤中 :
+                </b>
+                <ul>
+                  {props.userData.group_like != undefined ||
+                  props.userData.group_like != null ? (
+                    props.userData.group_like.map((likeId, index) => {
+                      let data = dbFriendsGroupData.find(
+                        (group) => group.group_id == likeId
+                      );
+                      return (
+                        <li style={{ listStyleType: "decimal" }}>
+                          {data.group_startdt.slice(0, 10)}{" "}
+                          {data.group_startdt.slice(11, 20)} 在{" "}
+                          {data.location_name}
+                          (ID:{" "}
+                          <NavLink
+                            to={"/friendsGroupDetail/" + data.group_id}
+                            className="userLink"
+                          >
+                            {data.group_id}
+                          </NavLink>
+                          )
+                          <DeleteForeverIcon
+                            style={{ verticalAlign: "middle" }}
+                            onClick={() =>
+                              removeUserGroupDB(data.group_id, "GROUP_LIKE")
+                            }
+                          />
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <span>還沒有</span>
+                  )}
+                </ul>
+              </Grid>
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+              <EditProfile />
+            </TabPanel>
+          </div>
+          {/* <div style={{marginLeft:40}}>
           <img
             src={indexmanstand}
             style={{
@@ -712,8 +684,9 @@ const User = (props) => {
             alt="banner"
           />
         </div> */}
-      </Grid>
-    );
+        </Grid>
+      );
+    }
   };
 
   const EditProfile = () => {

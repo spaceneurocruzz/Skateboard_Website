@@ -70,7 +70,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FriendsGroupHistory = (props) => {
-  console.log(props);
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
   const [commentData, setCommentData] = useState([]);
