@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import "../css/app.css";
 import indexman from "../imgs/indexman.jpg";
 
-import { Link, NavLink } from "react-router-dom";
-
 const Home = () => {
   const [sbGo, setSbGo] = useState("");
 
@@ -44,22 +42,6 @@ const Home = () => {
       >
         {sbGo}
       </div>
-      {/* <div style={{ display: "flex" }}>
-        <NavLink to="/guidemap">
-          <div
-            className="circle"
-          >
-            滑板地圖
-          </div>
-        </NavLink>
-        <NavLink to="/guidemap">
-          <div
-            className="circle2"
-          >
-            揪團
-          </div>
-        </NavLink>
-      </div> */}
     </div>
   );
 };

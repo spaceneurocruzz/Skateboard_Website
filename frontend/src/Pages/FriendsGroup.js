@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import { AuthContext } from "../App";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import { Switch, Route, useHistory } from "react-router";
 import Container from "@material-ui/core/Container";
-import AddLocationIcon from "@material-ui/icons/AddLocation";
 
-import MaterialTable from "material-table";
 import FriendsGroupList from "../Components/FriendsGroup/FriendsGroupList";
-import FriendsGroupDetail from "../Pages/FriendsGroupDetail";
 import Fab from "@material-ui/core/Fab";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import FriendsGroupModalInput from "../Components/FriendsGroup/FriendsGroupModalInput";
-import { getFriendsGroupApi, getUserApi } from "../axiosApi";
-//import { Switch } from "@material-ui/core";
+import { getFriendsGroupApi } from "../axiosApi";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,16 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const FriendsGroup = (props) => {
-  const { state } = React.useContext(AuthContext);
   const classes = useStyles();
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token") || null;
-    const refreshToken = localStorage.getItem("refresh_token") || null;
-
-    if (accessToken && refreshToken) {
-    }
-  }, []);
 
   const getFriendsGroupDBById = (group_id) => {
     if (props.dbFriendsGroupData != undefined) {
@@ -78,27 +63,6 @@ const FriendsGroup = (props) => {
       })
       .finally(() => {});
   }, []);
-
-  // useEffect(()=>{
-  //   if(dbFriendsGroupData != undefined || dbFriendsGroupData !=null){
-  //     dbFriendsGroupData.map((data, index) => {
-  //       if(data["join_user"]!=undefined || data["join_user"]!=null||
-  //       data["possible_user"]!=undefined || data["possible_user"]!=null||
-  //       data["upper_limit"]!=undefined || data["upper_limit"]!=null)
-  //       {
-  //         data["join_count"] = data["join_user"].length;
-  //         console.log(data["upper_limit"])
-
-  //         if(data["upper_limit"] === 0){
-  //           data["remain_count"] = 999
-  //         }
-  //         else{
-  //           data["remain_count"] = data["upper_limit"] - data["join_user"].length;
-  //         }
-  //       }
-  //     });
-  //   }
-  // },[dbFriendsGroupData])
 
   if (
     props.dbFriendsGroupData != undefined ||
@@ -157,22 +121,24 @@ const FriendsGroup = (props) => {
         style={{ textAlign: "center" }}
         className="user_conatainer"
       >
-        
         <Grid container id="back-to-top-anchor">
           <FriendsGroupModalInput
             dbFriendsGroupData={props.dbFriendsGroupData}
           />
-        <Link to="/FriendsGroupHistory/" className="link">
-          <Button variant="contained" color="text.primary" className={classes.buttonAdd}>
-            歷史揪團
-          </Button>
-        </Link>
+          <Link to="/FriendsGroupHistory/" className="link">
+            <Button
+              variant="contained"
+              color="text.primary"
+              className={classes.buttonAdd}
+            >
+              歷史揪團
+            </Button>
+          </Link>
         </Grid>
         <Grid container>
           <FriendsGroupList
             dbFriendsGroupData={props.dbFriendsGroupData}
             updateFriendsGroupDB={props.updateFriendsGroupDB}
-            //updateFriendsGroupDBById={updateFriendsGroupDBById}
             getFriendsGroupDBById={getFriendsGroupDBById}
             userData={props.userData}
             updateUserDB={props.updateUserDB}

@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
-import {
-  getFriendsGroupCommentsApi,
-  getFriendsGroupApi,
-} from "../../axiosApi";
-import { AuthContext } from "../../App";
-import ShowAlertMessages from "../ShowAlertMessages";
-import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
-
-import { Link, NavLink } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-
 import Container from "@material-ui/core/Container";
-import MaterialTable from "material-table";
+import { makeStyles } from "@material-ui/core/styles";
 import ImportContactsIcon from "@material-ui/icons/ImportContacts";
+import MaterialTable from "material-table";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { getFriendsGroupApi, getFriendsGroupCommentsApi } from "../../axiosApi";
+
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,29 +27,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
   },
-  paper: {
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    paddingBottom: 20,
-  },
   button: {
     margin: 10,
     paddingTop: 20,
-  },
-  card: {
-    maxWidth: 345,
-  },
-  media: {
-    height: 0,
-    paddingTop: "56.25%",
-  },
-  chips: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  chip: {
-    margin: 2,
   },
   button: {
     margin: theme.spacing(1),
@@ -65,13 +39,11 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 20,
     marginTop: 50,
     textAlign: "left",
-    //background:'#f05a27'
   },
 }));
 
 const FriendsGroupHistory = (props) => {
   const classes = useStyles();
-  const { state } = React.useContext(AuthContext);
   const [commentData, setCommentData] = useState([]);
   const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
 

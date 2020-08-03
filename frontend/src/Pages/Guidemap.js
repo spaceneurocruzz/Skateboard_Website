@@ -2,39 +2,21 @@ import React, { useState, useEffect } from "react";
 import { patchUserApi, getGuidemapApi } from "../axiosApi";
 import { Map, GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import { AuthContext } from "../App";
-import ShowAlertMessages from "../Components/ShowAlertMessages"
 
-import Container from "@material-ui/core/Container";
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import TagFacesIcon from "@material-ui/icons/TagFaces";
-import Chip from "@material-ui/core/Chip";
-import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
-import Card from "@material-ui/core/Card";
-import Typography from "@material-ui/core/Typography";
 import MapModalInput from "../Components/Map/MapModalInput";
 import MapList from "../Components/Map/MapList";
 import shopMarker from "../imgs/shopping-bag.png";
 import skateboardMarker from "../imgs/skateboardMarker.png";
-import placelike from "../imgs/placelike.png";
-import placeunlike from "../imgs/placeunlike.png";
-import share from "../imgs/share.png";
 
-import CssBaseline from "@material-ui/core/CssBaseline";
-import useScrollTrigger from "@material-ui/core/useScrollTrigger";
-import Box from "@material-ui/core/Box";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import Card from "@material-ui/core/Card";
+import Typography from "@material-ui/core/Typography";
 import Fab from "@material-ui/core/Fab";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import Zoom from "@material-ui/core/Zoom";
-
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import ShareIcon from "@material-ui/icons/Share";
-
-import CircularProgress from "@material-ui/core/CircularProgress";
 
 React.useLayoutEffect = React.useEffect;
 
@@ -45,10 +27,8 @@ const useStyles = makeStyles((theme) => ({
     },
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
-      // width: "25ch",
     },
     display: "flex",
-    // justifyContent: 'center',
     flexWrap: "wrap",
     listStyle: "none",
     padding: theme.spacing(0.5),
@@ -66,26 +46,12 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
   },
-  inlineContainer: {
-    display: "inline",
-  },
-  paper: {
-    backgroundColor: theme.palette.background.paper,
-    border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
   button: {
-    // color: blue[900],
     margin: 10,
     paddingTop: 20,
   },
   card: {
     maxWidth: 345,
-  },
-  media: {
-    height: 0,
-    paddingTop: "56.25%",
   },
   cardContent: {
     padding: 10,
@@ -103,27 +69,6 @@ const useStyles = makeStyles((theme) => ({
 const Guidemap = (props) => {
   const { state } = React.useContext(AuthContext);
   const classes = useStyles();
-  const [marker, showMarker] = useState(false);
-  const [place, setPlace] = useState(0);
-  const [chipData, setChipData] = React.useState([
-    { key: 0, label: "滑板場" },
-    { key: 1, label: "店家" },
-  ]);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token") || null;
-    const refreshToken = localStorage.getItem("refresh_token") || null;
-
-    // if (accessToken && refreshToken) {
-    //   state={
-    //     isAuthenticated: true,
-    //     access: accessToken,
-    //     refresh: refreshToken,
-    //     username: null,
-    //   }
-    //   console.log(state)
-    // }
-  }, []);
 
   const [dbGuideMapData, setDbGuideMapData] = useState([]);
 
@@ -144,9 +89,7 @@ const Guidemap = (props) => {
 
   const getMapDBByLocationId = (locationId) => {
     if (dbGuideMapData != undefined) {
-      return dbGuideMapData.find(
-        (data) => data.location_id === locationId
-      );
+      return dbGuideMapData.find((data) => data.location_id === locationId);
     } else {
       return null;
     }
@@ -169,12 +112,6 @@ const Guidemap = (props) => {
     }
 
     setDbGuideMapData(dbGuideMapData);
-  };
-
-  const handleDelete = (chipToDelete) => () => {
-    setChipData((chips) =>
-      chips.filter((chip) => chip.key !== chipToDelete.key)
-    );
   };
 
   const countMap = (mapId) => {
@@ -234,33 +171,6 @@ const Guidemap = (props) => {
     );
   };
 
-  const addtoFavorite = (e, locationName) => {
-    e.preventDefault();
-    console.log("like")
-    let preLikeMapArr = props.userData.map_like;
-
-    if (preLikeMapArr == null) {
-      preLikeMapArr = [locationName];
-    } else {
-      preLikeMapArr.push(locationName);
-    }
-
-    let mapLike = {
-      map_like: preLikeMapArr,
-    };
-
-    patchUserApi(state.username, mapLike)
-      .then((res) => {
-        console.table(res.data);
-        props.updateGroupUserDB(mapLike);
-        alert("已加到最愛！");
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-  };
-
   return (
     <>
       <Container component="main" maxWidth="lg">
@@ -270,7 +180,6 @@ const Guidemap = (props) => {
               updateGuideMapDB={updateGuideMapDB}
               userData={props.userData}
             />
-            {/* <LocationFilter /> */}
             <h3 style={{ marginLeft: 30, marginBottom: 20, marginTop: 50 }}>
               <span style={{ verticalAlign: "middle" }}>場地</span>
               <img
@@ -363,7 +272,7 @@ const Guidemap = (props) => {
                     </Typography>
                   </CardContent>
                   <CardActions disableSpacing className={classes.cardAction}>
-                      {/* <img
+                    {/* <img
                         src={placeunlike}
                         alt="placeunlike"
                         style={{ height: 32, zIndex: 500 }}

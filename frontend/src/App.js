@@ -22,7 +22,6 @@ import logo from "./imgs/skateboardLogo.png";
 import axiosInstance, {
   logoutApi,
   getFriendsGroupApi,
-  getGuidemapApi,
   getUserApi,
 } from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
@@ -39,11 +38,9 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import DraftsIcon from "@material-ui/icons/Drafts";
-import SendIcon from "@material-ui/icons/Send";
 import MenuIcon from "@material-ui/icons/Menu";
+
 export const AuthContext = React.createContext();
 
 const initialState = {
@@ -57,18 +54,14 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
       if (action.payload.data == undefined) {
-        console.log(state);
-
         return {
           ...state,
           isAuthenticated: true,
           access: localStorage.getItem("access_token"),
           refresh: localStorage.getItem("refresh_token"),
           username: localStorage.getItem("username"),
-          // username: JSON.parse(action.payload.config.data).username,
         };
       } else {
-        console.log(action);
         return {
           ...state,
           isAuthenticated: true,
@@ -112,7 +105,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     fontSize: 24,
     textDecoration: "none",
-    // backgroundColor: '#2e1534',
     backgroundSize: "cover",
   },
   activelink: {
@@ -173,9 +165,9 @@ const SideMenu = () => {
         style={{
           width: 35,
           height: 35,
-          marginTop: '6vw',
+          marginTop: "6vw",
           marginBottom: "auto",
-          marginRight: '2vw',
+          marginRight: "2vw",
         }}
         onClick={handleClick}
       />
@@ -186,13 +178,13 @@ const SideMenu = () => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-       <NavLink to="/guidemap" className="hamLink">
-        <StyledMenuItem>
-          <ListItemIcon>
-            <MapIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="地圖"/>
-        </StyledMenuItem>
+        <NavLink to="/guidemap" className="hamLink">
+          <StyledMenuItem>
+            <ListItemIcon>
+              <MapIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="地圖" />
+          </StyledMenuItem>
         </NavLink>
         <NavLink to="/friendsgroup" className="hamLink">
           <StyledMenuItem>
@@ -203,20 +195,20 @@ const SideMenu = () => {
           </StyledMenuItem>
         </NavLink>
         <NavLink to="/login" className="hamLink">
-        <StyledMenuItem>
-          <ListItemIcon>
-            <LockOpenIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="登入" />
-        </StyledMenuItem>
+          <StyledMenuItem>
+            <ListItemIcon>
+              <LockOpenIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="登入" />
+          </StyledMenuItem>
         </NavLink>
         <NavLink to="/signup" className="hamLink">
-        <StyledMenuItem>
-          <ListItemIcon>
-            <AccountCircleIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="註冊" />
-        </StyledMenuItem>
+          <StyledMenuItem>
+            <ListItemIcon>
+              <AccountCircleIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="註冊" />
+          </StyledMenuItem>
         </NavLink>
       </StyledMenu>
     </div>
@@ -227,7 +219,6 @@ const App = () => {
   const classes = useStyles();
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const history = useHistory();
-  const [value, setValue] = React.useState(0);
   const initUserData = {
     location: "",
     nickname: "",
@@ -248,8 +239,6 @@ const App = () => {
     getUserApi(state.username)
       .then((res) => {
         initUserDB(res.data);
-        //setUserdata(res.data);
-        //console.table(dbData);
       })
       .catch((error) => {
         console.error(error.response);
@@ -266,134 +255,6 @@ const App = () => {
       ...userData,
       [eventTarget.name]: eventTarget.value,
     });
-  };
-
-  const removeUserMapDB = (removeValue, column) => {
-    let updateMapArr = [];
-    let patchMapData = [];
-    let patchUserData = [];
-
-    switch (column) {
-      case "MAP_LIKE":
-        updateMapArr = getMapDBByLocationId(removeValue).like_user.filter(
-          (user) => user !== state.username
-        );
-
-        patchMapData = {
-          like_user: updateMapArr,
-        };
-
-        patchUserData = {
-          map_like: userData.map_like.filter((id) => id !== removeValue),
-        };
-        break;
-    }
-
-    patchGuidemapApi(removeValue, patchMapData)
-      .then((res) => {
-        updateMapDBByLocationId(removeValue, updateMapArr, "LIKE");
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-
-    patchUserApi(state.username, patchUserData)
-      .then((res) => {
-        setUserdata(patchUserData);
-        handleShowAlertOpen();
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-  };
-
-  const getFriendsGroupDBById = (groupId) => {
-    if (dbFriendsGroupData != undefined) {
-      return dbFriendsGroupData.find((data) => data.group_id === groupId);
-    } else {
-      return null;
-    }
-  };
-
-  const updateFriendsGroupDBById = (group_id, newData, type) => {
-    let index = dbFriendsGroupData.findIndex(
-      (data) => data.group_id === group_id
-    );
-
-    switch (type) {
-      case "JOIN":
-        dbFriendsGroupData[index].join_user = newData;
-        break;
-      case "LIKE":
-        dbFriendsGroupData[index].possible_user = newData;
-        break;
-      default:
-        console.log("none");
-    }
-    updateFriendsGroupDB([...dbFriendsGroupData]);
-  };
-
-  const removeUserGroupDB = (removeValue, column) => {
-    let updateGroupArr = [];
-    let patchGroupData = [];
-    let patchUserData = [];
-    let type = "";
-
-    switch (column) {
-      case "GROUP_JOIN":
-        updateGroupArr = getFriendsGroupDBById(removeValue).join_user.filter(
-          (user) => user !== state.username
-        );
-
-        patchGroupData = {
-          join_user: updateGroupArr,
-        };
-
-        patchUserData = {
-          group_join: userData.group_join.filter((id) => id !== removeValue),
-        };
-
-        type = "JOIN";
-
-        break;
-
-      case "GROUP_LIKE":
-        updateGroupArr = getFriendsGroupDBById(
-          removeValue
-        ).possible_user.filter((user) => user !== state.username);
-
-        patchGroupData = {
-          possible_user: updateGroupArr,
-        };
-
-        patchUserData = {
-          group_like: userData.group_like.filter((id) => id !== removeValue),
-        };
-        type = "LIKE";
-
-        break;
-    }
-
-    patchFriendsGroupApi(removeValue, patchGroupData)
-      .then((res) => {
-        updateFriendsGroupDBById(removeValue, updateGroupArr, type);
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-
-    patchUserApi(state.username, patchUserData)
-      .then((res) => {
-        setUserdata(patchUserData);
-        handleShowAlertOpen();
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
   };
 
   const updateGroupUserDB = (newValue) => {
@@ -586,7 +447,6 @@ const App = () => {
               updateUserDB={updateUserDB}
               dbFriendsGroupData={dbFriendsGroupData}
               updateGroupUserDB={updateGroupUserDB}
-              //removeUserDB={removeUserDB}
             />
           )}
         />
@@ -601,7 +461,6 @@ const App = () => {
               updateGroupUserDB={updateGroupUserDB}
               dbFriendsGroupData={dbFriendsGroupData}
               updateFriendsGroupDB={updateFriendsGroupDB}
-              //removeUserDB={removeUserDB}
             />
           )}
         />
@@ -629,7 +488,6 @@ const App = () => {
               updateUserDB={updateUserDB}
               initUserDB={initUserDB}
               dbFriendsGroupData={dbFriendsGroupData}
-              removeUserMapDB={removeUserMapDB}
               removeUserGroupDB={removeUserGroupDB}
               updateGroupUserDB={updateGroupUserDB}
             />
@@ -653,13 +511,7 @@ const App = () => {
           exact
           path={"/friendsGroupDetail/:id"}
           key={"route-friendsGroupDetail"}
-          //children={<FriendsGroupDetail />}
-          render={() => (
-            <FriendsGroupDetail
-            //userData={props.userData}
-            // dbFriendsGroupData={dbFriendsGroupData}
-            />
-          )}
+          render={() => <FriendsGroupDetail />}
         />
 
         <Route

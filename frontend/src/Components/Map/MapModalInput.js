@@ -24,7 +24,6 @@ import FormControl from "@material-ui/core/FormControl";
 import MuiPhoneNumber from "material-ui-phone-number";
 import AddLocationIcon from "@material-ui/icons/AddLocation";
 import Geocode from "react-geocode";
-import { blueGrey } from "@material-ui/core/colors";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -163,9 +162,6 @@ const MapModalInput = (props) => {
     setOpenShowErrorAlert(false);
   };
 
-  const [userData, setUserdata] = useState([]);
-
-  //insert user
   const handleSubmit = (e) => {
     e.preventDefault();
     let dbPost;
@@ -230,18 +226,6 @@ const MapModalInput = (props) => {
           })
           .finally(() => {});
       });
-    // .then(() => {
-    //   patchUserApi(state.username, userData)
-    //     .then((res) => {
-    //       console.table(userData);
-    //       console.table(res.data);
-    //       alert("更新使用者資料成功！");
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     })
-    //     .finally(() => {});
-    // });
   };
 
   const PickWeekTime = () => {
@@ -319,16 +303,15 @@ const MapModalInput = (props) => {
   return (
     <>
       {state.isAuthenticated ? (
-      <Button
-        variant="contained"
-        color="secondary"
-        className={classes.buttonAdd}
-        onClick={handleOpen}
-        startIcon={<AddLocationIcon />}
-      >
-        新增地點
-      </Button>
-      
+        <Button
+          variant="contained"
+          color="secondary"
+          className={classes.buttonAdd}
+          onClick={handleOpen}
+          startIcon={<AddLocationIcon />}
+        >
+          新增地點
+        </Button>
       ) : (
         <Button
           variant="contained"
@@ -339,8 +322,7 @@ const MapModalInput = (props) => {
         >
           請登入即可新增地點及發表評論
         </Button>
-      )
-      }
+      )}
       <Dialog
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -353,9 +335,15 @@ const MapModalInput = (props) => {
           timeout: 500,
         }}
       >
-      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages open={openShowErrorAlert} onClose={handleShowErrorAlertClose} />
-     
+        <ShowAlertMessages
+          open={openShowAlert}
+          onClose={handleShowAlertClose}
+        />
+        <ShowAlertErrorMessages
+          open={openShowErrorAlert}
+          onClose={handleShowErrorAlertClose}
+        />
+
         <Fade in={open}>
           <Grid
             container
@@ -410,7 +398,6 @@ const MapModalInput = (props) => {
                   fullWidth
                 />
 
-                {/* {pickWeekTime} */}
                 {pickWeekTime.map((item, index) => (
                   <PickWeekTime key={index} id={index} />
                 ))}
@@ -456,7 +443,6 @@ const MapModalInput = (props) => {
                 >
                   確認修改
                 </Button>
-                {/* </Grid> */}
               </form>
             </div>
           </Grid>

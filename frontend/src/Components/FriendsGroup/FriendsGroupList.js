@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from "react";
-import {
-  getFriendsGroupCommentsApi,
-  patchFriendsGroupApi,
-  patchUserApi,
-  getFriendsGroupApi,
-} from "../../axiosApi";
-import { AuthContext } from "../../App";
-import ShowAlertMessages from "../ShowAlertMessages";
-import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
-
-import { Link, NavLink } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-
-import TrackChangesIcon from "@material-ui/icons/TrackChanges";
-import MaterialTable from "material-table";
+import { makeStyles } from "@material-ui/core/styles";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ImportContactsIcon from "@material-ui/icons/ImportContacts";
+import TrackChangesIcon from "@material-ui/icons/TrackChanges";
+import MaterialTable from "material-table";
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { AuthContext } from "../../App";
+import {
+  getFriendsGroupApi, getFriendsGroupCommentsApi,
+  patchFriendsGroupApi,
+  patchUserApi
+} from "../../axiosApi";
+import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
+import ShowAlertMessages from "../ShowAlertMessages";
+
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -205,7 +204,6 @@ const FriendsGroupList = (props) => {
         console.table(res.data);
         props.updateGroupUserDB(groupJoin);
         handleShowAlertOpen();
-        //alert("已參加！");
       })
       .catch((error) => {
         handleShowErrorAlertOpen();
@@ -256,17 +254,12 @@ const FriendsGroupList = (props) => {
         console.table(res.data);
         props.updateGroupUserDB(groupLike);
         handleShowAlertOpen();
-        //alert("已追蹤！");
       })
       .catch((error) => {
         handleShowErrorAlertOpen();
         console.error(error.response);
       })
       .finally(() => {});
-  };
-
-  const updateComment = (newComment) => {
-    setCommentData([...commentData, newComment]);
   };
 
   return (

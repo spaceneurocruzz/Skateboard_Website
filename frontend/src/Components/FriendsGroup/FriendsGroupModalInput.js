@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Switch, Route, useHistory } from "react-router";
-import { postGuidemapApi } from "../../axiosApi";
-import { AuthContext } from "../../App";
-import ShowAlertMessages from "../ShowAlertMessages"
-
-import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-
-import Container from "@material-ui/core/Container";
+import { makeStyles } from "@material-ui/core/styles";
 import PostAddIcon from "@material-ui/icons/PostAdd";
-import FriendsGroupCreate from "../../Pages/FriendsGroupCreate";
-import MaterialTable from "material-table";
+import React from "react";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../../App";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,8 +24,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     marginBottom: 20,
     marginTop: 50,
-
-    //background:'#f05a27'
   },
 }));
 

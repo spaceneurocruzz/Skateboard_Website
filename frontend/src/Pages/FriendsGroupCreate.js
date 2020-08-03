@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Redirect, Link } from "react-router-dom";
-import { Switch, Route } from "react-router";
 import { getGuidemapApi, postFriendsGroupApi } from "../axiosApi";
 import { AuthContext } from "../App";
+import Geocode from "react-geocode";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
-import FriendsGroup from "../Pages/FriendsGroup";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import MUIRichTextEditor from "mui-rte";
-import TextField from "@material-ui/core/TextField";
+
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  createMuiTheme,
-  Theme,
-  MuiThemeProvider,
-} from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
+
 import Button from "@material-ui/core/Button";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -23,14 +16,10 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Checkbox from "@material-ui/core/Checkbox";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import Geocode from "react-geocode";
-import AccountCircle from "@material-ui/icons/AccountCircle";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
-
 import Dialog from "@material-ui/core/Dialog";
-
 import indexmanstand from "../imgs/indexmanstand.jpg";
 
 const useStyles = makeStyles((theme) => ({
@@ -63,50 +52,6 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-
-const defaultTheme = createMuiTheme((Theme) => {
-  palette: {
-    primary: {
-      main: "#000000";
-    }
-  }
-});
-
-Object.assign(defaultTheme, {
-  overrides: {
-    MUIRichTextEditor: {
-      root: {
-        backgroundColor: "#ebebeb",
-      },
-      container: {
-        display: "flex",
-        flexDirection: "column",
-      },
-      editor: {
-        backgroundColor: "#ebebeb",
-        padding: "20px",
-        height: "200px",
-        maxHeight: "200px",
-        overflow: "auto",
-      },
-      toolbar: {
-        // borderTop: "1px solid gray",
-        backgroundColor: "#ebebeb",
-      },
-      placeHolder: {
-        backgroundColor: "#ebebeb",
-        paddingLeft: 20,
-        width: "inherit",
-        position: "absolute",
-        top: "60px",
-      },
-      anchorLink: {
-        color: "#333333",
-        textDecoration: "underline",
-      },
-    },
-  },
-});
 
 const FriendsGroupCreate = (props) => {
   const { state } = React.useContext(AuthContext);
@@ -163,7 +108,6 @@ const FriendsGroupCreate = (props) => {
     }
   };
 
-  const [errorText, setErrorText] = useState("");
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(true);
@@ -193,14 +137,6 @@ const FriendsGroupCreate = (props) => {
     if (!input.group_enddt) {
       errorArr.push("結束日期");
     }
-    // if (!input.lower_limit) {
-    //   console.log("下限");
-    //   errorArr.push("下限");
-    // }
-    // if (!input.upper_limit) {
-    //   console.log("上限");
-    //   errorArr.push("上限");
-    // }
     if (!input.group_content) {
       errorArr.push("內容");
       setErrorFields([...errorFields, errorArr]);
@@ -244,9 +180,6 @@ const FriendsGroupCreate = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // if(!checkValid())
-    //   return;
-
     let dbPost = input;
 
     dbPost["create_user"] = state.username;
@@ -278,7 +211,6 @@ const FriendsGroupCreate = (props) => {
         }
       )
       .then(() => {
-        // dbPost["group_content"];
         postFriendsGroupApi(dbPost)
           .then((res) => {
             props.updateFriendsGroupDB([...props.dbFriendsGroupData, dbPost]);
@@ -286,15 +218,10 @@ const FriendsGroupCreate = (props) => {
             window.location.href = "/#/friendsgroup";
           })
           .catch((error) => {
-            //handleShowAlertOpen();
             handleShowErrorAlertOpen();
             console.error(error.response);
-            //window.location.href = "/#/friendsgroup";
-            // <Link to="/friendsgroup" />
           })
-          .finally(() => {
-            //window.location.reload(false);
-          });
+          .finally(() => {});
       });
   };
   const [isAddressChecked, setIsAddressChecked] = React.useState(false);
@@ -302,8 +229,6 @@ const FriendsGroupCreate = (props) => {
   const handleChange = (event) => {
     setIsAddressChecked(event.target.checked);
   };
-  // const [value, setValue] = React.useState(options[0]);
-  const [inputValue, setInputValue] = React.useState("");
 
   return (
     <>
@@ -330,9 +255,6 @@ const FriendsGroupCreate = (props) => {
             <Alert severity="error">
               <AlertTitle>以下資料不可為空！</AlertTitle>
               <span>{errorFields.join(", ")}</span>
-              {/* {errorFields.map((field, index) => {
-              <span>{field}</span>
-            })} */}
             </Alert>
           </Fade>
         </Dialog>
@@ -381,7 +303,6 @@ const FriendsGroupCreate = (props) => {
                     <span style={{ fontSize: 16, display: "block" }}>
                       開團時間
                     </span>
-                    {/* <form className={classes.datetime} noValidate> */}
                     <TextField
                       required
                       onChange={handleInputChange}
@@ -396,8 +317,6 @@ const FriendsGroupCreate = (props) => {
                       }}
                       style={{ marginTop: 20 }}
                     />
-                    {/* </form>
-                  <form className={classes.datetime} noValidate> */}
                     <TextField
                       required
                       onChange={handleInputChange}
@@ -412,24 +331,14 @@ const FriendsGroupCreate = (props) => {
                       }}
                       style={{ marginTop: 20 }}
                     />
-                    {/* </form> */}
                   </div>
                 </FormControl>
                 {!isAddressChecked && (
                   <Autocomplete
                     className={classes.textField}
                     id="combo-box-demo"
-                    // value={input.location_name}
                     onChange={handleContentChange}
-                    // onChange={(event, newValue) => {
-                    //   setInput({...input, location_name: newValue});
-                    // }}
-                    // inputValue={inputValue}
-                    // onInputChange={(event, newInputValue) => {
-                    //   setInputValue(newInputValue);
-                    // }}
                     name="location_name"
-                    //options={dbData.map(option => option.location_name)}
                     options={dbData}
                     getOptionLabel={(option) => option.location_name}
                     style={{ width: 300 }}
@@ -443,8 +352,6 @@ const FriendsGroupCreate = (props) => {
                     style={{ width: 500, marginBottom: 20 }}
                   />
                 )}
-                {/* <div className={classes.flexContainer}> */}
-                {/* <span style={{textAlign:'center'}}>沒有在上面？自行輸入</span> */}
 
                 <FormControlLabel
                   control={
@@ -529,10 +436,6 @@ const FriendsGroupCreate = (props) => {
                   value={input.group_content}
                   variant="filled"
                 />
-                {/* <MuiThemeProvider theme={defaultTheme}>
-                <MUIRichTextEditor label="輸入..." 
-                    />
-              </MuiThemeProvider> */}
                 <Button
                   onClick={handleSubmit}
                   type="submit"

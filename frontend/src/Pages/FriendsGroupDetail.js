@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import "../css/app.css";
 import { AuthContext } from "../App";
 import {
   getFriendsGroupCommentsApi,
@@ -9,18 +10,16 @@ import {
 import ShowAlertMessages from "../Components/ShowAlertMessages";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 
+import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import "../css/app.css";
 import PersonPinIcon from "@material-ui/icons/PersonPin";
-import FaceIcon from "@material-ui/icons/Face";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,36 +35,9 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  flexContainer: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  paper: {
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    paddingBottom: 20,
-  },
   button: {
     padding: 20,
     margin: 40,
-  },
-  card: {
-    maxWidth: 345,
-  },
-  media: {
-    height: 0,
-    paddingTop: "56.25%",
-  },
-  chips: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  chip: {
-    margin: 2,
-  },
-  buttonAdd: {
-    margin: theme.spacing(1),
   },
   button: {
     margin: theme.spacing(1),
@@ -92,10 +64,6 @@ const CommentList = (props) => {
             return (
               <>
                 <ListItem alignItems="flex-start" key={index}>
-                  {/* <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-            </ListItemAvatar> */}
-
                   <ListItemText
                     key={data.group_id}
                     primary={
@@ -115,7 +83,7 @@ const CommentList = (props) => {
                       alignItems: "left",
                     }}
                   >
-                     {data.create_dt.toString()}
+                    {data.create_dt.toString()}
                     {/*{`${data.create_dt
                       .toString()
                       .slice(0, 10)}  ${data.create_dt
@@ -123,7 +91,6 @@ const CommentList = (props) => {
                       .slice(11, 20)}`}*/}
                   </span>
                 </ListItem>
-                {/* <Divider variant="inset" component="li" /> */}
               </>
             );
           }
@@ -205,16 +172,11 @@ const FriendsGroupDetail = (props) => {
     dbPost = input;
     dbPost["create_dt"] = new Date();
     dbPost["update_dt"] = new Date();
-    console.log(dbPost);
-    //insert user
-    //post should return commentid and post to user table
+
     postFriendsGroupCommentsApi(dbPost)
       .then((res) => {
         handleShowAlertOpen();
-
         setCommentData([...commentData, dbPost]);
-        console.log(commentData);
-        //props.updateComment(dbPost);
       })
       .catch((error) => {
         console.error(error.response);
@@ -233,17 +195,6 @@ const FriendsGroupDetail = (props) => {
       <div>
         {dbFriendsGroupData.map((data, index) => {
           if (data.group_id == id) {
-            {
-              /* if (data.group_id == props.groupId) {
-          if (data.lower_limit === 0 && data.upper_limit === 0) {
-            data.lower_limit = 999;
-            data.upper_limit = 999;
-          } else if (data.lower_limit === 0) {
-            data.lower_limit = 999;
-          } else {
-            data.upper_limit = 999;
-          } */
-            }
             return (
               <Container
                 component="main"
@@ -271,7 +222,6 @@ const FriendsGroupDetail = (props) => {
                   </div>
                   <ListItem>
                     <ListItemText>
-                      {/* {`地址：${data.address}`} */}
                       地址：
                       <a
                         href={
@@ -353,7 +303,6 @@ const FriendsGroupDetail = (props) => {
                     onClick={handleSubmit}
                     variant="contained"
                     color="secondary"
-                    //className={classes.button}
                     endIcon={<Icon>send</Icon>}
                   >
                     送出留言

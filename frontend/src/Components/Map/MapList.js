@@ -1,74 +1,39 @@
-import React, { useState, useEffect } from "react";
-import {
-  getGuideMapCommentsApi,
-  postGuideMapCommentsApi,
-  patchUserApi,
-  patchGuidemapApi,
-  getGuidemapApi
-} from "../../axiosApi";
-import { AuthContext } from "../../App";
-import ShowAlertMessages from "../ShowAlertMessages";
-import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
-
-import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
+import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
-import Collapse from "@material-ui/core/Collapse";
-import IconButton from "@material-ui/core/IconButton";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
-import FilterListIcon from "@material-ui/icons/FilterList";
-import Tooltip from "@material-ui/core/Tooltip";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import TablePagination from "@material-ui/core/TablePagination";
-
+import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
-import Rating from "@material-ui/lab/Rating";
-import MaterialTable from "material-table";
-import ScheduleIcon from "@material-ui/icons/Schedule";
-import CommuteIcon from "@material-ui/icons/Commute";
-import InfoIcon from "@material-ui/icons/Info";
-import PlaceIcon from "@material-ui/icons/Place";
-import ImportContactsIcon from "@material-ui/icons/ImportContacts";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import RateReviewIcon from "@material-ui/icons/RateReview";
-import CommentIcon from "@material-ui/icons/Comment";
-
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import Divider from "@material-ui/core/Divider";
-import ListItemText from "@material-ui/core/ListItemText";
-
+import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import Button from "@material-ui/core/Button";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
-import PersonIcon from "@material-ui/icons/Person";
-import AddIcon from "@material-ui/icons/Add";
-import Typography from "@material-ui/core/Typography";
-import { blue } from "@material-ui/core/colors";
-
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import MapModalInput from "./MapModalInput";
-import Avatar from "@material-ui/core/Avatar";
-import TaiwanMapJson from "../../Data/TaiwanMap.json";
-import { ReloadContext } from "../../Pages/Guidemap";
-import shopMarker from "../../imgs/shopping-bag.png";
-import skateboardMarker from "../../imgs/skateboardMarker.png";
-
+import ListItemText from "@material-ui/core/ListItemText";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import CommentIcon from "@material-ui/icons/Comment";
+import CommuteIcon from "@material-ui/icons/Commute";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import indexmanstand from "../../imgs/indexmanstand.jpg";
-import Backdrop from "@material-ui/core/Backdrop";
-import Fade from "@material-ui/core/Fade";
-import Snackbar from "@material-ui/core/Snackbar";
+import InfoIcon from "@material-ui/icons/Info";
+import RateReviewIcon from "@material-ui/icons/RateReview";
+import ScheduleIcon from "@material-ui/icons/Schedule";
 import MuiAlert from "@material-ui/lab/Alert";
+import Rating from "@material-ui/lab/Rating";
+import MaterialTable from "material-table";
+import React, { useEffect, useState } from "react";
+import { AuthContext } from "../../App";
+import {
+  getGuidemapApi, getGuideMapCommentsApi,
+
+
+  patchGuidemapApi, patchUserApi, postGuideMapCommentsApi
+} from "../../axiosApi";
+import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
+import ShowAlertMessages from "../ShowAlertMessages";
+
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -455,19 +420,6 @@ const MapList = (props) => {
     },
   ];
 
-  const [location_name, setlocation_name] = useState("");
-  const [rows, setRows] = useState([]);
-  const [chipData, setChipData] = useState([
-    { key: 0, label: "滑板場" },
-    { key: 1, label: "店家" },
-  ]);
-
-  const locationTypeList = [
-    { key: 0, label: "滑板場" },
-    { key: 1, label: "店家" },
-    { key: 2, label: "全部" },
-  ];
-
   const [dbGuideMapData, setDbGuideMapData] = useState([]);
   const [isGuidemapLoaded, setIsGuidemapLoaded] = useState(false);
 
@@ -533,7 +485,6 @@ const MapList = (props) => {
   useEffect(() => {
     getGuideMapCommentsApi()
       .then((res) => {
-        // setCommentData(commentData => ({...commentData, commentData:res.data}));
         setCommentData(...commentData, res.data);
       })
       .catch((error) => {
@@ -552,12 +503,6 @@ const MapList = (props) => {
     }
     console.log(Math.round((ratingTotal / dataByMapId.length) * 10) / 10);
     return Math.round((ratingTotal / dataByMapId.length) * 10) / 10;
-  };
-
-  const handleDelete = (chipToDelete) => () => {
-    setChipData((chips) =>
-      chips.filter((chip) => chip.key !== chipToDelete.key)
-    );
   };
 
   const handleChangePage = (event, newPage) => {
@@ -614,7 +559,6 @@ const MapList = (props) => {
         console.table(res.data);
         props.updateGroupUserDB(mapLike);
         handleShowAlertOpen();
-        // alert("已加到最愛！");
       })
       .catch((error) => {
         console.error(error.response);
@@ -626,25 +570,6 @@ const MapList = (props) => {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   };
 
-  // const ShowMessages = (props) => {
-  //   const classes = useStyles();
-  //   const { onClose, open } = props;
-
-  //   const handleClose = (value) => {
-  //     onClose(value);
-  //   };
-
-  //   return (
-  //     <div className={classes.root}>
-  //       <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
-  //         <Alert onClose={handleClose} severity="success">
-  //           更新成功！
-  //         </Alert>
-  //       </Snackbar>
-  //       {/* <Alert severity={msgType}請確認資料！</Alert> */}
-  //     </div>
-  //   );
-  // };
   if (!isGuidemapLoaded) {
     return <div>Loading...</div>;
   } else {

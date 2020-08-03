@@ -36,32 +36,19 @@ import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import TrackChangesIcon from "@material-ui/icons/TrackChanges";
 import EmojiEventsIcon from "@material-ui/icons/EmojiEvents";
 
-import indexmanstand from "../imgs/indexmanstand.jpg";
-
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
       margin: theme.spacing(1),
       fontSize: "20px",
-      // width: "25ch",
     },
   },
   button: {
-    // color: blue[900],
     margin: 10,
     paddingTop: 20,
   },
   input: {
     display: "none",
-  },
-  icon: {
-    margin: theme.spacing(2),
-  },
-  iconHover: {
-    margin: theme.spacing(2),
-    "&:hover": {
-      color: red[800],
-    },
   },
   tab: {
     fontSize: "16px",
@@ -84,15 +71,12 @@ const useStyles = makeStyles((theme) => ({
 const User = (props) => {
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
-  const { dispatch } = React.useContext(AuthContext);
   const [img, setImg] = useState({
     mainState: "initial",
     selectedFile: null,
     imageUploaded: 0,
   });
 
-  const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
   const localUsername = localStorage.getItem("username");
 
   const [openMap, setOpenMap] = React.useState(false);
@@ -149,27 +133,23 @@ const User = (props) => {
       getUserApi(localUsername)
         .then((res) => {
           props.initUserDB(res.data);
-          //setUserdata(res.data);
-          //console.table(dbData);
         })
         .catch((error) => {
           console.error(error.response);
         })
         .finally(() => {});
-    }, [props.userData]);
+    }, []);
   } else {
     useEffect(() => {
       getUserApi(state.username)
         .then((res) => {
           props.initUserDB(res.data);
-          //setUserdata(res.data);
-          //console.table(dbData);
         })
         .catch((error) => {
           console.error(error.response);
         })
         .finally(() => {});
-    }, [props.userData]);
+    }, []);
   }
 
   const [dbGuideMapData, setDbGuideMapData] = useState([]);
@@ -187,7 +167,7 @@ const User = (props) => {
         console.error(error);
       })
       .finally(() => {});
-  }, [props.userData]);
+  }, []);
 
   const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
   const [isFriendsLoaded, setIsFriendsLoaded] = useState(false);
@@ -204,7 +184,7 @@ const User = (props) => {
         console.error(error);
       })
       .finally(() => {});
-  }, [props.userData]);
+  }, []);
 
   let holdEvent = [];
   if (dbFriendsGroupData != undefined) {
@@ -477,7 +457,6 @@ const User = (props) => {
           }}
         >
           <div className={classes.tabroot} style={{ display: "flex" }}>
-            {/* <AppBar position="static"> */}
             <Tabs
               orientation="vertical"
               variant="scrollable"
@@ -494,7 +473,6 @@ const User = (props) => {
                 className={classes.tab}
               />
             </Tabs>
-            {/* </AppBar> */}
             <TabPanel value={value} index={0}>
               <Grid container>
                 <EditLocationIcon />
@@ -585,9 +563,7 @@ const User = (props) => {
                   {holdEvent != undefined || holdEvent != null ? (
                     holdEvent.map((data, index) => {
                       return (
-                        <li
-                          style={{ listStyleType: "decimal" }}
-                        >
+                        <li style={{ listStyleType: "decimal" }}>
                           {data.group_startdt.slice(0, 10)}{" "}
                           {data.group_startdt.slice(11, 19)} 在{" "}
                           {data.location_name}
@@ -690,17 +666,6 @@ const User = (props) => {
               <EditProfile />
             </TabPanel>
           </div>
-          {/* <div style={{marginLeft:40}}>
-          <img
-            src={indexmanstand}
-            style={{
-              height: 500,
-              width: "auto",
-              marginBottom: 70,
-            }}
-            alt="banner"
-          />
-        </div> */}
         </Grid>
       );
     }
@@ -722,7 +687,7 @@ const User = (props) => {
             id="filled-password-input"
             label="密碼"
             type="password"
-            value={password}
+            value={props.password}
             autoComplete="current-password"
             variant="filled"
           />
@@ -734,7 +699,7 @@ const User = (props) => {
             id="filled-required-email"
             name="email"
             label="Email(必填)"
-            value={userData.email}
+            value={props.userData.email}
             variant="filled"
             style={{ width: 300 }}
           />
@@ -746,7 +711,7 @@ const User = (props) => {
             id="filled-required"
             name="nickname"
             label="暱稱"
-            value={userData.nickname}
+            value={props.userData.nickname}
             variant="filled"
           />
           <TextField
@@ -754,7 +719,7 @@ const User = (props) => {
             id="filled-search"
             label="所在城市"
             name="location"
-            value={userData.location}
+            value={props.userData.location}
             variant="filled"
           />
         </Grid>
@@ -768,7 +733,7 @@ const User = (props) => {
             multiline
             style={{ width: 400 }}
             rows={5}
-            value={userData.intro}
+            value={props.userData.intro}
             variant="filled"
           />
         </Grid>
@@ -850,7 +815,6 @@ const User = (props) => {
               <span></span>
             </div>
           </div>
-          {/* <span style={{fontSize:24, verticalAlign:"middle"}}>{state.username}</span> */}
         </Grid>
 
         <TabInfo />
