@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  patchUserApi,
-  patchGuidemapApi,
-  patchFriendsGroupApi,
-} from "./axiosApi";
 import { Link, NavLink } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
+import "./css/app.css";
 import User from "./Pages/User";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
@@ -17,7 +13,6 @@ import FriendsGroupDetail from "./Pages/FriendsGroupDetail";
 import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import FriendsGroupHistory from "./Components/FriendsGroup/FriendsGroupHistory";
 import Discussion from "./Pages/Discussion";
-import "./css/app.css";
 import logo from "./imgs/skateboardLogo.png";
 import axiosInstance, {
   logoutApi,
@@ -488,7 +483,6 @@ const App = () => {
               updateUserDB={updateUserDB}
               initUserDB={initUserDB}
               dbFriendsGroupData={dbFriendsGroupData}
-              removeUserGroupDB={removeUserGroupDB}
               updateGroupUserDB={updateGroupUserDB}
             />
           )}

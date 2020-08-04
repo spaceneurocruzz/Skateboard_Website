@@ -52,5 +52,5 @@ module.exports = {
     watchContentBase: true,
   },
   plugins: [HTMLWebpackPluginConfig,],
-  mode: "production",
+  mode: "development",
 };

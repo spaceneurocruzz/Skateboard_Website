@@ -79,24 +79,6 @@ const User = (props) => {
 
   const localUsername = localStorage.getItem("username");
 
-  const [openMap, setOpenMap] = React.useState(false);
-  const [openActivity, setOpenActivity] = React.useState(false);
-  const [openGroup, setOpenGroup] = React.useState(false);
-  const [openArticle, setOpenArticle] = React.useState(false);
-
-  const handleMapClick = () => {
-    setOpenMap(!openMap);
-  };
-  const handleActivityClick = () => {
-    setOpenActivity(!openActivity);
-  };
-  const handleGroupClick = () => {
-    setOpenGroup(!openGroup);
-  };
-  const handleArticleClick = () => {
-    setOpenArticle(!openArticle);
-  };
-
   const [openShowAlert, setOpenShowAlert] = React.useState(false);
 
   const handleShowAlertOpen = () => {
@@ -752,14 +734,8 @@ const User = (props) => {
     );
   };
 
-  return (
-    <>
-      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages
-        open={openShowErrorAlert}
-        onClose={handleShowErrorAlertClose}
-      />
-
+  const UserDetail = () => {
+    return (
       <Container
         className="user_conatainer"
         component="main"
@@ -774,40 +750,40 @@ const User = (props) => {
             src={`https://ui-avatars.com/api/?name=${state.username}&size=128&rounded=true&background=040404&color=fff`}
           />
           {/* <input
-              accept="image/*"
-              className={classes.input}
-              id="contained-button-file"
-              name="avatar"
-              multiple
-              type="file"
-              onChange={handleUploadClick}
-            />
-            <label htmlFor="contained-button-file">
-              <Fab component="span" className={classes.button}>
-                <AddPhotoAlternateIcon />
-              </Fab>
-            </label> */}
+            accept="image/*"
+            className={classes.input}
+            id="contained-button-file"
+            name="avatar"
+            multiple
+            type="file"
+            onChange={handleUploadClick}
+          />
+          <label htmlFor="contained-button-file">
+            <Fab component="span" className={classes.button}>
+              <AddPhotoAlternateIcon />
+            </Fab>
+          </label> */}
           {/* <img
-              width="200px"
-              className={classes.media}
-              src={img.selectedFile}
-            /> */}
+            width="200px"
+            className={classes.media}
+            src={img.selectedFile}
+          /> */}
           {/* <img
-              width="200px"
-              className={classes.media}
-              src={`../..${props.userData.avatar}`}
-            /> */}
+            width="200px"
+            className={classes.media}
+            src={`../..${props.userData.avatar}`}
+          /> */}
           {/* <Button
-              onClick={handleAvatarSubmit}
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              確認
-            </Button> */}
+            onClick={handleAvatarSubmit}
+            type="submit"
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            確認
+          </Button> */}
           {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
-          <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
+        <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
           <div style={{ marginLeft: 50 }}>
             <h2>暱稱：{userData.nickname}</h2>
             <div style={{ display: "flex" }}>
@@ -816,9 +792,19 @@ const User = (props) => {
             </div>
           </div>
         </Grid>
-
         <TabInfo />
       </Container>
+    );
+  };
+
+  return (
+    <>
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+      <UserDetail />
     </>
   );
 };

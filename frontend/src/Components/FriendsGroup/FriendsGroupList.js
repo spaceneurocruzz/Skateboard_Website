@@ -8,15 +8,13 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../../App";
 import {
-  getFriendsGroupApi, getFriendsGroupCommentsApi,
+  getFriendsGroupApi,
+  getFriendsGroupCommentsApi,
   patchFriendsGroupApi,
-  patchUserApi
+  patchUserApi,
 } from "../../axiosApi";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 import ShowAlertMessages from "../ShowAlertMessages";
-
-
-
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -262,14 +260,8 @@ const FriendsGroupList = (props) => {
       .finally(() => {});
   };
 
-  return (
-    <>
-      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages
-        open={openShowErrorAlert}
-        onClose={handleShowErrorAlertClose}
-      />
-
+  const GroupTable = () => {
+    return (
       <Container component="main" maxWidth="lg">
         <div className={classes.root}>
           <div style={{ width: "100%", marginBottom: 50, marginTop: 10 }}>
@@ -355,6 +347,17 @@ const FriendsGroupList = (props) => {
           </div>
         </div>
       </Container>
+    );
+  };
+
+  return (
+    <>
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+      <GroupTable />
     </>
   );
 };

@@ -4,6 +4,7 @@ import { AuthContext } from "../App";
 import Geocode from "react-geocode";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
+import { googleMapApiKey } from "../constants";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -196,7 +197,7 @@ const FriendsGroupCreate = (props) => {
       }
     }
 
-    Geocode.setApiKey("AIzaSyB7KldR4x33szhmh1Q8Vit9YynpWfvcOOs");
+    Geocode.setApiKey(googleMapApiKey);
     Geocode.enableDebug();
     Geocode.fromAddress(input.address)
       .then(
@@ -230,34 +231,18 @@ const FriendsGroupCreate = (props) => {
     setIsAddressChecked(event.target.checked);
   };
 
-  return (
-    <>
-      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
-      <ShowAlertErrorMessages
-        open={openShowErrorAlert}
-        onClose={handleShowErrorAlertClose}
-      />
+  const Alert = () => {
+    return (
+      <Alert severity="error">
+        <AlertTitle>以下資料不可為空！</AlertTitle>
+        <span>{errorFields.join(", ")}</span>
+      </Alert>
+    );
+  };
 
-      <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
-        <Dialog
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          className={classes.modal}
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={open}>
-            <Alert severity="error">
-              <AlertTitle>以下資料不可為空！</AlertTitle>
-              <span>{errorFields.join(", ")}</span>
-            </Alert>
-          </Fade>
-        </Dialog>
+  const WriteDetail = () => {
+    return (
+      <>
         <Grid item xs={6} style={{ marginLeft: 100 }}>
           <form className={classes.formControl} noValidate autoComplete="off">
             <h2>填寫開團資訊</h2>
@@ -464,6 +449,36 @@ const FriendsGroupCreate = (props) => {
             />
           </div>
         </Grid>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertErrorMessages
+        open={openShowErrorAlert}
+        onClose={handleShowErrorAlertClose}
+      />
+
+      <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
+        <Dialog
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={open}
+          onClose={handleClose}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={open}>
+            <Alert />
+          </Fade>
+        </Dialog>
+        <WriteDetail />
       </Grid>
     </>
   );
