@@ -128,7 +128,7 @@ const FriendsGroup = (props) => {
           <Link to="/FriendsGroupHistory/" className="link">
             <Button
               variant="contained"
-              color="text.primary"
+              color="default"
               className={classes.buttonAdd}
             >
               歷史揪團

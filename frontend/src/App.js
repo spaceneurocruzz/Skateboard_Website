@@ -383,16 +383,21 @@ const App = () => {
               </NavLink>
             </li> */}
             {state.isAuthenticated && (
-              <li className="nav-link-item">
-                <NavLink
-                  to="/user"
-                  activeClassName={classes.activelink}
-                  className={classes.link}
-                >
-                  <FaceIcon style={{ verticalAlign: "middle" }} />
-                  <span style={{ verticalAlign: "middle" }}>會員中心</span>
-                </NavLink>
-              </li>
+              <>
+                <li className="nav-link-item">
+                  <NavLink
+                    to="/user"
+                    activeClassName={classes.activelink}
+                    className={classes.link}
+                  >
+                    <FaceIcon style={{ verticalAlign: "middle" }} />
+                    <span style={{ verticalAlign: "middle" }}>會員中心</span>
+                  </NavLink>
+                </li>
+                <img
+                  src={`https://ui-avatars.com/api/?name=${state.username}&size=50&rounded=true&background=4181ff&color=fff`}
+                /><span style={{fontSize:15, marginLeft:5, marginRight:15}}>{state.username}</span>
+              </>
             )}
             {!state.isAuthenticated ? (
               <li className="nav-link-btn">

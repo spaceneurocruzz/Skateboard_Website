@@ -325,7 +325,7 @@ const FriendsGroupDetail = (props) => {
         open={openShowErrorAlert}
         onClose={handleShowErrorAlertClose}
       />
-      <FriendsGroupDetail />
+      <ShowDetail />
     </>
   );
 };

@@ -3,6 +3,7 @@ import { postGuidemapApi } from "../../axiosApi";
 import { AuthContext } from "../../App";
 import ShowAlertMessages from "../ShowAlertMessages";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
+import { googleMapApiKey } from "../../constants";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -76,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
 
 const MapModalInput = (props) => {
   const { state } = React.useContext(AuthContext);
-  Geocode.setApiKey("AIzaSyB7KldR4x33szhmh1Q8Vit9YynpWfvcOOs");
+  Geocode.setApiKey(googleMapApiKey);
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState({

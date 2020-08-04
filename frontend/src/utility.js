@@ -1,3 +1,2 @@
-const transDateTime=(dt)=>{
-    
-}
+const transDateTime = (dt) => {};
+

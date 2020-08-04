@@ -163,7 +163,8 @@ const CommentList = (props) => {
                         alignItems: "left",
                       }}
                     >
-                      {data.create_dt.toString()}
+                      {data.create_dt.slice(0, 10)}{" "}
+                      {data.create_dt.slice(11, 19)}
                     </span>
                   </ListItem>
                   <Divider variant="inset" component="li" />
@@ -276,8 +277,8 @@ const WriteComment = (props) => {
 
     dbPost = input;
     dbPost["rating"] = ratingVal;
-    dbPost["create_dt"] = new Date();
-    dbPost["update_dt"] = new Date();
+    dbPost["create_dt"] = new Date().toISOString();
+    dbPost["update_dt"] = new Date().toISOString();
 
     //insert user
     //post should return commentid and post to user table

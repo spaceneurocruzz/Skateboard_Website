@@ -14,7 +14,7 @@ module.exports = {
     // index: "./src/index.js",
   },
   watch: true,
-  devtool:"",
+  devtool:"inline-source-map",
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist/static"),

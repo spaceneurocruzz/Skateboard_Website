@@ -168,11 +168,21 @@ const User = (props) => {
       .finally(() => {});
   }, []);
 
-  let holdEvent = [];
+  const filterNewData = (data) => new Date(data.group_startdt) >= new Date();
+  const filterOldData = (data) => new Date(data.group_startdt) < new Date();
+
+  let newHoldEvent = [];
+  let oldHoldEvent = [];
+  let newJoinEvent = [];
+  let oldJoinEvent = [];
+  let newTrackEvent = [];
+  let oldTrackEvent = [];
   if (dbFriendsGroupData != undefined) {
-    holdEvent = dbFriendsGroupData.filter(
+    let userEvent = dbFriendsGroupData.filter(
       (group) => group.create_user == state.username
     );
+    newHoldEvent = userEvent.filter(filterNewData);
+    oldHoldEvent = userEvent.filter(filterOldData);
   }
 
   const getMapDBByLocationId = (locationId) => {
@@ -409,7 +419,7 @@ const User = (props) => {
         {value === index && (
           <Container>
             <Box p={3}>
-              <Typography>{children}</Typography>
+              <Typography component="div">{children}</Typography>
             </Box>
           </Container>
         )}
@@ -454,12 +464,14 @@ const User = (props) => {
                 {...a11yProps(2)}
                 className={classes.tab}
               />
+              <Tab label="歷史紀錄" {...a11yProps(2)} className={classes.tab} />
             </Tabs>
+
             <TabPanel value={value} index={0}>
               <Grid container>
                 <EditLocationIcon />
                 <b>
-                  <div style={{ marginBottom: 10 }}>新增地點 :</div>
+                  <span style={{ marginBottom: 10 }}>新增地點 :</span>
                 </b>
                 <ul>
                   {props.userData.map_add != undefined ||
@@ -479,7 +491,10 @@ const User = (props) => {
                         );
                       }
                       return (
-                        <li style={{ listStyleType: "decimal" }}>
+                        <li
+                          key={data.location_id}
+                          style={{ listStyleType: "decimal" }}
+                        >
                           {data.location_type} {data.location_name}:{" "}
                           {data.address}
                         </li>
@@ -509,7 +524,10 @@ const User = (props) => {
                         );
                       }
                       return (
-                        <li style={{ listStyleType: "decimal" }}>
+                        <li
+                          key={data.location_id}
+                          style={{ listStyleType: "decimal" }}
+                        >
                           {data.location_type} {data.location_name}:{" "}
                           <a
                             href={
@@ -542,10 +560,13 @@ const User = (props) => {
                   舉辦中 :
                 </b>
                 <ul>
-                  {holdEvent != undefined || holdEvent != null ? (
-                    holdEvent.map((data, index) => {
+                  {newHoldEvent != undefined || newHoldEvent != null ? (
+                    newHoldEvent.map((data, index) => {
                       return (
-                        <li style={{ listStyleType: "decimal" }}>
+                        <li
+                          key={data.group_id}
+                          style={{ listStyleType: "decimal" }}
+                        >
                           {data.group_startdt.slice(0, 10)}{" "}
                           {data.group_startdt.slice(11, 19)} 在{" "}
                           {data.location_name}
@@ -574,30 +595,37 @@ const User = (props) => {
                   {props.userData.group_join != undefined ||
                   props.userData.group_join != null ? (
                     props.userData.group_join.map((joinId, index) => {
-                      let data = dbFriendsGroupData.find(
-                        (group) => group.group_id == joinId
-                      );
-                      return (
-                        <li style={{ listStyleType: "decimal" }}>
-                          {data.group_startdt.slice(0, 10)}{" "}
-                          {data.group_startdt.slice(11, 19)} 在{" "}
-                          {data.location_name}
-                          (ID:{" "}
-                          <NavLink
-                            to={"/friendsGroupDetail/" + data.group_id}
-                            className="userLink"
+                      let data = dbFriendsGroupData.filter(
+                        (group) =>
+                          group.group_id == joinId &&
+                          new Date(group.group_startdt) >= new Date()
+                      )[0];
+                      if (data != undefined) {
+                        return (
+                          <li
+                            key={data.group_id}
+                            style={{ listStyleType: "decimal" }}
                           >
-                            {data.group_id}
-                          </NavLink>
-                          )
-                          <DeleteForeverIcon
-                            style={{ verticalAlign: "middle" }}
-                            onClick={() =>
-                              removeUserGroupDB(data.group_id, "GROUP_JOIN")
-                            }
-                          />
-                        </li>
-                      );
+                            {data.group_startdt.slice(0, 10)}{" "}
+                            {data.group_startdt.slice(11, 19)} 在{" "}
+                            {data.location_name}
+                            (ID:{" "}
+                            <NavLink
+                              to={"/friendsGroupDetail/" + data.group_id}
+                              className="userLink"
+                            >
+                              {data.group_id}
+                            </NavLink>
+                            )
+                            <DeleteForeverIcon
+                              style={{ verticalAlign: "middle" }}
+                              onClick={() =>
+                                removeUserGroupDB(data.group_id, "GROUP_JOIN")
+                              }
+                            />
+                          </li>
+                        );
+                      }
                     })
                   ) : (
                     <span>還沒有</span>
@@ -613,11 +641,61 @@ const User = (props) => {
                   {props.userData.group_like != undefined ||
                   props.userData.group_like != null ? (
                     props.userData.group_like.map((likeId, index) => {
-                      let data = dbFriendsGroupData.find(
-                        (group) => group.group_id == likeId
-                      );
+                      let data = dbFriendsGroupData.filter(
+                        (group) =>
+                          group.group_id == likeId &&
+                          new Date(group.group_startdt) >= new Date()
+                      )[0];
+                      if (data != undefined) {
+                        return (
+                          <li
+                            key={data.group_id}
+                            style={{ listStyleType: "decimal" }}
+                          >
+                            {data.group_startdt.slice(0, 10)}{" "}
+                            {data.group_startdt.slice(11, 19)} 在{" "}
+                            {data.location_name}
+                            (ID:{" "}
+                            <NavLink
+                              to={"/friendsGroupDetail/" + data.group_id}
+                              className="userLink"
+                            >
+                              {data.group_id}
+                            </NavLink>
+                            )
+                            <DeleteForeverIcon
+                              style={{ verticalAlign: "middle" }}
+                              onClick={() =>
+                                removeUserGroupDB(data.group_id, "GROUP_LIKE")
+                              }
+                            />
+                          </li>
+                        );
+                      }
+                    })
+                  ) : (
+                    <span>還沒有</span>
+                  )}
+                </ul>
+              </Grid>
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+              <EditProfile />
+            </TabPanel>
+            <TabPanel value={value} index={3}>
+              <Grid container>
+                <b>
+                  <EmojiEventsIcon />
+                  過期舉辦 :
+                </b>
+                <ul>
+                  {oldHoldEvent != undefined || oldHoldEvent != null ? (
+                    oldHoldEvent.map((data, index) => {
                       return (
-                        <li style={{ listStyleType: "decimal" }}>
+                        <li
+                          key={data.group_id}
+                          style={{ listStyleType: "decimal" }}
+                        >
                           {data.group_startdt.slice(0, 10)}{" "}
                           {data.group_startdt.slice(11, 19)} 在{" "}
                           {data.location_name}
@@ -628,13 +706,7 @@ const User = (props) => {
                           >
                             {data.group_id}
                           </NavLink>
-                          )
-                          <DeleteForeverIcon
-                            style={{ verticalAlign: "middle" }}
-                            onClick={() =>
-                              removeUserGroupDB(data.group_id, "GROUP_LIKE")
-                            }
-                          />
+                          )<span>[參加人數: {data.join_user.length}]</span>
                         </li>
                       );
                     })
@@ -643,9 +715,98 @@ const User = (props) => {
                   )}
                 </ul>
               </Grid>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-              <EditProfile />
+              <Grid container>
+                <b>
+                  <EventAvailableIcon />
+                  過期參加 :
+                </b>
+                <ul>
+                  {props.userData.group_join != undefined ||
+                  props.userData.group_join != null ? (
+                    props.userData.group_join.map((joinId, index) => {
+                      let data = dbFriendsGroupData.filter(
+                        (group) =>
+                          group.group_id == joinId &&
+                          new Date(group.group_startdt) < new Date()
+                      )[0];
+                      if (data != undefined) {
+                        return (
+                          <li
+                            key={data.group_id}
+                            style={{ listStyleType: "decimal" }}
+                          >
+                            {data.group_startdt.slice(0, 10)}{" "}
+                            {data.group_startdt.slice(11, 19)} 在{" "}
+                            {data.location_name}
+                            (ID:{" "}
+                            <NavLink
+                              to={"/friendsGroupDetail/" + data.group_id}
+                              className="userLink"
+                            >
+                              {data.group_id}
+                            </NavLink>
+                            )
+                            <DeleteForeverIcon
+                              style={{ verticalAlign: "middle" }}
+                              onClick={() =>
+                                removeUserGroupDB(data.group_id, "GROUP_JOIN")
+                              }
+                            />
+                          </li>
+                        );
+                      }
+                    })
+                  ) : (
+                    <span>沒有</span>
+                  )}
+                </ul>
+              </Grid>
+              <Grid container>
+                <b>
+                  <TrackChangesIcon />
+                  過期追蹤 :
+                </b>
+                <ul>
+                  {props.userData.group_like != undefined ||
+                  props.userData.group_like != null ? (
+                    props.userData.group_like.map((likeId, index) => {
+                      let data = dbFriendsGroupData.filter(
+                        (group) =>
+                          group.group_id == likeId &&
+                          new Date(group.group_startdt) < new Date()
+                      )[0];
+                      if (data != undefined) {
+                        return (
+                          <li
+                            key={data.group_id}
+                            style={{ listStyleType: "decimal" }}
+                          >
+                            {data.group_startdt.slice(0, 10)}{" "}
+                            {data.group_startdt.slice(11, 19)} 在{" "}
+                            {data.location_name}
+                            (ID:{" "}
+                            <NavLink
+                              to={"/friendsGroupDetail/" + data.group_id}
+                              className="userLink"
+                            >
+                              {data.group_id}
+                            </NavLink>
+                            )
+                            <DeleteForeverIcon
+                              style={{ verticalAlign: "middle" }}
+                              onClick={() =>
+                                removeUserGroupDB(data.group_id, "GROUP_LIKE")
+                              }
+                            />
+                          </li>
+                        );
+                      }
+                    })
+                  ) : (
+                    <span>沒有</span>
+                  )}
+                </ul>
+              </Grid>
             </TabPanel>
           </div>
         </Grid>
