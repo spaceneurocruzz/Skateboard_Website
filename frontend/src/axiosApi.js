@@ -98,6 +98,10 @@ export const getUserApi = (username) => {
   return userAxiosInstance.get(`get/username=${username}`);
 };
 
+export const getUserListApi = () => {
+  return axiosInstance.get(`get/usernameList`);
+};
+
 export const patchUserApi = (username, data) => {
   return userAxiosInstance.patch(`update/username=${username}`, data);
 };

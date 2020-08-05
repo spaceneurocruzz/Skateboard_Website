@@ -118,6 +118,7 @@ export const Login = (props) => {
         history.push("/");
       })
       .catch(function (error) {
+        console.log(error.response)
         setAuthData({
           ...authData,
           isSubmitting: false,

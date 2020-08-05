@@ -12,14 +12,14 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../App";
 import {
-  getFriendsGroupApi, getFriendsGroupCommentsApi,
-
-  postFriendsGroupCommentsApi
+  getFriendsGroupApi,
+  getFriendsGroupCommentsApi,
+  postFriendsGroupCommentsApi,
+  getUserApi,
 } from "../axiosApi";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
 import "../css/app.css";
-
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,12 +81,11 @@ const CommentList = (props) => {
                       alignItems: "left",
                     }}
                   >
-                    {data.create_dt.toString()}
-                    {/*{`${data.create_dt
-                      .toString()
+                    {/* {data.create_dt.toString()} */}
+                    {`${data.create_dt
                       .slice(0, 10)}  ${data.create_dt
                       .toString()
-                      .slice(11, 20)}`}*/}
+                      .slice(11, 19)}`}
                   </span>
                 </ListItem>
               </>
@@ -98,62 +97,16 @@ const CommentList = (props) => {
   }
 };
 
-const FriendsGroupDetail = (props) => {
-  const classes = useStyles();
-  let { id } = useParams();
-
+const ShowDetail = (props) => {
   const { state } = React.useContext(AuthContext);
-  const [commentData, setCommentData] = useState([]);
-  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
+
   const [input, setInput] = useState({
-    group_id: id,
+    group_id: props.id,
     comment_user: state.username,
     comment: "",
     create_dt: new Date().toISOString(),
     update_dt: new Date().toISOString(),
   });
-
-  useEffect(() => {
-    getFriendsGroupApi()
-      .then((res) => {
-        setDbFriendsGroupData(...dbFriendsGroupData, res.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {});
-  }, []);
-
-  useEffect(() => {
-    getFriendsGroupCommentsApi()
-      .then((res) => {
-        setCommentData(...commentData, res.data);
-      })
-      .catch((error) => {
-        console.error(error.response);
-      })
-      .finally(() => {});
-  }, []);
-
-  const [openShowAlert, setOpenShowAlert] = React.useState(false);
-
-  const handleShowAlertOpen = () => {
-    setOpenShowAlert(true);
-  };
-
-  const handleShowAlertClose = () => {
-    setOpenShowAlert(false);
-  };
-
-  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
-
-  const handleShowErrorAlertOpen = () => {
-    setOpenShowErrorAlert(true);
-  };
-
-  const handleShowErrorAlertClose = () => {
-    setOpenShowErrorAlert(false);
-  };
 
   const handleInputChange = (event) => {
     setInput({
@@ -168,13 +121,13 @@ const FriendsGroupDetail = (props) => {
     let dbPost = {};
 
     dbPost = input;
-    dbPost["create_dt"] = new Date();
-    dbPost["update_dt"] = new Date();
+    dbPost["create_dt"] = new Date().toISOString();
+    dbPost["update_dt"] = new Date().toISOString();
 
     postFriendsGroupCommentsApi(dbPost)
       .then((res) => {
-        handleShowAlertOpen();
-        setCommentData([...commentData, dbPost]);
+        props.handleShowAlertOpen();
+        props.setCommentData([...props.commentData, dbPost]);
       })
       .catch((error) => {
         console.error(error.response);
@@ -182,17 +135,12 @@ const FriendsGroupDetail = (props) => {
       .finally(() => {});
   };
 
-  const ShowDetail = ()=>{
-    return(
-      <div>
-      {dbFriendsGroupData.map((data, index) => {
-        if (data.group_id == id) {
+  return (
+    <div>
+      {props.dbFriendsGroupData.map((data, index) => {
+        if (data.group_id == props.id) {
           return (
-            <Container
-              component="main"
-              maxWidth="md"
-              style={{ marginTop: 70 }}
-            >
+            <Container component="main" maxWidth="md" style={{ marginTop: 70 }}>
               <Grid Container>
                 <div style={{ marginTop: 70, marginBottom: 30 }}>
                   <span style={{ fontSize: 24, fontWeight: "bold" }}>
@@ -308,15 +256,66 @@ const FriendsGroupDetail = (props) => {
                   marginTop: 40,
                 }}
               >
-                <CommentList groupId={id} commentData={commentData} />
+                <CommentList
+                  groupId={props.id}
+                  commentData={props.commentData}
+                />
               </Grid>
             </Container>
           );
         }
-      })} 
-      </div>
-    )
-  }
+      })}
+    </div>
+  );
+};
+
+const FriendsGroupDetail = (props) => {
+  let { id } = useParams();
+
+  const [commentData, setCommentData] = useState([]);
+  const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
+
+  useEffect(() => {
+    getFriendsGroupApi()
+      .then((res) => {
+        setDbFriendsGroupData(...dbFriendsGroupData, res.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
+
+  useEffect(() => {
+    getFriendsGroupCommentsApi()
+      .then((res) => {
+        setCommentData(...commentData, res.data);
+      })
+      .catch((error) => {
+        console.error(error.response);
+      })
+      .finally(() => {});
+  }, []);
+
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
+
+  const [openShowErrorAlert, setOpenShowErrorAlert] = React.useState(false);
+
+  const handleShowErrorAlertOpen = () => {
+    setOpenShowErrorAlert(true);
+  };
+
+  const handleShowErrorAlertClose = () => {
+    setOpenShowErrorAlert(false);
+  };
 
   return (
     <>
@@ -325,7 +324,14 @@ const FriendsGroupDetail = (props) => {
         open={openShowErrorAlert}
         onClose={handleShowErrorAlertClose}
       />
-      <ShowDetail />
+      <ShowDetail
+        key={id}
+        id={id}
+        dbFriendsGroupData={dbFriendsGroupData}
+        commentData={commentData}
+        setCommentData={setCommentData}
+        handleShowAlertOpen={handleShowAlertOpen}
+      />
     </>
   );
 };

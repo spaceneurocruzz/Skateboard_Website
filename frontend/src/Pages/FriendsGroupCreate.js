@@ -54,13 +54,235 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const WriteDetail = (props) => {
+  const classes = useStyles();
+  const [isAddressChecked, setIsAddressChecked] = React.useState(false);
+
+  const handleChange = (event) => {
+    setIsAddressChecked(event.target.checked);
+  };
+
+  return (
+    <>
+      <Grid item xs={6} style={{ marginLeft: 100 }}>
+        <form className={classes.formControl} noValidate autoComplete="off">
+          <h2>填寫開團資訊</h2>
+          <div className={classes.paper}>
+            <FormControl className={classes.formControl}>
+              <TextField
+                disabled
+                defaultValue={localStorage.getItem("username")}
+                id="create_user"
+                name="create_user"
+                label="建立者"
+                variant="filled"
+                className={classes.textField}
+                style={{ width: 250 }}
+              />
+              <FormControl component="fieldset">
+                <RadioGroup
+                  onChange={props.handleInputChange}
+                  row
+                  aria-label="group_type"
+                  name="group_type"
+                  value={props.input.group_type}
+                  style={{ marginTop: 20 }}
+                >
+                  <FormControlLabel
+                    value="交流"
+                    control={<Radio />}
+                    label="交流"
+                  />
+                  <FormControlLabel
+                    value="教學"
+                    control={<Radio />}
+                    label="教學"
+                  />
+                </RadioGroup>
+              </FormControl>
+
+              <FormControl>
+                <div
+                  className={classes.flexContainer}
+                  style={{ marginBottom: 20 }}
+                >
+                  <span style={{ fontSize: 16, display: "block" }}>
+                    開團時間
+                  </span>
+                  <TextField
+                    required
+                    onChange={props.handleInputChange}
+                    value={props.input.group_startdt}
+                    id="datetime-local"
+                    name="group_startdt"
+                    label="開始"
+                    type="datetime-local"
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    style={{ marginTop: 20 }}
+                  />
+                  <TextField
+                    required
+                    onChange={props.handleInputChange}
+                    value={props.input.group_enddt}
+                    id="datetime-local"
+                    name="group_enddt"
+                    label="結束"
+                    type="datetime-local"
+                    className={classes.textField}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    style={{ marginTop: 20 }}
+                  />
+                </div>
+              </FormControl>
+              {!isAddressChecked && (
+                <Autocomplete
+                  className={classes.textField}
+                  id="combo-box-demo"
+                  onChange={props.handleContentChange}
+                  name="location_name"
+                  options={props.dbData}
+                  getOptionLabel={(option) => option.location_name}
+                  style={{ width: 300 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="場地名稱"
+                      variant="outlined"
+                    />
+                  )}
+                  style={{ width: 500, marginBottom: 20 }}
+                />
+              )}
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isAddressChecked}
+                    onChange={handleChange}
+                    color="primary"
+                    inputProps={{ "aria-label": "secondary checkbox" }}
+                  />
+                }
+                label="沒有在上面？自行輸入"
+              />
+              {isAddressChecked && (
+                <>
+                  <TextField
+                    required
+                    onChange={props.handleInputChange}
+                    size="small"
+                    id="location_name"
+                    name="location_name"
+                    label="場地名稱"
+                    variant="filled"
+                    fullWidth
+                    style={{ marginTop: 20 }}
+                  />
+                  <TextField
+                    required
+                    onChange={props.handleInputChange}
+                    size="small"
+                    id="address"
+                    name="address"
+                    label="地址"
+                    variant="filled"
+                    fullWidth
+                    style={{ marginTop: 20 }}
+                  />
+                </>
+              )}
+              <div className={classes.flexContainer}>
+                <TextField
+                  onChange={props.handleInputChange}
+                  id="lower_limit"
+                  label="人數下限"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="filled"
+                  style={{ marginTop: 20, marginRight: 20 }}
+                />
+                <TextField
+                  onChange={props.handleInputChange}
+                  id="uppper_limit"
+                  label="人數上限"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="filled"
+                  style={{ marginTop: 20 }}
+                />
+              </div>
+              <TextField
+                onChange={props.handleInputChange}
+                // size="small"
+                required
+                id="group_title"
+                name="group_title"
+                label="主題"
+                variant="filled"
+                fullWidth
+                style={{ marginTop: 20 }}
+              />
+              <h3>內容</h3>
+              <TextField
+                required
+                onChange={props.handleInputChange}
+                id="filled-multiline-static"
+                label="填寫相關內容"
+                name="group_content"
+                multiline
+                fullWidth
+                rows={8}
+                // value={props.input.group_content}
+                variant="filled"
+              />
+              <Button
+                onClick={props.handleSubmit}
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                style={{ marginTop: 20, width: 150, marginBottom: 70 }}
+              >
+                確認修改
+              </Button>
+            </FormControl>
+          </div>
+        </form>
+      </Grid>
+      <Grid item xs>
+        <div>
+          <img
+            src={indexmanstand}
+            style={{
+              height: 700,
+              width: "auto",
+              marginTop: 150,
+              marginBottom: 70,
+            }}
+            alt="banner"
+          />
+        </div>
+      </Grid>
+    </>
+  );
+};
+
 const FriendsGroupCreate = (props) => {
   const { state } = React.useContext(AuthContext);
   const classes = useStyles();
   const [input, setInput] = useState({
     map_id: 1,
-    group_startdt: new Date().toISOString(),
-    group_enddt: new Date().toISOString(),
+    group_startdt: "",
+    group_enddt: "",
     location_name: "",
     latitude: 0,
     longitude: 0,
@@ -90,25 +312,6 @@ const FriendsGroupCreate = (props) => {
       .finally(() => {});
   }, []);
 
-  const handleInputChange = (event) => {
-    if (
-      event.target.name == "group_startdt" ||
-      event.target.name == "group_enddt"
-    ) {
-      setInput({
-        ...input,
-        [event.target.name]: event.target.value
-          .toLocaleString()
-          .replace("T", " "),
-      });
-    } else {
-      setInput({
-        ...input,
-        [event.target.name]: event.target.value,
-      });
-    }
-  };
-
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(true);
@@ -116,6 +319,14 @@ const FriendsGroupCreate = (props) => {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleInputChange = (event) => {
+    setInput({
+      ...input,
+      [event.target.name]: event.target.value,
+    });
+    console.log(event.target.value)
   };
 
   const [isValid, setIsValid] = useState(true);
@@ -225,11 +436,6 @@ const FriendsGroupCreate = (props) => {
           .finally(() => {});
       });
   };
-  const [isAddressChecked, setIsAddressChecked] = React.useState(false);
-
-  const handleChange = (event) => {
-    setIsAddressChecked(event.target.checked);
-  };
 
   const Alert = () => {
     return (
@@ -237,219 +443,6 @@ const FriendsGroupCreate = (props) => {
         <AlertTitle>以下資料不可為空！</AlertTitle>
         <span>{errorFields.join(", ")}</span>
       </Alert>
-    );
-  };
-
-  const WriteDetail = () => {
-    return (
-      <>
-        <Grid item xs={6} style={{ marginLeft: 100 }}>
-          <form className={classes.formControl} noValidate autoComplete="off">
-            <h2>填寫開團資訊</h2>
-            <div className={classes.paper}>
-              <FormControl className={classes.formControl}>
-                <TextField
-                  disabled
-                  defaultValue={state.username}
-                  id="create_user"
-                  name="create_user"
-                  label="建立者"
-                  variant="filled"
-                  className={classes.textField}
-                  style={{ width: 250 }}
-                />
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    onChange={handleInputChange}
-                    row
-                    aria-label="group_type"
-                    name="group_type"
-                    value={input.group_type}
-                    style={{ marginTop: 20 }}
-                  >
-                    <FormControlLabel
-                      value="交流"
-                      control={<Radio />}
-                      label="交流"
-                    />
-                    <FormControlLabel
-                      value="教學"
-                      control={<Radio />}
-                      label="教學"
-                    />
-                  </RadioGroup>
-                </FormControl>
-
-                <FormControl>
-                  <div
-                    className={classes.flexContainer}
-                    style={{ marginBottom: 20 }}
-                  >
-                    <span style={{ fontSize: 16, display: "block" }}>
-                      開團時間
-                    </span>
-                    <TextField
-                      required
-                      onChange={handleInputChange}
-                      // value={input.start_dt}
-                      id="datetime-local"
-                      name="group_startdt"
-                      label="開始"
-                      type="datetime-local"
-                      className={classes.textField}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      style={{ marginTop: 20 }}
-                    />
-                    <TextField
-                      required
-                      onChange={handleInputChange}
-                      // value={input.end_dt}
-                      id="datetime-local"
-                      name="group_enddt"
-                      label="結束"
-                      type="datetime-local"
-                      className={classes.textField}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      style={{ marginTop: 20 }}
-                    />
-                  </div>
-                </FormControl>
-                {!isAddressChecked && (
-                  <Autocomplete
-                    className={classes.textField}
-                    id="combo-box-demo"
-                    onChange={handleContentChange}
-                    name="location_name"
-                    options={dbData}
-                    getOptionLabel={(option) => option.location_name}
-                    style={{ width: 300 }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="場地名稱"
-                        variant="outlined"
-                      />
-                    )}
-                    style={{ width: 500, marginBottom: 20 }}
-                  />
-                )}
-
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={isAddressChecked}
-                      onChange={handleChange}
-                      color="primary"
-                      inputProps={{ "aria-label": "secondary checkbox" }}
-                    />
-                  }
-                  label="沒有在上面？自行輸入"
-                />
-                {isAddressChecked && (
-                  <>
-                    <TextField
-                      required
-                      onChange={handleInputChange}
-                      size="small"
-                      id="location_name"
-                      name="location_name"
-                      label="場地名稱"
-                      variant="filled"
-                      fullWidth
-                      style={{ marginTop: 20 }}
-                    />
-                    <TextField
-                      required
-                      onChange={handleInputChange}
-                      size="small"
-                      id="address"
-                      name="address"
-                      label="地址"
-                      variant="filled"
-                      fullWidth
-                      style={{ marginTop: 20 }}
-                    />
-                  </>
-                )}
-                <div className={classes.flexContainer}>
-                  <TextField
-                    id="lower_limit"
-                    label="人數下限"
-                    type="number"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    variant="filled"
-                    style={{ marginTop: 20, marginRight: 20 }}
-                  />
-                  <TextField
-                    id="uppper_limit"
-                    label="人數上限"
-                    type="number"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    variant="filled"
-                    style={{ marginTop: 20 }}
-                  />
-                </div>
-                <TextField
-                  onChange={handleInputChange}
-                  // size="small"
-                  required
-                  id="group_title"
-                  name="group_title"
-                  label="主題"
-                  variant="filled"
-                  fullWidth
-                  style={{ marginTop: 20 }}
-                />
-                <h3>內容</h3>
-                <TextField
-                  required
-                  onChange={handleInputChange}
-                  id="filled-multiline-static"
-                  label="填寫相關內容"
-                  name="group_content"
-                  multiline
-                  fullWidth
-                  rows={8}
-                  value={input.group_content}
-                  variant="filled"
-                />
-                <Button
-                  onClick={handleSubmit}
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  style={{ marginTop: 20, width: 150, marginBottom: 70 }}
-                >
-                  確認修改
-                </Button>
-              </FormControl>
-            </div>
-          </form>
-        </Grid>
-        <Grid item xs>
-          <div>
-            <img
-              src={indexmanstand}
-              style={{
-                height: 700,
-                width: "auto",
-                marginTop: 150,
-                marginBottom: 70,
-              }}
-              alt="banner"
-            />
-          </div>
-        </Grid>
-      </>
     );
   };
 
@@ -478,7 +471,14 @@ const FriendsGroupCreate = (props) => {
             <Alert />
           </Fade>
         </Dialog>
-        <WriteDetail />
+        <WriteDetail
+          input={input}
+          dbData={dbData}
+          handleInputChange={handleInputChange}
+          handleContentChange={handleContentChange}
+          handleSubmit={handleSubmit}
+          state={state}
+        />
       </Grid>
     </>
   );

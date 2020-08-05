@@ -19,16 +19,14 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-        required=True
-    )
-    username = serializers.CharField()
-    password = serializers.CharField(min_length=8, write_only=True)
-    map_create = serializers.ListField(required=False)
-    map_like = serializers.ListField(required=False)
-    group_create = serializers.ListField(required=False)
-    group_like = serializers.ListField(required=False)
-    group_join = serializers.ListField(required=False)
+    # email = serializers.EmailField(required=True)
+    # username = serializers.CharField()
+    # password = serializers.CharField(min_length=8, write_only=True)
+    map_create = serializers.ListField(required=False, allow_null=True)
+    map_like = serializers.ListField(required=False, allow_null=True)
+    group_create = serializers.ListField(required=False, allow_null=True)
+    group_like = serializers.ListField(required=False, allow_null=True)
+    group_join = serializers.ListField(required=False, allow_null=True)
 
     class Meta:
         model = CustomUser
