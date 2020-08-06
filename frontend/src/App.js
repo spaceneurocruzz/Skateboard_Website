@@ -35,6 +35,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import MenuIcon from "@material-ui/icons/Menu";
+import NotificationsIcon from "@material-ui/icons/Notifications";
 
 export const AuthContext = React.createContext();
 
@@ -98,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
     },
     color: "#CA3900",
     fontWeight: 600,
-    fontSize: 24,
+    fontSize: 22,
     textDecoration: "none",
     backgroundSize: "cover",
   },
@@ -384,19 +385,27 @@ const App = () => {
             </li> */}
             {state.isAuthenticated && (
               <>
-                <li className="nav-link-item">
+                <li className="nav-link-item-user">
                   <NavLink
                     to="/user"
                     activeClassName={classes.activelink}
                     className={classes.link}
                   >
-                    <FaceIcon style={{ verticalAlign: "middle" }} />
+                    {/* <FaceIcon style={{ verticalAlign: "middle" }} />
                     <span style={{ verticalAlign: "middle" }}>會員中心</span>
+                   */}
+                   <span
+                      style={{ color:"#4181ff", fontSize:17, marginLeft: 10, verticalAlign: "middle"  }}
+                    >
+                    <img style={{verticalAlign: "middle", marginRight: 5 }}
+                      src={`https://ui-avatars.com/api/?name=${state.username}&size=46&rounded=true&background=4181ff&color=fff`}
+                    />
+                 
+                      {state.username}
+                    </span>
                   </NavLink>
                 </li>
-                <img
-                  src={`https://ui-avatars.com/api/?name=${state.username}&size=50&rounded=true&background=4181ff&color=fff`}
-                /><span style={{fontSize:15, marginLeft:5, marginRight:15}}>{state.username}</span>
+                <NotificationsIcon style={{ fontSize: 28, color: "#CA3900", marginRight:10 }} />
               </>
             )}
             {!state.isAuthenticated ? (

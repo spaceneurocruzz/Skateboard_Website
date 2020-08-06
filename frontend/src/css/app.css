@@ -366,8 +366,18 @@
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     pointer-events: auto;
-    margin-left: 30px;
+    margin-left: 20px;
     margin-right: 30px;
+  }
+
+  .nav-link-item-user {
+    display: flex;
+    flex-direction: row;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    pointer-events: auto;
+    margin-left: 20px;
+    margin-right: 10px;
   }
 
   .nav-link-btn {

@@ -110,7 +110,9 @@ const CommentList = (props) => {
   if (!props.commentData.some((t) => t.map_id === props.locationId)) {
     return (
       <List className={classes.root}>
-        <h4>目前還沒有評論哦！</h4>
+        <h4 style={{ marginLeft: "auto", marginRight: "auto" }}>
+          目前還沒有評論哦！
+        </h4>
       </List>
     );
   } else {
@@ -186,6 +188,12 @@ const ShowCommentsDialog = (props) => {
     onClose(value);
   };
 
+  let currentLocation = props.getMapDBByLocationId(props.locationId);
+  let locationName="";
+  if (currentLocation != undefined) {
+    locationName = currentLocation.location_name;
+  }
+
   return (
     <Dialog
       aria-labelledby="transition-modal-title"
@@ -194,13 +202,13 @@ const ShowCommentsDialog = (props) => {
       open={open}
       onClose={handleClose}
       fullWidth
-      maxWidth="sm"
+      maxWidth="md"
     >
       <DialogTitle
         id="simple-dialog-title"
         style={{ backgroundColor: "#b7dcf9" }}
       >
-        關於這個場地的評論
+        關於 [{locationName}] 的評論
       </DialogTitle>
       <CommentList
         locationId={props.locationId}
@@ -289,22 +297,21 @@ const WriteComment = (props) => {
         props.updateComments(dbPost);
         props.onClose();
       })
-      .then(() => {
-        //updatemaprating
-        //props.updateGuideMapDB();
-      })
       .catch((error) => {
         console.error(error.response);
       })
       .finally(() => {});
 
     let updateRating = {
-      rating: props.countCommentRating(dbPost.map_id),
+      rating: props.countCommentRating(dbPost.map_id, ratingVal),
     };
 
     patchGuidemapApi(dbPost.map_id, updateRating)
       .then((res) => {
         props.updateMapDBByLocationId(dbPost.map_id, updateRating, "RATING");
+      })
+      .then(() => {
+        props.setIsDataChanged(true);
       })
       .catch((error) => {
         console.error(error.response);
@@ -365,6 +372,12 @@ const WriteCommentsDialog = (props) => {
   const classes = useStyles();
   const { onClose, open } = props;
 
+  let currentLocation = props.getMapDBByLocationId(props.locationId);
+  let locationName="";
+  if (currentLocation != undefined) {
+    locationName = currentLocation.location_name;
+  }
+
   return (
     <Dialog
       aria-labelledby="transition-modal-title"
@@ -379,7 +392,7 @@ const WriteCommentsDialog = (props) => {
         id="simple-dialog-title"
         style={{ backgroundColor: "#b7dcf9" }}
       >
-        我要寫評論
+        我要評論 [{locationName}]
       </DialogTitle>
       <WriteComment
         locationId={props.locationId}
@@ -389,36 +402,142 @@ const WriteCommentsDialog = (props) => {
         onClose={onClose}
         countCommentRating={props.countCommentRating}
         handleShowAlertOpen={props.handleShowAlertOpen}
+        setIsDataChanged={props.setIsDataChanged}
+        updateMapDBByLocationId={props.updateMapDBByLocationId}
       />
     </Dialog>
   );
 };
 
-const MapList = (props) => {
+const MapTable = (props) => {
   const classes = useStyles();
+
+  return (
+    <Container component="main" maxWidth="lg">
+      <div className={classes.root}>
+        <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
+          <MaterialTable
+            title={"場地或店家列表"}
+            columns={[
+              {
+                title: "類型",
+                field: "location_type",
+                lookup: { 場地: "場地", 店家: "店家" },
+                width: 100,
+              },
+              { title: "場地名稱", field: "location_name", width: 225 },
+              { title: "地址", field: "address" },
+              {
+                title: "綜合評分",
+                field: "rating",
+                width: 220,
+                render: (rowData) => {
+                  return (
+                    <Rating
+                      name="hover-feedback"
+                      value={rowData.rating}
+                      readOnly
+                    />
+                  );
+                },
+              },
+            ]}
+            data={props.dbGuideMapData}
+            actions={[
+              (rowData) => ({
+                icon: () => <CommentIcon />,
+                tooltip: "查看評論",
+                onClick: (event, rowData) =>
+                  props.handleShowCommentsOpen(event, rowData.location_id),
+              }),
+              (rowData) => ({
+                icon: () => <RateReviewIcon />,
+                tooltip: "發表評論",
+                onClick: (event, rowData) => {
+                  props.handleWriteCommentsOpen(event, rowData.location_id);
+                },
+                disabled: !props.state.isAuthenticated,
+              }),
+              (rowData) => ({
+                icon: () => <FavoriteBorderIcon />,
+                tooltip: "加入最愛",
+                onClick: (event, rowData) => {
+                  props.likeMap(event, rowData.location_id);
+                },
+                disabled:
+                  !props.state.isAuthenticated ||
+                  (rowData.like_user != undefined
+                    ? rowData.like_user.includes(props.state.username)
+                    : false),
+              }),
+            ]}
+            options={{
+              filtering: true,
+              headerStyle: {
+                backgroundColor: "#015da5",
+                color: "#FFF",
+                fontSize: 16,
+              },
+              actionsColumnIndex: -1,
+            }}
+            localization={{
+              header: {
+                actions: "評論/加入最愛",
+              },
+            }}
+            detailPanel={(rowData) => {
+              return (
+                <Grid
+                  container
+                  // spacing={1}
+                  style={{ backgroundColor: "#e8f8fb" }}
+                >
+                  <Grid item xs={12} sm={1}></Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Box p={1}>{<ScheduleIcon />}開放時間</Box>
+                    <Box p={1}>
+                      <ListItemText
+                        primary={`平日: ${rowData.openhours["weekdayTimeStart"]}- ${rowData.openhours["weekdayTimeEnd"]}`}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                      <ListItemText
+                        primary={`假日與例假日: ${rowData.openhours["weekendTimeStart"]}- ${rowData.openhours["weekendTimeEnd"]}`}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <Box p={1}>{<CommuteIcon />}建議交通方式</Box>
+                    <Box p={1}>
+                      <ListItemText
+                        primary={`${rowData.traffic}`}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Box p={1}>{<InfoIcon />}場地介紹</Box>
+                    <Box p={1}>
+                      <ListItemText
+                        primary={`${rowData.intro}`}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                    </Box>
+                  </Grid>
+                </Grid>
+              );
+            }}
+            onRowClick={(event, rowData, togglePanel) => togglePanel()}
+          />
+        </div>
+      </div>
+    </Container>
+  );
+};
+
+const MapList = (props) => {
   const { state } = React.useContext(AuthContext);
-  const [city, setCity] = useState("臺北市");
-  const [district, setDistrict] = useState("中正區");
-  const [locationType, setLocationType] = useState({ key: 2, label: "全部" });
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [response, setResponse] = useState(null);
-  const initialState = [
-    {
-      location_name: "",
-      location_type: "",
-      latitude: null,
-      longitude: null,
-      address: "",
-      traffic: "",
-      openhours: null,
-      phone: "",
-      rating: 0,
-      create_dt: null,
-      update_dt: null,
-      modified_user: "",
-    },
-  ];
+  const [isDataChanged, setIsDataChanged] = useState(false);
 
   const [dbGuideMapData, setDbGuideMapData] = useState([]);
   const [isGuidemapLoaded, setIsGuidemapLoaded] = useState(false);
@@ -426,16 +545,17 @@ const MapList = (props) => {
   useEffect(() => {
     getGuidemapApi()
       .then((res) => {
-        setDbGuideMapData(res.data);
+        props.getGuideMapDB(res.data);
       })
       .then((res) => {
         setIsGuidemapLoaded(true);
+        setIsDataChanged(false);
       })
       .catch((error) => {
         console.error(error);
       })
       .finally(() => {});
-  }, [props.dbGuideMapData]);
+  }, [isDataChanged]);
 
   const [openShowAlert, setOpenShowAlert] = React.useState(false);
 
@@ -487,31 +607,32 @@ const MapList = (props) => {
       .then((res) => {
         setCommentData(...commentData, res.data);
       })
+      .then((res) => {
+        setIsDataChanged(false);
+      })
       .catch((error) => {
         console.error(error);
       })
       .finally(() => {});
   }, []);
 
-  const countCommentRating = (mapId) => {
-    console.log(commentData);
+  const countCommentRating = (mapId, ratingVal) => {
     let ratingTotal = 0;
+    let dataCount = 0;
     let dataByMapId = commentData.filter((group) => group.map_id == mapId);
-    for (let x in dataByMapId) {
-      ratingTotal += Number(dataByMapId[x].rating);
-      console.log(dataByMapId[x].rating);
+
+    for (let idx in dataByMapId) {
+      ratingTotal += Number(dataByMapId[idx].rating);
+      dataCount++;
     }
-    console.log(Math.round((ratingTotal / dataByMapId.length) * 10) / 10);
-    return Math.round((ratingTotal / dataByMapId.length) * 10) / 10;
-  };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+    ratingTotal += ratingVal;
+    dataCount += 1;
+    if (dataCount === 0) {
+      dataCount = 1;
+    }
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+    return Math.round((ratingTotal / dataCount) * 10) / 10;
   };
 
   const updateComments = (newValue) => {
@@ -520,9 +641,9 @@ const MapList = (props) => {
 
   const likeMap = (e, location_id) => {
     e.preventDefault();
-    console.log(location_id);
 
     let preLikeUserArr = props.getMapDBByLocationId(location_id).like_user;
+    console.log(preLikeUserArr);
     if (preLikeUserArr == null || preLikeUserArr == undefined) {
       preLikeUserArr = [state.username];
     } else {
@@ -565,130 +686,6 @@ const MapList = (props) => {
       .finally(() => {});
   };
 
-  const MapTable = () => {
-    return (
-      <Container component="main" maxWidth="lg">
-        <div className={classes.root}>
-          <div style={{ width: "100%", marginBottom: 50, marginTop: 50 }}>
-            <MaterialTable
-              title={"場地或店家列表"}
-              columns={[
-                {
-                  title: "類型",
-                  field: "location_type",
-                  lookup: { 場地: "場地", 店家: "店家" },
-                  width: 100,
-                },
-                { title: "場地名稱", field: "location_name", width: 225 },
-                { title: "地址", field: "address" },
-                {
-                  title: "綜合評分",
-                  field: "rating",
-                  width: 220,
-                  render: (rowData) => {
-                    return (
-                      <Rating
-                        name="hover-feedback"
-                        value={rowData.rating}
-                        readOnly
-                      />
-                    );
-                  },
-                },
-              ]}
-              data={props.dbGuideMapData}
-              actions={[
-                (rowData) => ({
-                  icon: () => <CommentIcon />,
-                  tooltip: "查看評論",
-                  onClick: (event, rowData) =>
-                    handleShowCommentsOpen(event, rowData.location_id),
-                }),
-                (rowData) => ({
-                  icon: () => <RateReviewIcon />,
-                  tooltip: "發表評論",
-                  onClick: (event, rowData) => {
-                    handleWriteCommentsOpen(event, rowData.location_id);
-                  },
-                  disabled: !state.isAuthenticated,
-                }),
-                (rowData) => ({
-                  icon: () => <FavoriteBorderIcon />,
-                  tooltip: "加入最愛",
-                  onClick: (event, rowData) => {
-                    likeMap(event, rowData.location_id);
-                  },
-                  disabled:
-                    !state.isAuthenticated ||
-                    (rowData.like_user != undefined
-                      ? rowData.like_user.includes(state.username)
-                      : false),
-                }),
-              ]}
-              options={{
-                filtering: true,
-                headerStyle: {
-                  backgroundColor: "#015da5",
-                  color: "#FFF",
-                  fontSize: 16,
-                },
-                actionsColumnIndex: -1,
-              }}
-              localization={{
-                header: {
-                  actions: "評論/加入最愛",
-                },
-              }}
-              detailPanel={(rowData) => {
-                return (
-                  <Grid
-                    container
-                    // spacing={1}
-                    style={{ backgroundColor: "#e8f8fb" }}
-                  >
-                    <Grid item xs={12} sm={1}></Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Box p={1}>{<ScheduleIcon />}開放時間</Box>
-                      <Box p={1}>
-                        <ListItemText
-                          primary={`平日: ${rowData.openhours["weekdayTimeStart"]}- ${rowData.openhours["weekdayTimeEnd"]}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                        <ListItemText
-                          primary={`假日與例假日: ${rowData.openhours["weekendTimeStart"]}- ${rowData.openhours["weekendTimeEnd"]}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={3}>
-                      <Box p={1}>{<CommuteIcon />}建議交通方式</Box>
-                      <Box p={1}>
-                        <ListItemText
-                          primary={`${rowData.traffic}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Box p={1}>{<InfoIcon />}場地介紹</Box>
-                      <Box p={1}>
-                        <ListItemText
-                          primary={`${rowData.intro}`}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </Box>
-                    </Grid>
-                  </Grid>
-                );
-              }}
-              onRowClick={(event, rowData, togglePanel) => togglePanel()}
-            />
-          </div>
-        </div>
-      </Container>
-    );
-  };
-
   if (!isGuidemapLoaded) {
     return <div>Loading...</div>;
   } else {
@@ -704,10 +701,12 @@ const MapList = (props) => {
         />
 
         <ShowCommentsDialog
+          dbGuideMapData={props.dbGuideMapData}
           open={openShowComments}
           onClose={handleShowCommentsClose}
           locationId={openShowCommentsMapId}
           commentData={commentData}
+          getMapDBByLocationId={props.getMapDBByLocationId}
         />
         <WriteCommentsDialog
           open={openWriteComments}
@@ -718,8 +717,17 @@ const MapList = (props) => {
           updateComments={updateComments}
           countCommentRating={countCommentRating}
           handleShowAlertOpen={handleShowAlertOpen}
+          setIsDataChanged={setIsDataChanged}
+          getMapDBByLocationId={props.getMapDBByLocationId}
+          updateMapDBByLocationId={props.updateMapDBByLocationId}
         />
-        <MapTable />
+        <MapTable
+          state={state}
+          dbGuideMapData={props.dbGuideMapData}
+          handleShowCommentsOpen={handleShowCommentsOpen}
+          handleWriteCommentsOpen={handleWriteCommentsOpen}
+          likeMap={likeMap}
+        />
       </>
     );
   }

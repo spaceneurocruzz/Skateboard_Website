@@ -700,8 +700,6 @@ const User = (props) => {
     setOpenShowErrorAlert(false);
   };
 
-  const [password, setPassword] = useState("");
-
   const handleInputChange = (event) => {
     props.updateUserDB(event.target);
   };

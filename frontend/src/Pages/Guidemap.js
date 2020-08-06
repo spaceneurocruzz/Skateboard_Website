@@ -83,6 +83,10 @@ const Guidemap = (props) => {
       .finally(() => {});
   }, []);
 
+  const getGuideMapDB = (newData) => {
+    setDbGuideMapData(newData);
+  };
+
   const updateGuideMapDB = (newData) => {
     setDbGuideMapData([...dbGuideMapData, newData]);
   };
@@ -318,7 +322,7 @@ const Guidemap = (props) => {
         <Grid container>
           <MapList
             dbGuideMapData={dbGuideMapData}
-            updateGuideMapDB={updateGuideMapDB}
+            getGuideMapDB={getGuideMapDB}
             userData={props.userData}
             updateGroupUserDB={props.updateGroupUserDB}
             getMapDBByLocationId={getMapDBByLocationId}
