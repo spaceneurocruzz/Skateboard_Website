@@ -2,7 +2,7 @@ import React from "react";
 
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from "@material-ui/core/styles";
 
 const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -10,8 +10,8 @@ const Alert = (props) => {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
-    '& > * + *': {
+    width: "100%",
+    "& > * + *": {
       marginTop: theme.spacing(2),
     },
   },
@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ShowAlertMessages = (props) => {
   const classes = useStyles();
-  const { onClose, open } = props;
+  const { onClose, open, type } = props;
 
   const handleClose = (value) => {
     onClose(value);
@@ -29,7 +29,7 @@ const ShowAlertMessages = (props) => {
     <div className={classes.root}>
       <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success">
-          更新成功！
+          {type == "register" ? "註冊成功！" : "更新成功！"}
         </Alert>
       </Snackbar>
     </div>

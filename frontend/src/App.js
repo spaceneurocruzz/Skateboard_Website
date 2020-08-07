@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Switch, Route, useHistory } from "react-router";
 import "./css/app.css";
+import axiosInstance, {
+  logoutApi,
+  getFriendsGroupApi,
+  getUserApi,
+} from "./axiosApi";
+import { NotifyProvider } from "./NotifyContext";
+import Notification from "./Components/Notification";
 import User from "./Pages/User";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
@@ -14,11 +21,6 @@ import FriendsGroupCreate from "./Pages/FriendsGroupCreate";
 import FriendsGroupHistory from "./Components/FriendsGroup/FriendsGroupHistory";
 import Discussion from "./Pages/Discussion";
 import logo from "./imgs/skateboardLogo.png";
-import axiosInstance, {
-  logoutApi,
-  getFriendsGroupApi,
-  getUserApi,
-} from "./axiosApi";
 // import SocialLogin from "./SocialLogin";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -36,8 +38,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import Badge from "@material-ui/core/Badge";
 
 export const AuthContext = React.createContext();
+export const NotifyContext = React.createContext();
 
 const initialState = {
   isAuthenticated: false,
@@ -111,6 +116,18 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: 10,
     borderRadius: 10,
   },
+  userLink: {
+    color: "#ea6a00",
+    fontWeight: 1000,
+    fontSize: 22,
+    textDecoration: "none",
+    alignItems: "center",
+  },
+  media:{
+    borderRadius: "50%",
+    width:46,
+    height:46,
+  }
 }));
 
 const StyledMenu = withStyles({
@@ -211,10 +228,90 @@ const SideMenu = () => {
   );
 };
 
+const MemberMenu = (props) => {
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <li className="nav-link-item-user">
+        <NavLink
+          to="/user"
+          activeClassName={classes.activelink}
+          className={classes.link}
+          onClick={handleClick}
+          onMouseOver={handleClick}
+        >
+          <span
+            style={{
+              color: "#4181ff",
+              fontSize: 17,
+              marginLeft: 10,
+              verticalAlign: "middle",
+            }}
+          >
+            {props.userData.avatar == "default.jpg" ? (
+              <img
+                style={{ verticalAlign: "middle", marginRight: 5 }}
+                src={`https://ui-avatars.com/api/?name=${props.state.username}&size=46&rounded=true&background=4181ff&color=fff`}
+              />
+            ) : (
+              <img
+                className={classes.media}
+                src={`../..${props.userData.avatar}`}
+              />
+            )}
+
+            {props.state.username}
+          </span>
+        </NavLink>
+      </li>
+      <StyledMenu
+        id="customized-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        MenuListProps={{ onMouseLeave: handleClose }}
+      >
+        <NavLink to="/user" className={classes.userLink}>
+          <StyledMenuItem>
+            <ListItemIcon>
+              <FaceIcon fontSize="default" />
+            </ListItemIcon>
+            <ListItemText primary="會員中心" />
+          </StyledMenuItem>
+        </NavLink>
+        <span onClick={props.handleLogout} className={classes.userLink}>
+          <StyledMenuItem>
+            <ListItemIcon>
+              <ExitToAppIcon fontSize="default" />
+            </ListItemIcon>
+            <ListItemText primary="登出" />
+          </StyledMenuItem>
+        </span>
+      </StyledMenu>
+    </div>
+  );
+};
+
+const NotifyMenu = (props) => {
+  return <Notification />;
+};
+
 const App = () => {
   const classes = useStyles();
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const history = useHistory();
+  const [notification, setNotification] = useState([]);
   const initUserData = {
     location: "",
     nickname: "",
@@ -331,29 +428,30 @@ const App = () => {
         dispatch,
       }}
     >
-      <div className="header">
-        <div className="logo">
-          <Link to="/" className="link">
-            <img src={logo} alt="logo" />
-          </Link>
-          <Link to="/" className="link">
-            <span className="logoText">SkateboardGO</span>
-          </Link>
-        </div>
-        <SideMenu />
-        <div className="nav forlargescreen">
-          <ul className="nav-link">
-            <li className="nav-link-item">
-              <NavLink
-                to="/guidemap"
-                activeClassName={classes.activelink}
-                className={classes.link}
-              >
-                <MapIcon style={{ verticalAlign: "middle" }} />
-                <span style={{ verticalAlign: "middle" }}>地圖</span>
-              </NavLink>
-            </li>
-            {/* <li className="nav-link-item">
+      <NotifyProvider>
+        <div className="header">
+          <div className="logo">
+            <Link to="/" className="link">
+              <img src={logo} alt="logo" />
+            </Link>
+            <Link to="/" className="link">
+              <span className="logoText">SkateboardGO</span>
+            </Link>
+          </div>
+          <SideMenu />
+          <div className="nav forlargescreen">
+            <ul className="nav-link">
+              <li className="nav-link-item">
+                <NavLink
+                  to="/guidemap"
+                  activeClassName={classes.activelink}
+                  className={classes.link}
+                >
+                  <MapIcon style={{ verticalAlign: "middle" }} />
+                  <span style={{ verticalAlign: "middle" }}>地圖</span>
+                </NavLink>
+              </li>
+              {/* <li className="nav-link-item">
               <NavLink
                 to="/calendar"
                 activeClassName={classes.activelink}
@@ -363,17 +461,17 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>活動日曆</span>
               </NavLink>
             </li> */}
-            <li className="nav-link-item">
-              <NavLink
-                to="/friendsgroup"
-                activeClassName={classes.activelink}
-                className={classes.link}
-              >
-                <PeopleAltIcon style={{ verticalAlign: "middle" }} />
-                <span style={{ verticalAlign: "middle" }}>揪團</span>
-              </NavLink>
-            </li>
-            {/* <li className="nav-link-item">
+              <li className="nav-link-item">
+                <NavLink
+                  to="/friendsgroup"
+                  activeClassName={classes.activelink}
+                  className={classes.link}
+                >
+                  <PeopleAltIcon style={{ verticalAlign: "middle" }} />
+                  <span style={{ verticalAlign: "middle" }}>揪團</span>
+                </NavLink>
+              </li>
+              {/* <li className="nav-link-item">
               <NavLink
                 to="/discussion"
                 activeClassName={classes.activelink}
@@ -383,157 +481,137 @@ const App = () => {
                 <span style={{ verticalAlign: "middle" }}>技術交流</span>
               </NavLink>
             </li> */}
-            {state.isAuthenticated && (
-              <>
-                <li className="nav-link-item-user">
-                  <NavLink
-                    to="/user"
-                    activeClassName={classes.activelink}
-                    className={classes.link}
-                  >
-                    {/* <FaceIcon style={{ verticalAlign: "middle" }} />
-                    <span style={{ verticalAlign: "middle" }}>會員中心</span>
-                   */}
-                   <span
-                      style={{ color:"#4181ff", fontSize:17, marginLeft: 10, verticalAlign: "middle"  }}
+              {state.isAuthenticated && (
+                <>
+                  <MemberMenu state={state} userData={userData} handleLogout={handleLogout} />
+                  <Notification
+                    state={state}
+                    notification={notification}
+                    dbFriendsGroupData={dbFriendsGroupData}
+                  />
+                </>
+              )}
+              {!state.isAuthenticated ? (
+                <li className="nav-link-btn">
+                  <Link to="/login/" className="link">
+                    <Button
+                      variant="contained"
+                      style={{ backgroundColor: "#188af2", color: "white" }}
                     >
-                    <img style={{verticalAlign: "middle", marginRight: 5 }}
-                      src={`https://ui-avatars.com/api/?name=${state.username}&size=46&rounded=true&background=4181ff&color=fff`}
-                    />
-                 
-                      {state.username}
-                    </span>
-                  </NavLink>
+                      登入
+                    </Button>
+                  </Link>
                 </li>
-                <NotificationsIcon style={{ fontSize: 28, color: "#CA3900", marginRight:10 }} />
-              </>
-            )}
-            {!state.isAuthenticated ? (
-              <li className="nav-link-btn">
-                <Link to="/login/" className="link">
-                  <Button
-                    variant="contained"
-                    style={{ backgroundColor: "#188af2", color: "white" }}
-                  >
-                    登入
-                  </Button>
-                </Link>
-              </li>
-            ) : (
-              <li className="nav-link-btn">
-                <Button
-                  onClick={handleLogout}
-                  variant="contained"
-                  style={{ backgroundColor: "#616263", color: "white" }}
-                >
-                  登出
-                </Button>
-              </li>
-            )}
-            {!state.isAuthenticated && (
-              <li className="nav-link-btn">
-                <Link to="/signup/" className="link">
-                  <Button variant="contained" color="primary">
-                    註冊
-                  </Button>
-                </Link>
-              </li>
-            )}
-            {/* <SocialLogin /> */}
-          </ul>
+              ) : (
+                <li className="nav-link-btn"></li>
+              )}
+              {!state.isAuthenticated && (
+                <li className="nav-link-btn">
+                  <Link to="/signup/" className="link">
+                    <Button variant="contained" color="primary">
+                      註冊
+                    </Button>
+                  </Link>
+                </li>
+              )}
+              {/* <SocialLogin /> */}
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <Switch>
-        <Route exact path="/" render={() => <Home />} />
-        <Route
-          exact
-          path={"/guidemap"}
-          key={"route-guidemap"}
-          render={() => (
-            <Guidemap
-              userData={userData}
-              updateUserDB={updateUserDB}
-              dbFriendsGroupData={dbFriendsGroupData}
-              updateGroupUserDB={updateGroupUserDB}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={"/friendsgroup"}
-          key={"route-friendsgroup"}
-          render={() => (
-            <FriendsGroup
-              userData={userData}
-              updateUserDB={updateUserDB}
-              updateGroupUserDB={updateGroupUserDB}
-              dbFriendsGroupData={dbFriendsGroupData}
-              updateFriendsGroupDB={updateFriendsGroupDB}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={"/friendsgrouphistory"}
-          key={"route-friendsgrouphistory"}
-          render={() => (
-            <FriendsGroupHistory
-              userData={userData}
-              updateUserDB={updateUserDB}
-              updateGroupUserDB={updateGroupUserDB}
-              dbFriendsGroupData={dbFriendsGroupData}
-              updateFriendsGroupDB={updateFriendsGroupDB}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={"/user"}
-          key={"route-user"}
-          render={() => (
-            <User
-              userData={userData}
-              updateUserDB={updateUserDB}
-              initUserDB={initUserDB}
-              dbFriendsGroupData={dbFriendsGroupData}
-              updateGroupUserDB={updateGroupUserDB}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={"/friendsGroup/create"}
-          key={"route-friendsGroupCreate"}
-          render={() => (
-            <FriendsGroupCreate
-              userData={userData}
-              updateUserDB={updateUserDB}
-              dbFriendsGroupData={dbFriendsGroupData}
-              updateFriendsGroupDB={updateFriendsGroupDB}
-            />
-          )}
-        />
+        <Switch>
+          <Route exact path="/" render={() => <Home />} />
+          <Route
+            exact
+            path={"/guidemap"}
+            key={"route-guidemap"}
+            render={() => (
+              <Guidemap
+                userData={userData}
+                updateUserDB={updateUserDB}
+                dbFriendsGroupData={dbFriendsGroupData}
+                updateGroupUserDB={updateGroupUserDB}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={"/friendsgroup"}
+            key={"route-friendsgroup"}
+            render={() => (
+              <FriendsGroup
+                userData={userData}
+                updateUserDB={updateUserDB}
+                updateGroupUserDB={updateGroupUserDB}
+                dbFriendsGroupData={dbFriendsGroupData}
+                updateFriendsGroupDB={updateFriendsGroupDB}
+                notification={notification}
+                setNotification={setNotification}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={"/friendsgrouphistory"}
+            key={"route-friendsgrouphistory"}
+            render={() => (
+              <FriendsGroupHistory
+                userData={userData}
+                updateUserDB={updateUserDB}
+                updateGroupUserDB={updateGroupUserDB}
+                dbFriendsGroupData={dbFriendsGroupData}
+                updateFriendsGroupDB={updateFriendsGroupDB}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={"/user"}
+            key={"route-user"}
+            render={() => (
+              <User
+                userData={userData}
+                updateUserDB={updateUserDB}
+                initUserDB={initUserDB}
+                dbFriendsGroupData={dbFriendsGroupData}
+                updateGroupUserDB={updateGroupUserDB}
+              />
+            )}
+          />
+          <Route
+            exact
+            path={"/friendsGroup/create"}
+            key={"route-friendsGroupCreate"}
+            render={() => (
+              <FriendsGroupCreate
+                userData={userData}
+                updateUserDB={updateUserDB}
+                dbFriendsGroupData={dbFriendsGroupData}
+                updateFriendsGroupDB={updateFriendsGroupDB}
+              />
+            )}
+          />
 
-        <Route
-          exact
-          path={"/friendsGroupDetail/:id"}
-          key={"route-friendsGroupDetail"}
-          render={() => <FriendsGroupDetail />}
-        />
+          <Route
+            exact
+            path={"/friendsGroupDetail/:id"}
+            key={"route-friendsGroupDetail"}
+            render={() => <FriendsGroupDetail />}
+          />
 
-        <Route
-          exact
-          path={"/login/"}
-          render={() => <Login userData={userData} initUserDB={initUserDB} />}
-        />
-        <Route exact path={"/signup/"} component={Signup} />
-      </Switch>
-      <div className="footer">
-        <div>Frontend: ReactJS, Material-UI</div>
-        <div>Backend: Django(Python), PosgreSQL</div>
-        <div>Designed by Sandy Lin, 2020</div>
-      </div>
+          <Route
+            exact
+            path={"/login/"}
+            render={() => <Login userData={userData} initUserDB={initUserDB} />}
+          />
+          <Route exact path={"/signup/"} component={Signup} />
+        </Switch>
+        <div className="footer">
+          <div>Frontend: ReactJS, Material-UI</div>
+          <div>Backend: Django(Python), PosgreSQL</div>
+          <div>Designed by Sandy Lin, 2020</div>
+        </div>
+      </NotifyProvider>
     </AuthContext.Provider>
   );
 };

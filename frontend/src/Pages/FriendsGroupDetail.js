@@ -1,13 +1,3 @@
-import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Icon from "@material-ui/core/Icon";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import PersonPinIcon from "@material-ui/icons/PersonPin";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../App";
@@ -20,6 +10,17 @@ import {
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
 import "../css/app.css";
+import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import Icon from "@material-ui/core/Icon";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import TextField from "@material-ui/core/TextField";
+import PersonPinIcon from "@material-ui/icons/PersonPin";
+import ShareIcon from '@material-ui/icons/Share';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -128,6 +129,8 @@ const ShowDetail = (props) => {
       .then((res) => {
         props.handleShowAlertOpen();
         props.setCommentData([...props.commentData, dbPost]);
+      }).then(()=>{
+        props.setNotification(...notification, "有新的留言");
       })
       .catch((error) => {
         console.error(error.response);
@@ -159,6 +162,7 @@ const ShowDetail = (props) => {
                   <span
                     style={{ marginLeft: 100 }}
                   >{`建立者：${data.create_user}`}</span>
+                  {/* <ShareIcon style={{ marginLeft: 100 }}/> */}
                 </div>
                 <ListItem>
                   <ListItemText>

@@ -33,6 +33,7 @@ import {
 } from "../../axiosApi";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 import ShowAlertMessages from "../ShowAlertMessages";
+import SyncIcon from '@material-ui/icons/Sync';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -189,7 +190,7 @@ const ShowCommentsDialog = (props) => {
   };
 
   let currentLocation = props.getMapDBByLocationId(props.locationId);
-  let locationName="";
+  let locationName = "";
   if (currentLocation != undefined) {
     locationName = currentLocation.location_name;
   }
@@ -373,7 +374,7 @@ const WriteCommentsDialog = (props) => {
   const { onClose, open } = props;
 
   let currentLocation = props.getMapDBByLocationId(props.locationId);
-  let locationName="";
+  let locationName = "";
   if (currentLocation != undefined) {
     locationName = currentLocation.location_name;
   }
@@ -483,6 +484,13 @@ const MapTable = (props) => {
             localization={{
               header: {
                 actions: "評論/加入最愛",
+              },
+              body: {
+                emptyDataSourceMessage: (
+                  <span>
+                    <SyncIcon />
+                  </span>
+                ),
               },
             }}
             detailPanel={(rowData) => {

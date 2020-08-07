@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import axios from "axios";
 import { NavLink } from "react-router-dom";
 import {
   getUserApi,
@@ -44,8 +44,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   button: {
-    margin: 10,
-    paddingTop: 20,
+    marginRight: 5,
   },
   input: {
     display: "none",
@@ -65,6 +64,15 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     display: "flex",
     height: 500,
+  },
+  submit: {
+    height: 40,
+    marginTop: 5,
+    marginRight: 5,
+  },
+  editBtn: {
+    height: 40,
+    marginTop: 5,
   },
 }));
 
@@ -457,7 +465,7 @@ const TabInfo = (props) => {
                     }
                   })
                 ) : (
-                  <span>沒有</span>
+                  <span></span>
                 )}
               </ul>
             </Grid>
@@ -503,7 +511,7 @@ const TabInfo = (props) => {
                     }
                   })
                 ) : (
-                  <span>沒有</span>
+                  <span></span>
                 )}
               </ul>
             </Grid>
@@ -550,7 +558,7 @@ const EditProfile = (props) => {
           style={{ width: 300 }}
         />
       </Grid>
-      <Grid container>
+      <Grid container style={{ marginLeft: 300 }}>
         <TextField
           onChange={props.handleInputChange}
           required
@@ -599,6 +607,8 @@ const EditProfile = (props) => {
 };
 
 const UserDetail = (props) => {
+  const classes = useStyles();
+
   return (
     <Container
       className="user_conatainer"
@@ -608,44 +618,92 @@ const UserDetail = (props) => {
     >
       <Grid
         container
-        style={{ marginTop: 70, marginBottom: 20, display: "flex" }}
+        style={{
+          marginTop: 70,
+          marginBottom: 20,
+          paddingLeft: 60,
+          display: "flex",
+        }}
       >
-        <img
-          src={`https://ui-avatars.com/api/?name=${props.userData.username}&size=128&rounded=true&background=040404&color=fff`}
-        />
-        {/* <input
-          accept="image/*"
-          className={classes.input}
-          id="contained-button-file"
-          name="avatar"
-          multiple
-          type="file"
-          onChange={handleUploadClick}
-        />
-        <label htmlFor="contained-button-file">
-          <Fab component="span" className={classes.button}>
-            <AddPhotoAlternateIcon />
-          </Fab>
-        </label> */}
-        {/* <img
-          width="200px"
-          className={classes.media}
-          src={img.selectedFile}
-        /> */}
-        {/* <img
-          width="200px"
-          className={classes.media}
-          src={`../..${props.userData.avatar}`}
-        /> */}
-        {/* <Button
-          onClick={handleAvatarSubmit}
-          type="submit"
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          確認
-        </Button> */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {!props.userData.avatar && (
+            <img
+              src={`https://ui-avatars.com/api/?name=${props.userData.username}&size=200&rounded=true&background=040404&color=fff`}
+            />
+          )}
+          {props.img.selectedFile ? (
+            <img
+              width="200px"
+              height="200px"
+              className={classes.media}
+              src={URL.createObjectURL(props.img.selectedFile)}
+            />
+          ) : (
+            <img
+              width="200px"
+              height="200px"
+              className={classes.media}
+              src={`../..${props.userData.avatar}`}
+            />
+          )}
+          {!props.showEdit && (
+            <Button
+              onClick={props.handleShowEdit}
+              type="submit"
+              variant="contained"
+              color="default"
+              className={classes.editBtn}
+              style={{ marginTop: 5, marginBottom: 11 }}
+            >
+              修改照片
+            </Button>
+          )}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+            }}
+          >
+            {props.showEdit && (
+              <>
+                <input
+                  accept="image/*"
+                  className={classes.input}
+                  id="contained-button-file"
+                  name="avatar"
+                  multiple
+                  type="file"
+                  onChange={props.handleUploadClick}
+                />
+                <label htmlFor="contained-button-file">
+                  <Fab component="span" className={classes.button}>
+                    <AddPhotoAlternateIcon
+                      style={{ height: 30, width: 30, marginTop: 5 }}
+                    />
+                  </Fab>
+                </label>
+                <Button
+                  onClick={props.handleAvatarSubmit}
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  className={classes.submit}
+                >
+                  確認
+                </Button>
+                <Button
+                  onClick={props.handleAvatarCancel}
+                  type="submit"
+                  variant="contained"
+                  color="default"
+                  className={classes.submit}
+                >
+                  取消
+                </Button>
+              </>
+            )}{" "}
+          </div>
+        </div>
         {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
       <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
         <div style={{ marginLeft: 50 }}>
@@ -703,6 +761,8 @@ const User = (props) => {
   const handleInputChange = (event) => {
     props.updateUserDB(event.target);
   };
+
+  const [errorType, setErrorType] = React.useState(null);
 
   const [isDataChanged, setIsDataChanged] = useState(false);
 
@@ -935,40 +995,54 @@ const User = (props) => {
       .finally(() => {});
   };
 
+  const handleAvatarCancel = (e) => {
+    setImg({
+      mainState: "uploaded",
+      selectedFile: null,
+      imageUploaded: 0,
+    });
+
+    setShowEdit(false);
+  };
+
   const handleAvatarSubmit = (e) => {
     e.preventDefault();
-
+    let uploadImg = img.selectedFile;
+    if (uploadImg.size > 500000) {
+      console.log(uploadImg.size)
+      setErrorType("檔案請勿超過500KB!");
+      setOpenShowErrorAlert(true);
+      return;
+    }
     let form_data = new FormData();
-    form_data.append("image", img.selectedFile[0]);
-    // form_data.append("title", state.username);
-    // form_data.append("content", state.username);
-    //form_data.append("_method", 'PATCH');
+    form_data.append("avatar", uploadImg);
+    form_data.append("title", state.username);
+    form_data.append("content", state.username);
+    console.log(uploadImg);
+    axios
+      .patch(`api/user/update/username=${state.username}`, form_data, {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        setIsDataChanged(true);
+        handleShowAlertOpen();
+        console.log(res.data);
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.log(err.response));
+  };
 
-    // axios
-    //   .patch(`api/user/update/username=${state.username}`, form_data, {
-    //     headers: {
-    //       "content-type": "multipart/form-data",
-    //       //"application/x-www-form-urlencoded"
-    //     },
-    //   })
-    //   .then((res) => {
-    //     // console.log(img.selectedFile[0]);
-    //     console.log(res.data);
-    //   })
-    //   .catch((err) => console.log(err));
+  const [showEdit, setShowEdit] = useState(false);
+  const handleShowEdit = (event) => {
+    setShowEdit(true);
   };
 
   const handleUploadClick = (event) => {
     let file = event.target.files[0];
-    const reader = new FileReader();
-    let url = reader.readAsDataURL(file);
-
-    reader.onloadend = (e) => {
-      setImg({
-        selectedFile: [reader.result],
-      });
-    };
-    // url = reader.readAsDataURL(file)
 
     setImg({
       mainState: "uploaded",
@@ -993,10 +1067,14 @@ const User = (props) => {
 
   return (
     <>
-      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
+      <ShowAlertMessages
+        open={openShowAlert}
+        onClose={handleShowAlertClose}
+      />
       <ShowAlertErrorMessages
         open={openShowErrorAlert}
         onClose={handleShowErrorAlertClose}
+        type={errorType}
       />
       <UserDetail
         userData={props.userData}
@@ -1008,6 +1086,14 @@ const User = (props) => {
         handleInputChange={handleInputChange}
         removeUserMapDB={removeUserMapDB}
         removeUserGroupDB={removeUserGroupDB}
+        handleUploadClick={handleUploadClick}
+        handleAvatarSubmit={handleAvatarSubmit}
+        handleAvatarCancel={handleAvatarCancel}
+        showEdit={showEdit}
+        handleShowEdit={handleShowEdit}
+        img={img}
+        setImg={setImg}
+        errorType={errorType}
       />
     </>
   );

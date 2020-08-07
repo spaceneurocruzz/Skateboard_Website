@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { AuthContext } from "../App";
+import { NotifyContext } from "../NotifyContext";
 import { Link } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -143,6 +144,7 @@ const FriendsGroup = (props) => {
             userData={props.userData}
             updateUserDB={props.updateUserDB}
             updateGroupUserDB={props.updateGroupUserDB}
+            setNotification={props.setNotification}
           />
         </Grid>
       </Container>

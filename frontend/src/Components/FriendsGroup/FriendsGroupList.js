@@ -1,12 +1,8 @@
-import Container from "@material-ui/core/Container";
-import { makeStyles } from "@material-ui/core/styles";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
-import ImportContactsIcon from "@material-ui/icons/ImportContacts";
-import TrackChangesIcon from "@material-ui/icons/TrackChanges";
-import MaterialTable from "material-table";
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../../App";
+import { useNotifyContext, ADD } from "../../NotifyContext";
+
 import {
   getFriendsGroupApi,
   getFriendsGroupCommentsApi,
@@ -15,6 +11,13 @@ import {
 } from "../../axiosApi";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 import ShowAlertMessages from "../ShowAlertMessages";
+import MaterialTable from "material-table";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import ImportContactsIcon from "@material-ui/icons/ImportContacts";
+import TrackChangesIcon from "@material-ui/icons/TrackChanges";
+import SyncIcon from "@material-ui/icons/Sync";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,6 +72,7 @@ const useStyles = makeStyles((theme) => ({
 const FriendsGroupList = (props) => {
   const classes = useStyles();
   const { state } = React.useContext(AuthContext);
+  const { notifyDispatch } = useNotifyContext();
   const [commentData, setCommentData] = useState([]);
   const [dbFriendsGroupData, setDbFriendsGroupData] = useState([]);
 
@@ -253,6 +257,15 @@ const FriendsGroupList = (props) => {
         props.updateGroupUserDB(groupLike);
         handleShowAlertOpen();
       })
+      .then(() => {
+        notifyDispatch({
+          type: ADD,
+          payload: {
+            content: "like",
+            type: "like",
+          },
+        });
+      })
       .catch((error) => {
         handleShowErrorAlertOpen();
         console.error(error.response);
@@ -290,7 +303,9 @@ const FriendsGroupList = (props) => {
                   width: 100,
                 },
               ]}
-              data={filterFriendsGroupData}
+              data={filterFriendsGroupData.sort(
+                (a, b) => a.group_id - b.group_id
+              )}
               actions={[
                 (rowData) => ({
                   icon: () => (
@@ -314,7 +329,8 @@ const FriendsGroupList = (props) => {
                     !state.isAuthenticated ||
                     (rowData.join_user != undefined
                       ? rowData.join_user.includes(state.username)
-                      : true),
+                      : true) ||
+                    rowData.join_user.length >= rowData.remain_count,
                 }),
                 (rowData) => ({
                   icon: () => <TrackChangesIcon />,
@@ -341,6 +357,13 @@ const FriendsGroupList = (props) => {
               localization={{
                 header: {
                   actions: ["詳細內容/ ", "參加/ ", "追蹤"],
+                },
+                body: {
+                  emptyDataSourceMessage: (
+                    <span>
+                      <SyncIcon />
+                    </span>
+                  ),
                 },
               }}
             />

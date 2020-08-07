@@ -4,6 +4,8 @@ import { NavLink } from "react-router-dom";
 import { userSignupApi } from "../axiosApi";
 import "../css/app.css";
 import Login from "./Login";
+import ShowAlertMessages from "../Components/ShowAlertMessages";
+import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
@@ -62,6 +64,16 @@ const theme = createMuiTheme({
 const Signup = () => {
   const classes = useStyles();
   const history = useHistory();
+
+  const [openShowAlert, setOpenShowAlert] = React.useState(false);
+
+  const handleShowAlertOpen = () => {
+    setOpenShowAlert(true);
+  };
+
+  const handleShowAlertClose = () => {
+    setOpenShowAlert(false);
+  };
 
   const initialState = {
     username: "",
@@ -124,7 +136,7 @@ const Signup = () => {
       password: authData.password,
     })
       .then(() => {
-        alert("註冊成功！");
+        handleShowAlertOpen();
         history.push("/");
       })
       .catch(function (error) {
@@ -138,6 +150,8 @@ const Signup = () => {
 
   return (
     <div className="user_conatainer">
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} type={"register"}/>
+
       <Container component="main" maxWidth="xs">
         <MuiThemeProvider theme={theme}>
           <CssBaseline />

@@ -22,6 +22,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     # email = serializers.EmailField(required=True)
     # username = serializers.CharField()
     # password = serializers.CharField(min_length=8, write_only=True)
+    avatar = serializers.ImageField(max_length=None, use_url=True, required=False)
     map_create = serializers.ListField(required=False, allow_null=True)
     map_like = serializers.ListField(required=False, allow_null=True)
     group_create = serializers.ListField(required=False, allow_null=True)
@@ -38,7 +39,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
                   'location',
                   'intro',
                   'nickname',
-                #   'avatar',
+                  'avatar',
                   "group_create",
                   "group_join",
                   "group_like",

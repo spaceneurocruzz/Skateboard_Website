@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ShowAlertErrorMessages = (props) => {
   const classes = useStyles();
-  const { onClose, open } = props;
+  const { onClose, open, type } = props;
 
   const handleClose = (value) => {
     onClose(value);
@@ -29,7 +29,7 @@ const ShowAlertErrorMessages = (props) => {
     <div className={classes.root}>
       <Snackbar open={open} autoHideDuration={1000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error">
-          資料有誤！
+        {type != null ? type : "資料有誤！"}
         </Alert>
       </Snackbar>
     </div>
