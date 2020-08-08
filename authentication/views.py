@@ -13,18 +13,23 @@ from .models import CustomUser
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+
 class UserList(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
-    # queryset = CustomUser.objects.all()
 
-    def get(self, request, format='json'):
-        users = CustomUser.users.all()
-        serializer = CustomUserSerializer(users)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, username):
+        usernameList = self.request.query_params.get('username', None)
+        if usernameList is not None:
+            usernames = [str(x) for x in usernameList.split(',')]
+            users = CustomUser.objects.filter(username__in=usernames)
+            serializer = CustomUserSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            users = CustomUser.objects.all()
+            serializer = CustomUserSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # username = self.kwargs['usernameList']
-        # return CustomUser.objects.filter(username=username)
 
 class CustomUserGet(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -38,26 +43,6 @@ class CustomUserGet(APIView):
         user = self.get_object(username)
         serializer = CustomUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    # def get(self, request, format='json'):
-    #     users = CustomUser.objects.all()
-    #     serializer = CustomUserSerializer(users)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-    def get_queryset(self):
-        query_params = self.request.query_params
-        usernameList = query_params.get('usernameList', None)
-    
-        usernameParams = []
-
-        if usernameList is not None:
-            for username in usernameList.split('|'):
-                usernameParams.append(username)
-            queryset_list = Model.objects.all()
-            queryset_list = queryset_list.filter(username=usernameParams)
-     
-            return queryset_list
 
 
 class CustomUserCreate(APIView):

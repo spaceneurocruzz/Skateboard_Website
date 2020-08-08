@@ -98,8 +98,12 @@ export const getUserApi = (username) => {
   return userAxiosInstance.get(`get/username=${username}`);
 };
 
-export const getUserListApi = () => {
-  return axiosInstance.get(`get/usernameList`);
+export const getAllUsersApi = () => {
+  return axiosInstance.get(`user/`);
+};
+
+export const getByUserListApi = (usernameList) => {
+  return axiosInstance.get(`user?username=${usernameList}`);
 };
 
 export const patchUserApi = (username, data) => {

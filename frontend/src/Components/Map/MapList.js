@@ -1,3 +1,15 @@
+import React, { useEffect, useState } from "react";
+import { AuthContext } from "../../App";
+import {
+  getGuidemapApi,
+  getGuideMapCommentsApi,
+  patchGuidemapApi,
+  patchUserApi,
+  postGuideMapCommentsApi,
+} from "../../axiosApi";
+import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
+import ShowAlertMessages from "../ShowAlertMessages";
+
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
@@ -22,18 +34,7 @@ import ScheduleIcon from "@material-ui/icons/Schedule";
 import MuiAlert from "@material-ui/lab/Alert";
 import Rating from "@material-ui/lab/Rating";
 import MaterialTable from "material-table";
-import React, { useEffect, useState } from "react";
-import { AuthContext } from "../../App";
-import {
-  getGuidemapApi,
-  getGuideMapCommentsApi,
-  patchGuidemapApi,
-  patchUserApi,
-  postGuideMapCommentsApi,
-} from "../../axiosApi";
-import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
-import ShowAlertMessages from "../ShowAlertMessages";
-import SyncIcon from '@material-ui/icons/Sync';
+import SyncIcon from "@material-ui/icons/Sync";
 
 const useStyles = makeStyles((theme) => ({
   root: {

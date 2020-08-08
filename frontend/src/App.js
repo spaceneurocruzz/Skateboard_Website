@@ -123,11 +123,11 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "none",
     alignItems: "center",
   },
-  media:{
+  media: {
     borderRadius: "50%",
-    width:46,
-    height:46,
-  }
+    width: 46,
+    height: 46,
+  },
 }));
 
 const StyledMenu = withStyles({
@@ -258,7 +258,7 @@ const MemberMenu = (props) => {
               verticalAlign: "middle",
             }}
           >
-            {props.userData.avatar == "default.jpg" ? (
+            {props.userData.avatar == "/media/default.png" ? (
               <img
                 style={{ verticalAlign: "middle", marginRight: 5 }}
                 src={`https://ui-avatars.com/api/?name=${props.state.username}&size=46&rounded=true&background=4181ff&color=fff`}
@@ -483,7 +483,11 @@ const App = () => {
             </li> */}
               {state.isAuthenticated && (
                 <>
-                  <MemberMenu state={state} userData={userData} handleLogout={handleLogout} />
+                  <MemberMenu
+                    state={state}
+                    userData={userData}
+                    handleLogout={handleLogout}
+                  />
                   <Notification
                     state={state}
                     notification={notification}

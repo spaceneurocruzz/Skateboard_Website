@@ -6,6 +6,7 @@ import {
   getFriendsGroupCommentsApi,
   postFriendsGroupCommentsApi,
   getUserApi,
+  getByUserListApi,
 } from "../axiosApi";
 import ShowAlertErrorMessages from "../Components/ShowAlertErrorMessages";
 import ShowAlertMessages from "../Components/ShowAlertMessages";
@@ -20,7 +21,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import TextField from "@material-ui/core/TextField";
 import PersonPinIcon from "@material-ui/icons/PersonPin";
-import ShareIcon from '@material-ui/icons/Share';
+import ShareIcon from "@material-ui/icons/Share";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,6 +43,11 @@ const useStyles = makeStyles((theme) => ({
   },
   button: {
     margin: theme.spacing(1),
+  },
+  media: {
+    borderRadius: "50%",
+    width: 46,
+    height: 46,
   },
 }));
 
@@ -83,10 +89,10 @@ const CommentList = (props) => {
                     }}
                   >
                     {/* {data.create_dt.toString()} */}
-                    {`${data.create_dt
-                      .slice(0, 10)}  ${data.create_dt
-                      .toString()
-                      .slice(11, 19)}`}
+                    {`${data.create_dt.slice(
+                      0,
+                      10
+                    )}  ${data.create_dt.toString().slice(11, 19)}`}
                   </span>
                 </ListItem>
               </>
@@ -129,7 +135,8 @@ const ShowDetail = (props) => {
       .then((res) => {
         props.handleShowAlertOpen();
         props.setCommentData([...props.commentData, dbPost]);
-      }).then(()=>{
+      })
+      .then(() => {
         props.setNotification(...notification, "有新的留言");
       })
       .catch((error) => {
@@ -137,6 +144,24 @@ const ShowDetail = (props) => {
       })
       .finally(() => {});
   };
+
+  const [userDataList, setUserDataList] = useState([]);
+
+  let data = props.dbFriendsGroupData.filter(
+    (group) => group.group_id == props.id
+  );
+  console.log(data.join_user)
+  useEffect(() => {
+    getByUserListApi(data.join_user)
+      .then((res) => {
+        setUserDataList(res.data);
+        console.log(res.data)
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {});
+  }, []);
 
   return (
     <div>
@@ -199,6 +224,21 @@ const ShowDetail = (props) => {
                 <ListItem>
                   <ListItemText>{`參加名單：${data.join_user}`}</ListItemText>
                 </ListItem>
+                {/* <ListItem>
+                  <ListItemText>
+                    {userDataList.map((data, index) => {
+                      return (
+                        <span>
+                          {data.username}
+                          <img
+                            className={classes.media}
+                            src={`..${data.avatar}`}
+                          />
+                        </span>
+                      );
+                    })}
+                  </ListItemText>
+                </ListItem> */}
                 <ListItem>
                   <ListItemText>{`追蹤名單：${data.possible_user}`}</ListItemText>
                 </ListItem>

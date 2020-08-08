@@ -558,7 +558,7 @@ const EditProfile = (props) => {
           style={{ width: 300 }}
         />
       </Grid>
-      <Grid container style={{ marginLeft: 300 }}>
+      <Grid container>
         <TextField
           onChange={props.handleInputChange}
           required
@@ -626,26 +626,36 @@ const UserDetail = (props) => {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {!props.userData.avatar && (
-            <img
-              src={`https://ui-avatars.com/api/?name=${props.userData.username}&size=200&rounded=true&background=040404&color=fff`}
-            />
-          )}
-          {props.img.selectedFile ? (
-            <img
-              width="200px"
-              height="200px"
-              className={classes.media}
-              src={URL.createObjectURL(props.img.selectedFile)}
-            />
-          ) : (
-            <img
-              width="200px"
-              height="200px"
-              className={classes.media}
-              src={`../..${props.userData.avatar}`}
-            />
-          )}
+          {props.userData.avatar == "/media/default.png" &&
+            (props.img.selectedFile ? (
+              <img
+                width="200px"
+                height="200px"
+                className={classes.media}
+                src={URL.createObjectURL(props.img.selectedFile)}
+              />
+            ) : (
+              <img
+                src={`https://ui-avatars.com/api/?name=${props.userData.username}&size=200&rounded=true&background=040404&color=fff`}
+              />
+            ))}
+
+          {props.userData.avatar != "/media/default.png" &&
+            (props.img.selectedFile ? (
+              <img
+                width="200px"
+                height="200px"
+                className={classes.media}
+                src={URL.createObjectURL(props.img.selectedFile)}
+              />
+            ) : (
+              <img
+                width="200px"
+                height="200px"
+                className={classes.media}
+                src={`../..${props.userData.avatar}`}
+              />
+            ))}
           {!props.showEdit && (
             <Button
               onClick={props.handleShowEdit}
@@ -707,7 +717,12 @@ const UserDetail = (props) => {
         {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
       <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
         <div style={{ marginLeft: 50 }}>
-          <h2>暱稱：{props.userData.nickname}</h2>
+          <h2>
+            暱稱：
+            {props.userData.nickname == ""
+              ? props.userData.username
+              : props.userData.nickname}
+          </h2>
           <div style={{ display: "flex" }}>
             <span>@{props.userData.username}</span>
             <span></span>
@@ -771,6 +786,7 @@ const User = (props) => {
       getUserApi(localStorage.getItem("username"))
         .then((res) => {
           props.initUserDB(res.data);
+          console.log(res.data);
         })
         .then(() => {
           setIsDataChanged(false);
@@ -1009,7 +1025,7 @@ const User = (props) => {
     e.preventDefault();
     let uploadImg = img.selectedFile;
     if (uploadImg.size > 500000) {
-      console.log(uploadImg.size)
+      console.log(uploadImg.size);
       setErrorType("檔案請勿超過500KB!");
       setOpenShowErrorAlert(true);
       return;
@@ -1067,10 +1083,7 @@ const User = (props) => {
 
   return (
     <>
-      <ShowAlertMessages
-        open={openShowAlert}
-        onClose={handleShowAlertClose}
-      />
+      <ShowAlertMessages open={openShowAlert} onClose={handleShowAlertClose} />
       <ShowAlertErrorMessages
         open={openShowErrorAlert}
         onClose={handleShowErrorAlertClose}

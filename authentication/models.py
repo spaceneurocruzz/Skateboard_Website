@@ -4,12 +4,10 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class CustomUser(AbstractUser):
-    # users = models.Manager()
-    # username = models.CharField(max_length=40, unique=True)
     location = models.CharField(blank=True, max_length=120)
     nickname = models.CharField(blank=True, max_length=120)
     intro = models.CharField(blank=True, max_length=800)
-    avatar = models.ImageField(upload_to='avatar', default='default.jpg')
+    avatar = models.ImageField(upload_to='avatar')
     map_like = ArrayField(models.IntegerField(blank=True, null=True), null=True)
     map_add = ArrayField(models.IntegerField(blank=True, null=True), null=True)
     map_comment = ArrayField(models.IntegerField(blank=True, null=True), null=True)
