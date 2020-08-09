@@ -9,6 +9,7 @@ import {
 } from "../../axiosApi";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
 import ShowAlertMessages from "../ShowAlertMessages";
+import { countCommentRating } from "../../utility";
 
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
@@ -304,8 +305,12 @@ const WriteComment = (props) => {
       })
       .finally(() => {});
 
+    let dataByMapId = props.commentData.filter(
+      (group) => group.map_id == dbPost.map_id
+    );
+
     let updateRating = {
-      rating: props.countCommentRating(dbPost.map_id, ratingVal),
+      rating: countCommentRating(dataByMapId, ratingVal),
     };
 
     patchGuidemapApi(dbPost.map_id, updateRating)
@@ -402,7 +407,6 @@ const WriteCommentsDialog = (props) => {
         commentData={props.commentData}
         updateComments={props.updateComments}
         onClose={onClose}
-        countCommentRating={props.countCommentRating}
         handleShowAlertOpen={props.handleShowAlertOpen}
         setIsDataChanged={props.setIsDataChanged}
         updateMapDBByLocationId={props.updateMapDBByLocationId}
@@ -624,25 +628,6 @@ const MapList = (props) => {
       })
       .finally(() => {});
   }, []);
-
-  const countCommentRating = (mapId, ratingVal) => {
-    let ratingTotal = 0;
-    let dataCount = 0;
-    let dataByMapId = commentData.filter((group) => group.map_id == mapId);
-
-    for (let idx in dataByMapId) {
-      ratingTotal += Number(dataByMapId[idx].rating);
-      dataCount++;
-    }
-
-    ratingTotal += ratingVal;
-    dataCount += 1;
-    if (dataCount === 0) {
-      dataCount = 1;
-    }
-
-    return Math.round((ratingTotal / dataCount) * 10) / 10;
-  };
 
   const updateComments = (newValue) => {
     setCommentData([...commentData, newValue]);

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage",
+    "test-update-snapshot": "jest --updateSnapshot",
     "webpack": "webpack",
     "start": "webpack-dev-server --config webpack.config.js  --watch --open --mode development"
   },
@@ -20,7 +21,9 @@
     "css-loader": "^3.6.0",
     "file-loader": "^6.0.0",
     "img-loader": "^3.0.1",
+    "jest": "^26.2.2",
     "node-sass": "^4.14.1",
+    "react-test-renderer": "^16.13.1",
     "style-loader": "^1.2.1",
     "url-loader": "^4.1.0",
     "webpack": "^4.43.0",
@@ -37,6 +40,7 @@
     "date-fns": "^2.14.0",
     "google-map-react": "^1.1.7",
     "google-maps-react": "^2.0.6",
+    "identity-obj-proxy": "^3.0.0",
     "material-table": "^1.65.0",
     "material-ui-icons": "^1.0.0-beta.36",
     "material-ui-phone-number": "^2.2.6",
