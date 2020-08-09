@@ -451,15 +451,6 @@ const TabInfo = (props) => {
                             {data.group_id}
                           </NavLink>
                           )
-                          <DeleteForeverIcon
-                            style={{ verticalAlign: "middle" }}
-                            onClick={() =>
-                              props.removeUserGroupDB(
-                                data.group_id,
-                                "GROUP_JOIN"
-                              )
-                            }
-                          />
                         </li>
                       );
                     }
@@ -500,12 +491,6 @@ const TabInfo = (props) => {
                             {data.group_id}
                           </NavLink>
                           )
-                          <DeleteForeverIcon
-                            style={{ verticalAlign: "middle" }}
-                            onClick={() =>
-                              removeUserGroupDB(data.group_id, "GROUP_LIKE")
-                            }
-                          />
                         </li>
                       );
                     }

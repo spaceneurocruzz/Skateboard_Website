@@ -303,10 +303,6 @@ const MemberMenu = (props) => {
   );
 };
 
-const NotifyMenu = (props) => {
-  return <Notification />;
-};
-
 const App = () => {
   const classes = useStyles();
   const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -491,7 +487,9 @@ const App = () => {
                   <Notification
                     state={state}
                     notification={notification}
+                    userData={userData}
                     dbFriendsGroupData={dbFriendsGroupData}
+                    initUserDB={initUserDB}
                   />
                 </>
               )}
