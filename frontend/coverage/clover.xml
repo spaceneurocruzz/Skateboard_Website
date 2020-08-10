@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1596958752843" clover="3.2.0">
-  <project timestamp="1596958752843" name="All files">
+<coverage generated="1597049736591" clover="3.2.0">
+  <project timestamp="1597049736591" name="All files">
     <metrics statements="11" coveredstatements="11" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1" elements="14" coveredelements="14" complexity="0" loc="11" ncloc="11" packages="1" files="1" classes="1"/>
     <file name="utility.js" path="/Users/astroneuro/Codes/Web_Frontend/Final2/Skateboard_Website/frontend/src/utility.js">
       <metrics statements="11" coveredstatements="11" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>

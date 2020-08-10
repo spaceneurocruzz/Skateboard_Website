@@ -99,11 +99,11 @@ export const getUserApi = (username) => {
 };
 
 export const getAllUsersApi = () => {
-  return axiosInstance.get(`user/`);
+  return userAxiosInstance.get(`user/`);
 };
 
 export const getByUserListApi = (usernameList) => {
-  return axiosInstance.get(`user?username=${usernameList}`);
+  return userAxiosInstance.get(`user?username=${usernameList}`);
 };
 
 export const patchUserApi = (username, data) => {
