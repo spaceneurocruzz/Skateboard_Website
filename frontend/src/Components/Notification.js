@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { getUserApi } from "../axiosApi";
 import { useNotifyContext, REMOVE } from "../NotifyContext";
+import "../css/app.css";
+import { AuthContext } from "../App";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import Badge from "@material-ui/core/Badge";
@@ -12,38 +15,40 @@ import MapIcon from "@material-ui/icons/Map";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 
+import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 const StyledMenu = withStyles({
-    paper: {
-      border: "1px solid #d3d4d5",
-    },
-  })((props) => (
-    <Menu
-      elevation={0}
-      getContentAnchorEl={null}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "center",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "center",
-      }}
-      {...props}
-    />
-  ));
-  
-  const StyledMenuItem = withStyles((theme) => ({
-    root: {
-      "&:focus": {
-        backgroundColor: theme.palette.success.light,
-        "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
-          color: theme.palette.common.white,
-        },
+  paper: {
+    border: "1px solid #d3d4d5",
+  },
+})((props) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: "bottom",
+      horizontal: "center",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "center",
+    }}
+    {...props}
+  />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+  root: {
+    "&:focus": {
+      backgroundColor: theme.palette.success.light,
+      "& .MuiListItemIcon-root, & .MuiListItemText-primary": {
+        color: theme.palette.common.white,
       },
     },
-  }))(MenuItem);
+  },
+}))(MenuItem);
 
 const Notification = (props) => {
+  const { state } = React.useContext(AuthContext);
   const { notifyDispatch } = useNotifyContext();
 
   const defaultProps = {
@@ -61,16 +66,58 @@ const Notification = (props) => {
     setAnchorEl(null);
   };
 
-//   console.log(notify)
-if(props.dbFriendsGroupData[0] != undefined){
+  if (state.username == null) {
+    useEffect(() => {
+      getUserApi(localStorage.getItem("username"))
+        .then((res) => {
+          props.initUserDB(res.data);
+        })
+        .then(() => {
+          setIsDataChanged(false);
+        })
+        .catch((error) => {
+          console.error(error.response);
+        })
+        .finally(() => {});
+    }, []);
+  } else {
+    useEffect(() => {
+      getUserApi(state.username)
+        .then((res) => {
+          props.initUserDB(res.data);
+        })
+        .then(() => {
+          setIsDataChanged(false);
+        })
+        .catch((error) => {
+          console.error(error.response);
+        })
+        .finally(() => {});
+    }, []);
+  }
+
+  const filteredGroupJoin = () => {
+    let filteredData = [];
+    props.userData.group_join.map((joinId, index) => {
+      let nowDt = new Date();
+      let data = props.dbFriendsGroupData.filter(
+        (group) =>
+          group.group_id == joinId &&
+          new Date(group.group_startdt) >= nowDt &&
+          new Date(group.group_startdt) < nowDt.setMonth(nowDt.getMonth() + 1)
+      )[0];
+      if (data != undefined) {
+        filteredData.push(data);
+      }
+    });
+
+    return filteredData;
+  };
+
   return (
     <div>
-      {/* <NotificationsIcon
-            style={{ fontSize: 28, color: "#CA3900", marginLeft: 20 }}
-            onClick={handleClick}
-          /> */}
       <Badge
-        badgeContent={props.dbFriendsGroupData.length}
+        badgeContent={filteredGroupJoin().length}
         max={999}
         {...defaultProps}
         onClick={handleClick}
@@ -83,27 +130,30 @@ if(props.dbFriendsGroupData[0] != undefined){
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <NavLink to="/guidemap" className="hamLink">
-          <StyledMenuItem>
-            <ListItemIcon>
-              <MapIcon fontSize="small" />
-            </ListItemIcon>
-            {/* <ListItemText primary={notify[0]} /> */}
-          </StyledMenuItem>
-        </NavLink>
-        <NavLink to="/friendsgroup" className="hamLink">
-          <StyledMenuItem>
-            <ListItemIcon>
-              <GroupAddIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary={props.dbFriendsGroupData[0].location_name}/>
-          </StyledMenuItem>
-        </NavLink>
+        <span style={{ marginLeft: 5 }}>即將到來的活動(1個月內)</span>
+        {filteredGroupJoin().map((data, index) => {
+          if (data != undefined) {
+            return (
+              <NavLink
+                to={`/friendsGroupDetail/${data.group_id}`}
+                className="userLink"
+              >
+                <StyledMenuItem>
+                  <ListItemIcon>
+                    <PeopleAltIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={data.location_name}
+                    secondary={data.group_startdt}
+                  />
+                </StyledMenuItem>
+              </NavLink>
+            );
+          }
+        })}
       </StyledMenu>
     </div>
-  );}else{
-      return <div>xx</div>
-  }
+  );
 };
 
 export default Notification;
