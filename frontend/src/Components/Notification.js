@@ -98,20 +98,24 @@ const Notification = (props) => {
 
   const filteredGroupJoin = () => {
     let filteredData = [];
-    props.userData.group_join.map((joinId, index) => {
-      let nowDt = new Date();
-      let data = props.dbFriendsGroupData.filter(
-        (group) =>
-          group.group_id == joinId &&
-          new Date(group.group_startdt) >= nowDt &&
-          new Date(group.group_startdt) < nowDt.setMonth(nowDt.getMonth() + 1)
-      )[0];
-      if (data != undefined) {
-        filteredData.push(data);
+    if(!props.userData.group_join){
+        props.userData.group_join.map((joinId, index) => {
+          let nowDt = new Date();
+          let data = props.dbFriendsGroupData.filter(
+            (group) =>
+              group.group_id == joinId &&
+              new Date(group.group_startdt) >= nowDt &&
+              new Date(group.group_startdt) < nowDt.setMonth(nowDt.getMonth() + 1)
+          )[0];
+          if (!data) {
+            filteredData.push(data);
+          }
+        });
+        return filteredData;
       }
-    });
-
-    return filteredData;
+      else{
+        return 0;
+      } 
   };
 
   return (
@@ -131,8 +135,8 @@ const Notification = (props) => {
         onClose={handleClose}
       >
         <span style={{ marginLeft: 5 }}>即將到來的活動(1個月內)</span>
-        {filteredGroupJoin().map((data, index) => {
-          if (data != undefined) {
+        {filteredGroupJoin() != 0 ? filteredGroupJoin().map((data, index) => {
+          if (!data) {
             return (
               <NavLink
                 to={`/friendsGroupDetail/${data.group_id}`}
@@ -150,7 +154,7 @@ const Notification = (props) => {
               </NavLink>
             );
           }
-        })}
+        }):  <span></span>}
       </StyledMenu>
     </div>
   );

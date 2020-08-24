@@ -192,7 +192,7 @@ const ShowCommentsDialog = (props) => {
 
   let currentLocation = props.getMapDBByLocationId(props.locationId);
   let locationName = "";
-  if (currentLocation != undefined) {
+  if (!currentLocation) {
     locationName = currentLocation.location_name;
   }
 
@@ -200,7 +200,6 @@ const ShowCommentsDialog = (props) => {
     <Dialog
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
-      //className={classes.modal}
       open={open}
       onClose={handleClose}
       fullWidth
@@ -290,11 +289,8 @@ const WriteComment = (props) => {
     dbPost["create_dt"] = new Date().toISOString();
     dbPost["update_dt"] = new Date().toISOString();
 
-    //insert user
-    //post should return commentid and post to user table
     postGuideMapCommentsApi(dbPost)
       .then((res) => {
-        // alert("更新成功！");
         props.handleShowAlertOpen();
         props.updateComments(dbPost);
         props.onClose();
@@ -376,7 +372,7 @@ const WriteCommentsDialog = (props) => {
 
   let currentLocation = props.getMapDBByLocationId(props.locationId);
   let locationName = "";
-  if (currentLocation != undefined) {
+  if (!currentLocation) {
     locationName = currentLocation.location_name;
   }
 
@@ -384,7 +380,6 @@ const WriteCommentsDialog = (props) => {
     <Dialog
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
-      //className={classes.modal}
       open={open}
       onClose={onClose}
       fullWidth
@@ -468,7 +463,7 @@ const MapTable = (props) => {
                 },
                 disabled:
                   !props.state.isAuthenticated ||
-                  (rowData.like_user != undefined
+                  (!rowData.like_user
                     ? rowData.like_user.includes(props.state.username)
                     : false),
               }),
@@ -498,7 +493,6 @@ const MapTable = (props) => {
               return (
                 <Grid
                   container
-                  // spacing={1}
                   style={{ backgroundColor: "#e8f8fb" }}
                 >
                   <Grid item xs={12} sm={1}></Grid>

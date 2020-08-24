@@ -90,6 +90,15 @@ export const Login = (props) => {
       errorMsg: null,
     });
 
+    console.log(authData)
+    if(authData.username == "" && authData.password == ""){
+      setAuthData({
+        ...authData,
+        username: "test",
+        password: "test123456",
+      });
+    }
+
     loginApi({
       username: authData.username,
       password: authData.password,

@@ -71,15 +71,12 @@ const FriendsGroupHistory = (props) => {
     (data) => new Date(data.group_startdt) < new Date()
   );
 
-  if (filterFriendsGroupData != undefined || filterFriendsGroupData != null) {
+  if (!filterFriendsGroupData) {
     filterFriendsGroupData.map((data, index) => {
       if (
-        data["join_user"] != undefined ||
-        data["join_user"] != null ||
-        data["possible_user"] != undefined ||
-        data["possible_user"] != null ||
-        data["upper_limit"] != undefined ||
-        data["upper_limit"] != null
+        !data["join_user"] ||
+        !data["possible_user"] ||
+        !data["upper_limit"]
       ) {
         data["join_count"] = data["join_user"].length;
 
@@ -121,7 +118,6 @@ const FriendsGroupHistory = (props) => {
                   lookup: { 交流: "交流", 教學: "教學" },
                   width: 90,
                 },
-                //   { title: "地區", field: "city", width:100 },
                 { title: "地點", field: "location_name", width: 120 },
                 { title: "時間", field: "group_startdt", width: 70 },
                 { title: "主題", field: "group_title", width: 270 },

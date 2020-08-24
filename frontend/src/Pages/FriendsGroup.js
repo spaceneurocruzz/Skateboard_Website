@@ -45,7 +45,7 @@ const FriendsGroup = (props) => {
   const classes = useStyles();
 
   const getFriendsGroupDBById = (group_id) => {
-    if (props.dbFriendsGroupData != undefined) {
+    if (!props.dbFriendsGroupData) {
       return props.dbFriendsGroupData.find(
         (data) => data.group_id === group_id
       );
@@ -66,17 +66,13 @@ const FriendsGroup = (props) => {
   }, []);
 
   if (
-    props.dbFriendsGroupData != undefined ||
-    props.dbFriendsGroupData != null
+    !props.dbFriendsGroupData
   ) {
     props.dbFriendsGroupData.map((data, index) => {
       if (
-        data["join_user"] != undefined ||
-        data["join_user"] != null ||
-        data["possible_user"] != undefined ||
-        data["possible_user"] != null ||
-        data["upper_limit"] != undefined ||
-        data["upper_limit"] != null
+        !data["join_user"] ||
+        !data["possible_user"] ||
+        !data["upper_limit"]
       ) {
         data["join_count"] = data["join_user"].length;
 

@@ -121,11 +121,8 @@ const TabInfo = (props) => {
 
     let newHoldEvent = [];
     let oldHoldEvent = [];
-    let newJoinEvent = [];
-    let oldJoinEvent = [];
-    let newTrackEvent = [];
-    let oldTrackEvent = [];
-    if (props.dbFriendsGroupData != undefined) {
+
+    if (!props.dbFriendsGroupData) {
       let userEvent = props.dbFriendsGroupData.filter(
         (group) => group.create_user == props.userData.username
       );
@@ -164,83 +161,47 @@ const TabInfo = (props) => {
 
           <TabPanel value={value} index={0} key={0}>
             <Grid container>
-              <EditLocationIcon />
-              <b>
-                <span style={{ marginBottom: 10 }}>新增地點 :</span>
-              </b>
-              <ul>
-                {props.userData.map_add != undefined ||
-                props.userData.map_add != null ? (
-                  props.userData.map_add.map((addId, index) => {
-                    let data = null;
-                    if (
-                      props.dbGuideMapData != undefined ||
-                      props.dbGuideMapData != null
-                    ) {
-                      data = props.dbGuideMapData.find(
-                        (map) => map.location_id == addId
-                      );
-                    } else if (props.dbGuideMapData != undefined) {
-                      data = props.dbGuideMapData.find(
-                        (map) => map.location_id == addId
-                      );
-                    }
-                    return (
-                      <li
-                        key={data.location_id}
-                        style={{ listStyleType: "decimal" }}
-                      >
-                        {data.location_type} {data.location_name}:{" "}
-                        {data.address}
-                      </li>
-                    );
-                  })
-                ) : (
-                  <span>還沒有</span>
-                )}
-              </ul>
-            </Grid>
-            <Grid container>
               <b>
                 <FavoriteIcon />
                 <span>最愛地點 :</span>
               </b>
               <ul>
-                {props.userData.map_like != undefined ||
-                props.userData.map_like != null ? (
+                {!props.userData.map_like ? (
                   props.userData.map_like.map((likeId, index) => {
                     let data = [];
-                    if (
-                      props.dbGuideMapData != undefined ||
-                      props.dbGuideMapData != null
-                    ) {
+                    if (!props.dbGuideMapData) {
                       data = props.dbGuideMapData.find(
                         (map) => map.location_id == likeId
                       );
                     }
-                    return (
-                      <li
-                        key={data.location_id}
-                        style={{ listStyleType: "decimal" }}
-                      >
-                        {data.location_type} {data.location_name}:{" "}
-                        <a
-                          href={
-                            "https://www.google.com/maps/dir/?api=1&destination=" +
-                            data.address
-                          }
-                          className="addressLink"
+                    if (!data) {
+                      return (
+                        <li
+                          key={data.location_id}
+                          style={{ listStyleType: "decimal" }}
                         >
-                          {data.address}
-                        </a>
-                        <DeleteForeverIcon
-                          style={{ verticalAlign: "middle" }}
-                          onClick={() =>
-                            props.removeUserMapDB(data.location_id, "MAP_LIKE")
-                          }
-                        />
-                      </li>
-                    );
+                          {data.location_type} {data.location_name}:{" "}
+                          <a
+                            href={
+                              "https://www.google.com/maps/dir/?api=1&destination=" +
+                              data.address
+                            }
+                            className="addressLink"
+                          >
+                            {data.address}
+                          </a>
+                          <DeleteForeverIcon
+                            style={{ verticalAlign: "middle" }}
+                            onClick={() =>
+                              props.removeUserMapDB(
+                                data.location_id,
+                                "MAP_LIKE"
+                              )
+                            }
+                          />
+                        </li>
+                      );
+                    }
                   })
                 ) : (
                   <span>還沒有</span>
@@ -255,26 +216,28 @@ const TabInfo = (props) => {
                 舉辦中 :
               </b>
               <ul>
-                {newHoldEvent != undefined || newHoldEvent != null ? (
+                {!newHoldEvent ? (
                   newHoldEvent.map((data, index) => {
-                    return (
-                      <li
-                        key={data.group_id}
-                        style={{ listStyleType: "decimal" }}
-                      >
-                        {data.group_startdt.slice(0, 10)}{" "}
-                        {data.group_startdt.slice(11, 19)} 在{" "}
-                        {data.location_name}
-                        (ID:{" "}
-                        <NavLink
-                          to={"/friendsGroupDetail/" + data.group_id}
-                          className="userLink"
+                    if (!data) {
+                      return (
+                        <li
+                          key={data.group_id}
+                          style={{ listStyleType: "decimal" }}
                         >
-                          {data.group_id}
-                        </NavLink>
-                        )<span>[參加人數: {data.join_user.length}]</span>
-                      </li>
-                    );
+                          {data.group_startdt.slice(0, 10)}{" "}
+                          {data.group_startdt.slice(11, 19)} 在{" "}
+                          {data.location_name}
+                          (ID:{" "}
+                          <NavLink
+                            to={"/friendsGroupDetail/" + data.group_id}
+                            className="userLink"
+                          >
+                            {data.group_id}
+                          </NavLink>
+                          )<span>[參加人數: {data.join_user.length}]</span>
+                        </li>
+                      );
+                    }
                   })
                 ) : (
                   <span>還沒有</span>
@@ -287,15 +250,14 @@ const TabInfo = (props) => {
                 參加中 :
               </b>
               <ul>
-                {props.userData.group_join != undefined ||
-                props.userData.group_join != null ? (
+                {!props.userData.group_join ? (
                   props.userData.group_join.map((joinId, index) => {
                     let data = props.dbFriendsGroupData.filter(
                       (group) =>
                         group.group_id == joinId &&
                         new Date(group.group_startdt) >= new Date()
                     )[0];
-                    if (data != undefined) {
+                    if (!data) {
                       return (
                         <li
                           key={data.group_id}
@@ -336,15 +298,14 @@ const TabInfo = (props) => {
                 追蹤中 :
               </b>
               <ul>
-                {props.userData.group_like != undefined ||
-                props.userData.group_like != null ? (
+                {!props.userData.group_like ? (
                   props.userData.group_like.map((likeId, index) => {
                     let data = props.dbFriendsGroupData.filter(
                       (group) =>
                         group.group_id == likeId &&
                         new Date(group.group_startdt) >= new Date()
                     )[0];
-                    if (data != undefined) {
+                    if (!data) {
                       return (
                         <li
                           key={data.group_id}
@@ -394,26 +355,28 @@ const TabInfo = (props) => {
                 過期舉辦 :
               </b>
               <ul>
-                {oldHoldEvent != undefined || oldHoldEvent != null ? (
+                {!oldHoldEvent ? (
                   oldHoldEvent.map((data, index) => {
-                    return (
-                      <li
-                        key={data.group_id}
-                        style={{ listStyleType: "decimal" }}
-                      >
-                        {data.group_startdt.slice(0, 10)}{" "}
-                        {data.group_startdt.slice(11, 19)} 在{" "}
-                        {data.location_name}
-                        (ID:{" "}
-                        <NavLink
-                          to={"/friendsGroupDetail/" + data.group_id}
-                          className="userLink"
+                    if (!data) {
+                      return (
+                        <li
+                          key={data.group_id}
+                          style={{ listStyleType: "decimal" }}
                         >
-                          {data.group_id}
-                        </NavLink>
-                        )<span>[參加人數: {data.join_user.length}]</span>
-                      </li>
-                    );
+                          {data.group_startdt.slice(0, 10)}{" "}
+                          {data.group_startdt.slice(11, 19)} 在{" "}
+                          {data.location_name}
+                          (ID:{" "}
+                          <NavLink
+                            to={"/friendsGroupDetail/" + data.group_id}
+                            className="userLink"
+                          >
+                            {data.group_id}
+                          </NavLink>
+                          )<span>[參加人數: {data.join_user.length}]</span>
+                        </li>
+                      );
+                    }
                   })
                 ) : (
                   <span>還沒有</span>
@@ -426,15 +389,14 @@ const TabInfo = (props) => {
                 過期參加 :
               </b>
               <ul>
-                {props.userData.group_join != undefined ||
-                props.userData.group_join != null ? (
+                {!props.userData.group_join ? (
                   props.userData.group_join.map((joinId, index) => {
                     let data = props.dbFriendsGroupData.filter(
                       (group) =>
                         group.group_id == joinId &&
                         new Date(group.group_startdt) < new Date()
                     )[0];
-                    if (data != undefined) {
+                    if (!data) {
                       return (
                         <li
                           key={data.group_id}
@@ -466,15 +428,14 @@ const TabInfo = (props) => {
                 過期追蹤 :
               </b>
               <ul>
-                {props.userData.group_like != undefined ||
-                props.userData.group_like != null ? (
+                {!props.userData.group_like ? (
                   props.userData.group_like.map((likeId, index) => {
                     let data = props.dbFriendsGroupData.filter(
                       (group) =>
                         group.group_id == likeId &&
                         new Date(group.group_startdt) < new Date()
                     )[0];
-                    if (data != undefined) {
+                    if (!data) {
                       return (
                         <li
                           key={data.group_id}
@@ -527,7 +488,6 @@ const EditProfile = (props) => {
           name="password"
           type="password"
           value={props.userData.password}
-          // autoComplete="current-password"
           variant="filled"
         />
       </Grid>
@@ -699,8 +659,6 @@ const UserDetail = (props) => {
             )}{" "}
           </div>
         </div>
-        {/* <div style={{ fontSize: 28, marginLeft: 50 }}>nickname</div>
-      <div style={{ fontSize: 28, marginLeft: 50 }}>username</div> */}
         <div style={{ marginLeft: 50 }}>
           <h2>
             暱稱：
@@ -832,7 +790,7 @@ const User = (props) => {
   }, []);
 
   const getMapDBByLocationId = (locationId) => {
-    if (dbGuideMapData != undefined) {
+    if (!dbGuideMapData) {
       return dbGuideMapData.find((data) => data.location_id === locationId);
     } else {
       return null;
@@ -903,7 +861,7 @@ const User = (props) => {
   };
 
   const getFriendsGroupDBById = (groupId) => {
-    if (dbFriendsGroupData != undefined) {
+    if (!dbFriendsGroupData) {
       return dbFriendsGroupData.find((data) => data.group_id === groupId);
     } else {
       return null;
@@ -1056,9 +1014,25 @@ const User = (props) => {
     e.preventDefault();
 
     console.log(props.userData);
+    delete props.userData["avatar"];
+    console.log(props.userData);
     patchUserApi(state.username, props.userData)
       .then((res) => {
         handleShowAlertOpen();
+      })
+      .then(() => {
+        getUserApi(localStorage.getItem("username"))
+          .then((res) => {
+            props.initUserDB(res.data);
+            console.log(res.data);
+          })
+          .then(() => {
+            setIsDataChanged(false);
+          })
+          .catch((error) => {
+            console.error(error.response);
+          })
+          .finally(() => {});
       })
       .catch((error) => {
         console.error(error.response);

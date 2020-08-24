@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { postGuidemapApi } from "../../axiosApi";
+import { postGuidemapApi, patchUserApi } from "../../axiosApi";
 import { AuthContext } from "../../App";
 import ShowAlertMessages from "../ShowAlertMessages";
 import ShowAlertErrorMessages from "../ShowAlertErrorMessages";
@@ -188,6 +188,7 @@ const MapModalInput = (props) => {
     let mapAdd = {
       map_add: preAddMapArr,
     };
+    console.log(mapAdd)
 
     Geocode.enableDebug();
     Geocode.fromAddress(input.address)
@@ -209,23 +210,20 @@ const MapModalInput = (props) => {
             handleShowAlertOpen();
             handleClose();
           })
-          .then(() => {
+          .catch((error) => {
+            console.error(error.response);
+          })
+          .finally(() => {
             patchUserApi(state.username, mapAdd)
               .then((res) => {
-                console.table(res.data);
                 props.updateGroupUserDB(mapAdd);
               })
               .catch((error) => {
-                handleShowErrorAlertOpen();
+                handleShowAlertOpen();
                 console.error(error.response);
               })
               .finally(() => {});
-          })
-          .catch((error) => {
-            handleShowErrorAlertOpen();
-            console.error(error.response);
-          })
-          .finally(() => {});
+          });
       });
   };
 
@@ -301,112 +299,6 @@ const MapModalInput = (props) => {
     );
   };
 
-  const CreateNewMap = () => {
-    return (
-      <Grid
-        container
-        style={{ paddingRight: 20, paddingLeft: 20, paddingBottom: 20 }}
-      >
-        <h3 id="transition-modal-title">來新增滑板場或店家吧！</h3>
-        <div className={classes.paper}>
-          <form className={classes.root} noValidate autoComplete="off">
-            {/* <Grid container>
-                  <Grid container> */}
-            <FormControl component="fieldset">
-              <RadioGroup
-                onChange={handleInputChange}
-                row
-                aria-label="gender"
-                name="location_type"
-                value={input.location_type}
-              >
-                <FormControlLabel
-                  value="場地"
-                  control={<Radio />}
-                  label="場地"
-                />
-                <FormControlLabel
-                  value="店家"
-                  control={<Radio />}
-                  label="店家"
-                />
-              </RadioGroup>
-            </FormControl>
-            {/* </Grid> */}
-
-            <TextField
-              onChange={handleInputChange}
-              size="small"
-              required
-              id="location_name"
-              name="location_name"
-              label="名稱"
-              variant="filled"
-              style={{ width: 300 }}
-            />
-
-            <TextField
-              onChange={handleInputChange}
-              size="small"
-              required
-              id="address"
-              name="address"
-              label="地址"
-              variant="filled"
-              fullWidth
-            />
-
-            {pickWeekTime.map((item, index) => (
-              <PickWeekTime key={index} id={index} />
-            ))}
-            <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
-              電話:{" "}
-              <MuiPhoneNumber
-                defaultCountry={"tw"}
-                onChange={handleInputPhoneChange}
-              />
-            </Grid>
-            <Grid container>
-              <TextField
-                onChange={handleInputChange}
-                size="small"
-                id="traffic"
-                label="建議交通方式"
-                name="traffic"
-                variant="filled"
-                multiline
-                fullWidth
-                rows={2}
-              />
-            </Grid>
-            <Grid container>
-              <TextField
-                onChange={handleInputChange}
-                size="small"
-                id="intro"
-                label="場地介紹"
-                name="intro"
-                variant="filled"
-                multiline
-                fullWidth
-                rows={5}
-              />
-            </Grid>
-            <Button
-              onClick={handleSubmit}
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              確認修改
-            </Button>
-          </form>
-        </div>
-      </Grid>
-    );
-  };
-
   return (
     <>
       {state.isAuthenticated ? (
@@ -452,7 +344,107 @@ const MapModalInput = (props) => {
         />
 
         <Fade in={open}>
-          <CreateNewMap />
+          <Grid
+            container
+            style={{ paddingRight: 20, paddingLeft: 20, paddingBottom: 20 }}
+          >
+            <h3 id="transition-modal-title">來新增滑板場或店家吧！</h3>
+            <div className={classes.paper}>
+              <form className={classes.root} noValidate autoComplete="off">
+                {/* <Grid container>
+                  <Grid container> */}
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    onChange={handleInputChange}
+                    row
+                    aria-label="gender"
+                    name="location_type"
+                    value={input.location_type}
+                  >
+                    <FormControlLabel
+                      value="場地"
+                      control={<Radio />}
+                      label="場地"
+                    />
+                    <FormControlLabel
+                      value="店家"
+                      control={<Radio />}
+                      label="店家"
+                    />
+                  </RadioGroup>
+                </FormControl>
+                {/* </Grid> */}
+
+                <TextField
+                  onChange={handleInputChange}
+                  size="small"
+                  required
+                  id="location_name"
+                  name="location_name"
+                  label="名稱"
+                  variant="filled"
+                  style={{ width: 300 }}
+                />
+
+                <TextField
+                  onChange={handleInputChange}
+                  size="small"
+                  required
+                  id="address"
+                  name="address"
+                  label="地址"
+                  variant="filled"
+                  fullWidth
+                />
+
+                {pickWeekTime.map((item, index) => (
+                  <PickWeekTime key={index} id={index} />
+                ))}
+                <Grid container style={{ marginTop: 20, marginBottom: 10 }}>
+                  電話:{" "}
+                  <MuiPhoneNumber
+                    defaultCountry={"tw"}
+                    onChange={handleInputPhoneChange}
+                  />
+                </Grid>
+                <Grid container>
+                  <TextField
+                    onChange={handleInputChange}
+                    size="small"
+                    id="traffic"
+                    label="建議交通方式"
+                    name="traffic"
+                    variant="filled"
+                    multiline
+                    fullWidth
+                    rows={2}
+                  />
+                </Grid>
+                <Grid container>
+                  <TextField
+                    onChange={handleInputChange}
+                    size="small"
+                    id="intro"
+                    label="場地介紹"
+                    name="intro"
+                    variant="filled"
+                    multiline
+                    fullWidth
+                    rows={5}
+                  />
+                </Grid>
+                <Button
+                  onClick={handleSubmit}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  確認修改
+                </Button>
+              </form>
+            </div>
+          </Grid>
         </Fade>
       </Dialog>
     </>

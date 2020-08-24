@@ -92,7 +92,7 @@ const Guidemap = (props) => {
   };
 
   const getMapDBByLocationId = (locationId) => {
-    if (dbGuideMapData != undefined) {
+    if (!dbGuideMapData) {
       return dbGuideMapData.find((data) => data.location_id === locationId);
     } else {
       return null;
@@ -175,94 +175,108 @@ const Guidemap = (props) => {
     );
   };
 
-  const MapTitle = () => {
-    return (
-      <h3 style={{ marginLeft: 30, marginBottom: 20, marginTop: 50 }}>
-        <span style={{ verticalAlign: "middle" }}>場地</span>
-        <img
-          src={skateboardMarker}
-          style={{ height: 32, verticalAlign: "middle" }}
-        />
-        <span style={{ marginLeft: 20, verticalAlign: "middle" }}>店家</span>
-        <img src={shopMarker} style={{ height: 32, verticalAlign: "middle" }} />
-      </h3>
-    );
-  };
-
-  const MapMarker = () => {
-    return (
-      <div>
-        <Map
-          style={{ height: "60vh" }}
-          className="map"
-          google={props.google}
-          initialCenter={{
-            lat: 25.04,
-            lng: 121.51,
-          }}
-          onClick={onMapClicked}
-          zoom={13}
-        >
-          {dbGuideMapData.map((data, index) =>
-            data.location_type === "場地" ? (
-              <Marker
-                icon={{
-                  url: skateboardMarker,
-                  anchor: new google.maps.Point(32, 32),
-                  scaledSize: new google.maps.Size(32, 32),
-                }}
-                key={index}
-                name={data.location_name}
-                address={data.address}
-                groupCount={countMap(data.location_id)}
-                position={{ lat: data.latitude, lng: data.longitude }}
-                onClick={onMarkerClick}
+  return (
+    <>
+      <Container component="main" maxWidth="lg">
+        <Grid container id="back-to-top-anchor">
+          <div className={classes.flexContainer}>
+            <MapModalInput
+              updateGuideMapDB={updateGuideMapDB}
+              userData={props.userData}
+            />
+            <h3 style={{ marginLeft: 30, marginBottom: 20, marginTop: 50 }}>
+              <span style={{ verticalAlign: "middle" }}>場地</span>
+              <img
+                src={skateboardMarker}
+                style={{ height: 32, verticalAlign: "middle" }}
               />
-            ) : (
-              <Marker
-                icon={{
-                  url: shopMarker,
-                  anchor: new google.maps.Point(32, 32),
-                  scaledSize: new google.maps.Size(32, 32),
-                }}
-                key={index}
-                name={data.location_name}
-                address={data.address}
-                groupCount={countMap(data.location_id)}
-                position={{ lat: data.latitude, lng: data.longitude }}
-                onClick={onMarkerClick}
+              <span style={{ marginLeft: 20, verticalAlign: "middle" }}>
+                店家
+              </span>
+              <img
+                src={shopMarker}
+                style={{ height: 32, verticalAlign: "middle" }}
               />
-            )
-          )}
-
-          <InfoWindow
-            marker={mapMarker.activeMarker}
-            onClose={onInfoWindowClose}
-            visible={mapMarker.showingInfoWindow}
+            </h3>
+          </div>
+        </Grid>
+      </Container>
+      <Grid
+        container
+        style={{ width: "80%", height: "60vh", textAlign: "center" }}
+      >
+        <div>
+          <Map
+            style={{ height: "60vh" }}
+            className="map"
+            google={props.google}
+            initialCenter={{
+              lat: 25.04,
+              lng: 121.51,
+            }}
+            onClick={onMapClicked}
+            zoom={13}
           >
-            {mapMarker.showingInfoWindow && (
-              <Card className={classes.card}>
-                <CardContent className={classes.cardContent}>
-                  <Typography variant="h6" component="h6">
-                    {mapMarker.selectedLocation.name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    <a
-                      href={
-                        "https://www.google.com/maps/dir/?api=1&destination=" +
-                        mapMarker.selectedLocation.address
-                      }
+            {dbGuideMapData.map((data, index) =>
+              data.location_type === "場地" ? (
+                <Marker
+                  icon={{
+                    url: skateboardMarker,
+                    anchor: new google.maps.Point(32, 32),
+                    scaledSize: new google.maps.Size(32, 32),
+                  }}
+                  key={index}
+                  name={data.location_name}
+                  address={data.address}
+                  groupCount={countMap(data.location_id)}
+                  position={{ lat: data.latitude, lng: data.longitude }}
+                  onClick={onMarkerClick}
+                />
+              ) : (
+                <Marker
+                  icon={{
+                    url: shopMarker,
+                    anchor: new google.maps.Point(32, 32),
+                    scaledSize: new google.maps.Size(32, 32),
+                  }}
+                  key={index}
+                  name={data.location_name}
+                  address={data.address}
+                  groupCount={countMap(data.location_id)}
+                  position={{ lat: data.latitude, lng: data.longitude }}
+                  onClick={onMarkerClick}
+                />
+              )
+            )}
+
+            <InfoWindow
+              marker={mapMarker.activeMarker}
+              onClose={onInfoWindowClose}
+              visible={mapMarker.showingInfoWindow}
+            >
+              {mapMarker.showingInfoWindow && (
+                <Card className={classes.card}>
+                  <CardContent className={classes.cardContent}>
+                    <Typography variant="h6" component="h6">
+                      {mapMarker.selectedLocation.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
                     >
-                      {mapMarker.selectedLocation.address}
-                    </a>
-                  </Typography>
-                </CardContent>
-                <CardActions disableSpacing className={classes.cardAction}>
-                  {/* <img
+                      <a
+                        href={
+                          "https://www.google.com/maps/dir/?api=1&destination=" +
+                          mapMarker.selectedLocation.address
+                        }
+                      >
+                        {mapMarker.selectedLocation.address}
+                      </a>
+                    </Typography>
+                  </CardContent>
+                  <CardActions disableSpacing className={classes.cardAction}>
+                    {/* <img
                 src={placeunlike}
                 alt="placeunlike"
                 style={{ height: 32, zIndex: 500 }}
@@ -282,41 +296,20 @@ const Guidemap = (props) => {
             <IconButton aria-label="share">
               <ShareIcon />
             </IconButton> */}
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    component="p"
-                    style={{ padding: 10 }}
-                  >
-                    目前揪團數：{mapMarker.selectedLocation.groupCount}
-                  </Typography>
-                </CardActions>
-              </Card>
-            )}
-          </InfoWindow>
-        </Map>
-      </div>
-    );
-  };
-
-  return (
-    <>
-      <Container component="main" maxWidth="lg">
-        <Grid container id="back-to-top-anchor">
-          <div className={classes.flexContainer}>
-            <MapModalInput
-              updateGuideMapDB={updateGuideMapDB}
-              userData={props.userData}
-            />
-            <MapTitle />
-          </div>
-        </Grid>
-      </Container>
-      <Grid
-        container
-        style={{ width: "80%", height: "60vh", textAlign: "center" }}
-      >
-        <MapMarker />
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                      style={{ padding: 10 }}
+                    >
+                      目前揪團數：{mapMarker.selectedLocation.groupCount}
+                    </Typography>
+                  </CardActions>
+                </Card>
+              )}
+            </InfoWindow>
+          </Map>
+        </div>
       </Grid>
       <Container component="main" maxWidth="lg">
         <Grid container>

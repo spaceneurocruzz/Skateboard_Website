@@ -200,6 +200,7 @@ const WriteDetail = (props) => {
                 <TextField
                   onChange={props.handleInputChange}
                   id="lower_limit"
+                  name="lower_limit"
                   label="人數下限"
                   type="number"
                   InputLabelProps={{
@@ -211,6 +212,7 @@ const WriteDetail = (props) => {
                 <TextField
                   onChange={props.handleInputChange}
                   id="uppper_limit"
+                  name="uppper_limit"
                   label="人數上限"
                   type="number"
                   InputLabelProps={{
